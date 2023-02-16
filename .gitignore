@@ -1,1 +1,5 @@
 **/.DS_Store
+**/~.*
+brief/
+*.pdf
+**/settings_prod.config
