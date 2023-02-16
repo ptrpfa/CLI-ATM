@@ -20,7 +20,7 @@ class Login implements Runnable {
         System.out.println("欢迎来到本次银行!");
         System.out.println("\n请输入密码：");
         String password = scanner.nextLine();
-        password = AES256.encrypt(password);
+        //password = AES256.encrypt(password);
         //String password = new String(console.readPassword("\n请输入密码："));
         System.out.println(password);
         System.out.println("\n请稍等...正搜查您的账本~");
