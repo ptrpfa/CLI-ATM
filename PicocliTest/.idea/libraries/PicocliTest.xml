@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="PicocliTest">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/PicocliTest_jar/PicocliTest.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
