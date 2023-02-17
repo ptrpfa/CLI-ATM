@@ -1,10 +1,10 @@
-package test;
+package Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Test {
+public class hashmapobj {
 
     public static void main(String[] args) {
 
