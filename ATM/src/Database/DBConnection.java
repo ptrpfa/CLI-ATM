@@ -10,9 +10,9 @@ import java.sql.*;
 public abstract interface DBConnection {
     
     // Specify configurations file
-    // public static final String CONFIGURATION_FILE = "settings.config";
-    // public static final String CONFIGURATION_FILE = "../../settings.config";
-    public static final String CONFIGURATION_FILE = "../../settings_prod.config";
+    public static final String FILEPATH = ""; // Insert your file path here
+    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
+    public static final String CONFIGURATION_FILE = String.format("%s/settings_prod.config", FILEPATH);
 
     // Method to establish a database connection
     public default Connection getDBConnection() {
