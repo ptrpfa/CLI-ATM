@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "ATM\\lib\\jansi-2.1.0.jar",
+        "ATM\\lib\\picocli-4.7.1.jar",
+        "ATM\\lib\\picocli-jansi-graalvm-1.2.0.jar"
+    ]
+}

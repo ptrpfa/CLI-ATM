@@ -1,5 +1,5 @@
 // Package declaration
-package ATM;
+package dependecies;
 
 // Imports
 import java.io.*;
