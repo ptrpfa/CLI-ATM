@@ -3,3 +3,4 @@
 brief/
 *.pdf
 **/settings_prod.config
+.vscode/
