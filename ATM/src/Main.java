@@ -1,3 +1,8 @@
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import Server.MySQLConnect;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 // import picocli.CommandLine.ArgGroup;
@@ -33,6 +38,26 @@ public class Main implements Runnable {
     public static void main(String[] args) {
 
         CommandLine.run(new Main(), args);
+        MySQLConnect mysqlConnect = new MySQLConnect();
+        String sql = "SELECT * FROM account";
+        try {
+            PreparedStatement statement = mysqlConnect.connect().prepareStatement(sql);
+            ResultSet myRs= statement.executeQuery();  
+            // while (myRs.next()) {
+            //     String Name = myRs.getString("AccountNo");
+            //     System.out.println(Name);
+            // }
+            myRs.next();
+            for(int i=0; i < 5; i++){
+                String Name = myRs.getString("AccountNo");
+                System.out.println(Name);
+                myRs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            mysqlConnect.disconnect();
+        }
     }
 
     //Set args to run
