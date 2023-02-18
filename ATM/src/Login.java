@@ -1,6 +1,11 @@
 import picocli.CommandLine;
+import pl.mjaron.etudes.Table;
+
 //import java.io.Console;
 import java.util.Scanner;
+import Server.ServerAccount;
+import Account.Account;
+import java.util.List;
 
 @CommandLine.Command(name = "login")
 class Login implements Runnable {
@@ -21,13 +26,20 @@ class Login implements Runnable {
         System.out.println("欢迎来到本次银行!");
         System.out.println("请输入ID:");
         int userID = scanner.nextInt();
-        System.out.println("\n请输入密码:");
-        //User.checkUser(userID,password);
-        String password = scanner.nextLine();
-        //password = AES256.encrypt(password);
-        //String password = new String(console.readPassword("\n请输入密码："));
-        System.out.println(password);
-        System.out.println("\n请稍等...正搜查您的账本~");
+        //System.out.println("\n请输入密码:");
+        // //User.checkUser(userID,password);
+        // String password = scanner.nextLine();
+        // //password = AES256.encrypt(password);
+        // //String password = new String(console.readPassword("\n请输入密码："));
+        // System.out.println(password);
+        // System.out.println("\n请稍等...正搜查您的账本~");
         scanner.close();
+        ServerAccount Serveracc = new ServerAccount();
+        List<Account> accounts = Serveracc.findUserAccounts(userID);
+        Account.displayHeader();
+        for (Account acc : accounts) {
+            acc.display();
+        }
+        
     }
 }

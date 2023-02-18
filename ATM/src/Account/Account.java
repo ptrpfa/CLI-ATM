@@ -1,9 +1,12 @@
 package Account;
 import java.util.Date;
 
+import pl.mjaron.etudes.Table;
+
 public class Account {
     private int accID;
     private int userID;
+    private String accNo;
     private String accName;
     private String description;
     private double holdingBalance;
@@ -13,12 +16,23 @@ public class Account {
     private double withdrawLimit;
     private Date openingDate;
     private boolean accActive;
-    public Account(int userID, int accID){
-        this.userID = userID;
-        this.accID = accID;
-        ///Get all the other fields from DB and set this.
 
+    public Account(int accID, int userID, String accNo, String accName, String description, double holdingBalance, double availableBalance, double totalBalance, double transferLimit, double withdrawLimit, Date openingDate, boolean accActive) {
+        this.accID = accID;
+        this.userID = userID;
+        this.accNo = accNo;
+        this.accName = accName;
+        this.description = description;
+        this.holdingBalance = holdingBalance;
+        this.availableBalance = availableBalance;
+        this.totalBalance = totalBalance;
+        this.transferLimit = transferLimit;
+        this.withdrawLimit = withdrawLimit;
+        this.openingDate = openingDate;
+        this.accActive = accActive;
     }
+
+    //For Creating Account
     public Account(int userID, String accName, String description) {
         //For Creation of account
         this.userID = userID;
@@ -36,6 +50,9 @@ public class Account {
 
     //Connect to the db and set the var too
     protected void setAccID(int accID){this.accID= accID;}
+
+    public void setAccNo(String accNo) {this.accNo = accNo;}
+
     public void setAccName(String accName) {
         this.accName = accName;
     }
@@ -71,6 +88,8 @@ public class Account {
     public int getAccID() {
         return accID;
     }
+
+    public String getAccNo() {return accNo;}
 
     public int getUserID() {
         return userID;
@@ -110,5 +129,16 @@ public class Account {
 
     public boolean isAccActive() {
         return accActive;
+    }
+
+    public static void displayHeader(){
+        System.out.printf("| %-15s | %-20s | %10s %n", "Account Number", "Account NAME", "Total Balance");
+        System.out.printf("------------------------------------------------------------%n");
+    }
+    
+    //Printing Methods
+    public void display(){
+        
+        System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
     }
 }

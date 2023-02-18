@@ -1,4 +1,4 @@
-package Test;
+package test;
 import picocli.CommandLine.Help.Ansi;
 //import org.fusesource.jansi.AnsiConsole; //Either this or the picocli one
 import picocli.jansi.graalvm.AnsiConsole;
