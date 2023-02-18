@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS "Account";
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE "Account" (
-  "AccountID" int unsigned NOT NULL AUTO_INCREMENT,
+  "AccountID" int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   "UserID" int unsigned NOT NULL,
   "AccountNo" varchar(200) NOT NULL,
   "Name" varchar(200) DEFAULT NULL,
