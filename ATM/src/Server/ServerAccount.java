@@ -16,6 +16,8 @@ public class ServerAccount implements SQLConnect{
             ResultSet rs= statement.executeQuery();  
             
             while (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("OpeningDate");
+                java.util.Date datetime = new java.util.Date(timestamp.getTime());
                 //Create the Acc object
                 Account acc = new Account(rs.getInt("AccountID"),
                                           rs.getInt("UserID"),
@@ -27,8 +29,9 @@ public class ServerAccount implements SQLConnect{
                                           rs.getDouble("TotalBalance"),
                                           rs.getDouble("TransferLimit"),
                                           rs.getDouble("WithdrawalLimit"),
-                                          rs.getDate("OpeningDate"),
+                                          datetime,
                                           rs.getBoolean("Active"));
+
                 accounts.add(acc);
             } 
         } catch (SQLException e) {
@@ -37,5 +40,30 @@ public class ServerAccount implements SQLConnect{
             SQLConnect.super.disconnectDB(db);
         }
         return accounts;
+    }
+    public void NewAccount(Account acc){
+        java.util.Date datetime = acc.getOpeningDate();
+        Timestamp timestamp = new Timestamp(datetime.getTime());
+        
+        String sql = String.format("INSERT INTO account VALUES(NULL, %d,?,?,?,%f,%f,%f,%f,%f,?,%b)",
+                                            acc.getUserID(),acc.getHoldingBalance(),acc.getAvailableBalance(),
+                                            acc.getTotalBalance(), acc.getTransferLimit(), acc.getWithdrawLimit(), acc.isAccActive());
+        Connection db = SQLConnect.super.getDBConnection();
+        try{
+            PreparedStatement ps = db.prepareStatement(sql);
+            ps.setString(1,acc.getAccNo() );
+            ps.setString(2,acc.getAccName() );
+            ps.setString(3,acc.getDescription());
+            ps.setTimestamp(4, timestamp); 
+            int row = ps.executeUpdate();
+
+            // rows affected
+            System.out.println(row);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.super.disconnectDB(db);
+        }
+        //return true;
     }
 }
