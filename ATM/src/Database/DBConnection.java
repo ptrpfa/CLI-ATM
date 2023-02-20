@@ -51,10 +51,9 @@ public abstract interface DBConnection {
         catch(Exception exception) { // Catch miscellaneous exceptions
             exception.printStackTrace();
         }
-        finally {
-            // Return Connection object to calling function
-            return dbConnection;
-        }
+
+        // Return Connection object to calling function
+        return dbConnection;
     }
 
     // Method to close a database connection (for redundancy)
