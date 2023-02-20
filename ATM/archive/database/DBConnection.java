@@ -1,6 +1,3 @@
-// Package declaration
-package Database;
-
 // Imports
 import java.io.*;
 import java.util.*;

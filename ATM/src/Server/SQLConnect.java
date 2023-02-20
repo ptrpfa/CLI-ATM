@@ -6,9 +6,14 @@ import java.util.*;
 import java.sql.*;
 
 public interface SQLConnect {
-    public static final String CONFIGURATION_FILE = "C:/Users/kerop/Documents/1109 JAVA-OOP/CSC1109-ATM/ATM/settings.config";
+    // Specify configurations file
+    public static final String FILEPATH = "/Users/peter/Desktop/Codebase/Assignments/CSC11009-ATM/ATM";
+    public static final String FILEPATH_ADRIANO = "C:/Users/kerop/Documents/1109 JAVA-OOP/CSC1109-ATM/ATM/settings.config";
+    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
+    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH_ADRIANO);
+    public static final String CONFIGURATION_FILE = String.format("%s/settings_prod.config", FILEPATH);
     
-    //Connect to databse
+    // Connect to databse
     public default Connection getDBConnection() {
         // Initialise return variable
         Connection dbConnection = null;
@@ -49,7 +54,7 @@ public interface SQLConnect {
         return dbConnection;
     }
 
-    //Close Connection
+    // Close Connection
     public default void disconnectDB(Connection db){
         if (db != null) {
             try {
