@@ -1,6 +1,3 @@
-// Package declaration
-package Database;
-
 import java.util.*;
 
 // Main controller class

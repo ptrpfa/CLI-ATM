@@ -1,20 +1,17 @@
-// Package declaration
-package Database;
-
 // Imports
 import java.io.*;
 import java.util.*;
 import java.sql.*;
 
 // Main class for Database connections
-public class DatabaseOld {
+public class Database {
    // Configuration settings file
    // public static final String CONFIGURATION_FILE = "settings.config";
-   public static final String CONFIGURATION_FILE = "settings_prod.config";
+   // public static final String CONFIGURATION_FILE = "../..settings.config";
+   public static final String CONFIGURATION_FILE = "../..settings_prod.config";
 
    // Program entrypoint
-   public static void main(String[] args) {
-
+   public static void main(String[] args) {      
       /* Load configuration settings */
       // Create a FileInputSteam object to read configuration settings file
       FileInputStream settingsFile = null;

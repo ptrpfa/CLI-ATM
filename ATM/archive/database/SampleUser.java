@@ -1,6 +1,3 @@
-// Package declaration
-package Database;
-
 /* Sample class implementation for using DBConnection */
 
 import java.util.*;
