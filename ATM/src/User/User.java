@@ -1,14 +1,9 @@
 package User;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import Server.MySQLConnect;
-
-class User {
+public class User {
     private int userID;
     private String username;
     private String passwordSalt;
@@ -22,68 +17,32 @@ class User {
     private Date registrationDate;
     private boolean active;
 
+    // Test
+    public User() {
+    }
+
     // Constructor taking 11 data from DB including NULLs
-    // public User(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
-    //             String addressTwo, String addressThree, String postalCode, Date registrationDate, boolean active) { 
+    public User(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
+                String addressTwo, String addressThree, String postalCode, Date registrationDate, boolean active) { 
         
-    //     this.userID = userID;
-    //     this.username = username;
-    //     this.passwordSalt = passwordSalt;
-    //     this.passwordHash = passwordHash;
-    //     this.email = email;
-    //     this.phone = phone;
-    //     this.addressOne = addressOne;
-    //     this.addressTwo = addressTwo;
-    //     this.addressThree = addressThree;
-    //     this.postalCode = postalCode;
-    //     this.registrationDate = registrationDate;
-    //     this.active = active;
+        this.userID = userID;
+        this.username = username;
+        this.passwordSalt = passwordSalt;
+        this.passwordHash = passwordHash;
+        this.email = email;
+        this.phone = phone;
+        this.addressOne = addressOne;
+        this.addressTwo = addressTwo;
+        this.addressThree = addressThree;
+        this.postalCode = postalCode;
+        this.registrationDate = registrationDate;
+        this.active = active;
     
-    // }
+    }
 
-    public User(int userID) {
-        boolean exists = false;
-        MySQLConnect mysqlConnect = new MySQLConnect();
-
-        // Select "User" database
-        String sql = "SELECT * FROM user";
-
-        // Try to connect with inputted UserID
-        try {
-            PreparedStatement statement = mysqlConnect.connect().prepareStatement(sql);
-            ResultSet myRs = statement.executeQuery();  
-
-            // Go to data row onwards
-            myRs.next(); 
-
-            // Reiterate the table to look for data where inputted userID exists
-            while(myRs.next()){
-                if(myRs.getInt("UserID") == userID){
-                    this.username = myRs.getString("Username");
-                    this.passwordSalt = myRs.getString("PasswordSalt");
-                    this.passwordHash = myRs.getString("PasswordHash");
-                    this.email = myRs.getString("Email");
-                    this.phone = myRs.getString("Phone");
-                    this.addressOne = myRs.getString("AddressOne");
-                    this.addressTwo = myRs.getString("AddressTwo");
-                    this.addressThree = myRs.getString("AddressThree");
-                    this.postalCode = myRs.getString("PostalCode");
-                    this.registrationDate = myRs.getDate("RegistrationDate");
-                    exists = true;
-                }
-            }
-
-            // Check if user exists after iterating entire database (maybe put in main?)
-            if(exists == false){
-                System.out.println("User does not exist bodoh!");
-            }
-        } 
-        catch (SQLException e) {
-            e.printStackTrace();
-        } 
-        finally {
-            mysqlConnect.disconnect();
-        }
+    // Returns user userID
+    public int getUserID() {
+        return this.userID;
     }
 
     // Returns user username
@@ -95,72 +54,80 @@ class User {
     public String getEmail() {
         return this.email;
     }
-
+    
     // Returns user phone number
     public String getPhone() {
         return this.phone;
     }
-
+    
     // Returns user address depending on requested option
     public String getAddresses(int option) {
         if(option == 1) {
-            String address = this.addressOne + ", "+ this.postalCode;
+            String address = this.addressOne;
             return address;
         }
         else if(option == 2) {
-            String address = this.addressTwo + ", "+ this.postalCode;
+            String address = this.addressTwo;
             return address;
         }
         else {
-            String address = this.addressThree + ", "+ this.postalCode;
+            String address = this.addressThree;
             return address;
         }
     }
 
+    // Returns user postal code
+    public String getPostalCode() {
+        return this.postalCode;
+    }
+    
     // Returns user registration date in dd-MM-yyyy format
     public String getRegistrationDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy"); // MM = numeric month, MMM = month in shortform, MMMM month in longform
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy"); 
         String date = formatter.format(this.registrationDate);
         return date;
     }
-
-    public boolean setUsername(String name) {
-        boolean exists = false;
-        MySQLConnect mysqlConnect = new MySQLConnect();
-
-        // Select "User" database
-        String sql = "SELECT * FROM user";
-
-        // Try to connect with inputted UserID
-        try {
-            PreparedStatement statement = mysqlConnect.connect().prepareStatement(sql);
-            ResultSet myRs = statement.executeQuery();  
-
-            // Go to data row onwards
-            myRs.next(); 
-
-            // Reiterate the table to look for data where inputted userID exists
-            while(myRs.next()){
-                if(myRs.getInt("UserID") == userID){
-                    String query = "UPDATE User SET Phone=\"+65 12345678\" WHERE Username LIKE ?"; // Add %?% during setting
-                }
-            }
-
-            // Check if user exists after iterating entire database (maybe put in main?)
-            if(exists == false){
-                System.out.println("User does not exist bodoh!");
-            }
-        } 
-        catch (SQLException e) {
-            e.printStackTrace();
-        } 
-        finally {
-            mysqlConnect.disconnect();
-        }
-        return true;
+    
+    // Hold userID 
+    public void setUserID(int ID) {
+        this.userID = ID;
+    }
+    
+    // Hold username to push for updates afterwards
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public static void main(String[] args) {
-        
+    // Hold passwordSalt
+    public void setPasswordSalt(String passwordSalt) {
+        this.passwordSalt = passwordSalt;
+    }
+
+    // Hold passwordHash to push for updates if required
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    // Hold username to push for updates afterwards
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // Hold username to push for updates afterwards
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    // Hold username to push for updates afterwards
+    public void setAddress(String addressOne, String addressTwo, String addressThree, String postalCode) {
+        this.addressOne = addressOne;
+        this.addressTwo = addressTwo;
+        this.addressThree = addressThree;
+        this.postalCode = postalCode;
+    }
+
+    // Hold registration date
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
     }
 }

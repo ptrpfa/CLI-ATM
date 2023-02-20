@@ -1,8 +1,8 @@
 package Account;
-public class AccountTranscation {
+public class AccountTransaction {
     private double amount;
     private Account account;
-    public AccountTranscation(Account account, double amount) {
+    public AccountTransaction(Account account, double amount) {
         this.account = account;
         this.amount = amount;
     }
