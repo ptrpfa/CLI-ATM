@@ -97,6 +97,6 @@ class Login implements Runnable {
         System.out.println("Enter password:");
         String password = scanner.nextLine();
 
-                
+        scanner.close();                
     }
 }
