@@ -2,7 +2,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import Server.MySQLConnect;
+import Server.SQLConnect;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 // import picocli.CommandLine.ArgGroup;

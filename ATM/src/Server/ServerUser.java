@@ -1,11 +1,43 @@
 package Server;
 
 import java.sql.*;
-
 import User.BusinessUser;
 import User.NormalUser;
 
-class ServerUser implements SQLConnect {
+public class ServerUser implements SQLConnect {
+
+    // Check username and password, return UserID and userType. 1 = NormalUser, 2 = BusinessUser 
+    public int[] checkUser (String username, String password) {
+        int[] store = new int[2];
+
+        Connection db = SQLConnect.super.getDBConnection();
+        String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
+
+        try {
+            PreparedStatement statement1 = db.prepareStatement(sql);
+
+            ResultSet myRs1 = statement1.executeQuery();  
+
+            myRs1.next();
+            
+            //String tempPassword = AES256.encrypt(password);
+
+            if(username.equals(myRs1.getString("Username")) /*&& password.equals(myRs1.getString("PasswordHash"))*/) {
+                int userID = myRs1.getInt("UserID");
+                int userType = myRs1.getInt("UserType");
+
+                store[0] = userID;
+                store[1] = userType;
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        } 
+        finally {
+            SQLConnect.super.disconnectDB(db);
+        }
+        return store;
+    }
 
     // Fetching of user information when normal user logs in
     public NormalUser findNormalUser(int userID) {
@@ -43,6 +75,7 @@ class ServerUser implements SQLConnect {
                                         myRs1.getString("AddressThree"), 
                                         myRs1.getString("PostalCode"), 
                                         myRs1.getDate("RegistrationDate"),
+                                        myRs1.getInt("UserType"),
                                         myRs1.getBoolean("Active"),
 
                                         myRs2.getString("NRIC"),
@@ -87,20 +120,21 @@ class ServerUser implements SQLConnect {
 
             // Read from User and NormalUser database and load user with saved particulars 
             businessUser = new BusinessUser(userID, 
-                                        myRs1.getString("Username"), 
-                                        myRs1.getString("PasswordSalt"), 
-                                        myRs1.getString("PasswordHash"), 
-                                        myRs1.getString("Email"), 
-                                        myRs1.getString("Phone"), 
-                                        myRs1.getString("AddressOne"), 
-                                        myRs1.getString("AddressTwo"), 
-                                        myRs1.getString("AddressThree"), 
-                                        myRs1.getString("PostalCode"), 
-                                        myRs1.getDate("RegistrationDate"),
-                                        myRs1.getBoolean("Active"),
+                                            myRs1.getString("Username"), 
+                                            myRs1.getString("PasswordSalt"), 
+                                            myRs1.getString("PasswordHash"), 
+                                            myRs1.getString("Email"), 
+                                            myRs1.getString("Phone"), 
+                                            myRs1.getString("AddressOne"), 
+                                            myRs1.getString("AddressTwo"), 
+                                            myRs1.getString("AddressThree"), 
+                                            myRs1.getString("PostalCode"), 
+                                            myRs1.getDate("RegistrationDate"),
+                                            myRs1.getInt("UserType"),
+                                            myRs1.getBoolean("Active"),
 
-                                        myRs2.getString("UEN"),
-                                        myRs2.getString("BusinessName"));            
+                                            myRs2.getString("UEN"),
+                                            myRs2.getString("BusinessName"));            
         } 
         catch (SQLException e) {
             e.printStackTrace();
@@ -111,7 +145,7 @@ class ServerUser implements SQLConnect {
         return businessUser;
     }
 
-    // Call this method at end of session to update database with latest information
+    // Method to update database with latest information
     public void updateNormalUser(NormalUser normalUser) {
         Connection db = SQLConnect.super.getDBConnection();
 
@@ -151,7 +185,7 @@ class ServerUser implements SQLConnect {
         }
     }
 
-    // Call this method at end of session to update database with latest information
+    // Method to update database with latest information
     public void updateBusinessUser(BusinessUser businessUser) {
         Connection db = SQLConnect.super.getDBConnection();
 
@@ -189,23 +223,31 @@ class ServerUser implements SQLConnect {
     }
 
     public static void main(String[] args) {
-        Integer userID = 833022;
+        // Integer userID = 833022;
 
         ServerUser testUser = new ServerUser();
-        NormalUser testestUser = testUser.findNormalUser(userID);
         
-        testestUser.setUsername("Na0m1_N30");
-        testestUser.setEmail("naomi@neo.sg");
-        testestUser.setPhone("+65 91234567");
-        testestUser.setAddress("Singapore", "SIT", "NYP", "626393");
+        int[] store = testUser.checkUser("Na0m1_N30", "0nlyf4ns");
+        if(store[1] == 1){
+            NormalUser user = testUser.findNormalUser(store[0]);
 
-        testestUser.setAllNames("Naomi", "梁文珊", "Neo");
-        testestUser.setNRIC("S3333333X");
+            System.out.println(user.getEmail());
+            user.setUsername("Na0m1_N30");
+            user.setEmail("naomi@neo.sg");
+            user.setPhone("+65 91234567");
+            user.setAddress("Singapore", "SIT", "NYP", "626393");
 
-        testUser.updateNormalUser(testestUser);
+            user.setAllNames("Naomi", "梁文珊", "Neo");
+            user.setNRIC("S3333333X");
+            
+            testUser.updateNormalUser(user);
 
-        System.out.println("\nGood day Mr/Ms " + testestUser.getLastName() + ", " + testestUser.getFirstName());
-        System.out.println("You have been a member since " + testestUser.getRegistrationDate());
-        System.out.println("Your birthday is coming soon! At: " + testestUser.getBirthday());
+            System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName());
+            System.out.println("You have been a member since " + user.getRegistrationDate());
+            System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
+        }
+        else if(store[1] == 2) {
+            BusinessUser user = testUser.findBusinessUser(store[0]);
+        }
     }
 }

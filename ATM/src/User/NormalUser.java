@@ -17,10 +17,10 @@ public class NormalUser extends User {
 
     // Constructor taking 17 data from DB including NULLs
     public NormalUser(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
-                      String addressTwo, String addressThree, String postalCode, Date registrationDate, boolean active, 
+                      String addressTwo, String addressThree, String postalCode, Date registrationDate, int userType, boolean active, 
                       String NRIC, String firstName, String middleName, String lastName, String gender, Date birthday) {
 
-        super(userID, username, passwordSalt, passwordHash, email, phone, addressOne, addressTwo, addressThree, postalCode, registrationDate, active);
+        super(userID, username, passwordSalt, passwordHash, email, phone, addressOne, addressTwo, addressThree, postalCode, registrationDate, userType, active);
         this.NRIC = NRIC;
         this.firstName = firstName;
         this.middleName = middleName;

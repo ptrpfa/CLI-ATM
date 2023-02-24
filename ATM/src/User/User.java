@@ -15,6 +15,7 @@ public class User {
     private String addressThree;
     private String postalCode;
     private Date registrationDate;
+    private int userType;
     private boolean active;
 
     // Test
@@ -23,7 +24,7 @@ public class User {
 
     // Constructor taking 11 data from DB including NULLs
     public User(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
-                String addressTwo, String addressThree, String postalCode, Date registrationDate, boolean active) { 
+                String addressTwo, String addressThree, String postalCode, Date registrationDate, int userType, boolean active) { 
         
         this.userID = userID;
         this.username = username;
@@ -36,6 +37,7 @@ public class User {
         this.addressThree = addressThree;
         this.postalCode = postalCode;
         this.registrationDate = registrationDate;
+        this.userType = userType;
         this.active = active;
     
     }
