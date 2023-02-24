@@ -1,8 +1,10 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import Server.SQLConnect;
+//import Server.ServerUser;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 // import picocli.CommandLine.ArgGroup;
@@ -61,7 +63,7 @@ public class Main implements Runnable {
 //
 //    static class Args {
 //        @ArgGroup(exclusive = false, multiplicity = "1", heading = "CLIENT mode args%n")
-//        ClientArgs clientArgs;
+//        ClientArgs clientArgs;cl
 //
 //        @ArgGroup(exclusive = false, multiplicity = "1", heading = "SERVER mode args%n")
 //        ServerArgs serverArgs;
@@ -72,3 +74,29 @@ public class Main implements Runnable {
 
 }
 
+@CommandLine.Command(name = "login")
+class Login implements Runnable {
+    @Override
+    public void run() {
+        String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
+        for (String line : banner) {
+            //AnsiConsole.systemInstall();
+            System.out.println(CommandLine.Help.Ansi.ON.string(line));
+            //AnsiConsole.systemUninstall();
+        }
+    }
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        //ServerUser testUser = new ServerUser();
+        //Console console = System.console();
+        //do while loop to check login, condition user is null
+        System.out.println("Welcome to 🐱LKP Bank!");
+        System.out.println("Enter username:");
+        String username = scanner.nextLine();
+        System.out.println("Enter password:");
+        String password = scanner.nextLine();
+
+                
+    }
+}
