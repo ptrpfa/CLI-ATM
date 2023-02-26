@@ -13,6 +13,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 // import picocli.jansi.graalvm.AnsiConsole;
+import picocli.CommandLine.Help.TextTable.Cell;
 
 //Common Header Banner
 @Command(name = "bank-teller", header = {
@@ -30,7 +31,7 @@ import picocli.CommandLine.Help.Ansi;
     commandListHeading = "Commands are: %n"
 )
 //End Command Header
-public class Main implements Runnable, Menu{
+public class Main implements Runnable{
     
     @Override
     public void run() {
@@ -43,7 +44,7 @@ public class Main implements Runnable, Menu{
 
     public static void main(String[] args) {
         final CommandLine commandLine = new CommandLine( new Main() );
-        commandLine.execute( "Login"); //Change to args if you don't want do default
+        commandLine.execute( "Login"); //Change to args if you want do default
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
         for( CommandLine.ParseResult pr : parseResult.subcommands() )
         {
@@ -51,8 +52,10 @@ public class Main implements Runnable, Menu{
                     .getExecutionResult()
                     .toString() );
         }//This part have to change
-
-
+        //Print Menu
+        //Scan input
+       // Menu menu = new Menu();
+        //menu.run();
     }
 
     @CommandLine.Command
@@ -83,36 +86,6 @@ public class Main implements Runnable, Menu{
         
         scanner.close();
         return user;
-    }
-
-    @Override
-    public boolean CreateAccount(int userid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'CreateAccount'");
-    }
-
-    @Override
-    public double Deposit(Account acc) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Deposit'");
-    }
-
-    @Override
-    public boolean Witdraw(Account acc) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Witdraw'");
-    }
-
-    @Override
-    public boolean TransferFunds(Account acc) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'TransferFunds'");
-    }
-
-    @Override
-    public void ViewTranscation(Account acc) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ViewTranscation'");
     }
 
 

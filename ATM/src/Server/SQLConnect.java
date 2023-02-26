@@ -7,16 +7,11 @@ import java.sql.*;
 
 public interface SQLConnect {
     // Specify configurations file
-    public static final String FILEPATH = "/Users/peter/Desktop/Codebase/Assignments/CSC1109-ATM/ATM";
-    // public static final String FILEPATH_ADRIANO = "C:/Users/kerop/Documents/1109 JAVA-OOP/CSC1109-ATM/ATM/settings.config";
-    // public static final String FILEPATH_DINIE = "ATM";
-    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
+    public static final String FILEPATH = "../..";
     public static final String CONFIGURATION_FILE = String.format("%s/settings_prod.config", FILEPATH);
-    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH_ADRIANO);
-    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH_DINIE);
     
     // Connect to databse
-    public default Connection getDBConnection() {
+    public static Connection getDBConnection() {
         // Initialise return variable
         Connection dbConnection = null;
 
@@ -57,7 +52,7 @@ public interface SQLConnect {
     }
 
     // Close Connection
-    public default void disconnectDB(Connection db){
+    public static void disconnectDB(Connection db){
         if (db != null) {
             try {
                 db.close();

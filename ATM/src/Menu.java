@@ -1,6 +1,9 @@
 import java.util.List;
+import java.util.Scanner;
 
 import Account.Account;
+import Account.AccountService;
+import User.User;
 import Server.ServerAccount;
 
 // import java.util.Scanner;
@@ -74,26 +77,25 @@ import Server.ServerAccount;
 //    }
 // }
 
- interface Menu{
-    String[] options = {
-           "1- Create New Account",
-           "2- Deposit",
-           "3- Withdraw",
-           "4- Transfer Funds",
-           "5- View Transcations",
-           "6- Exit"
-    };
+class Menu implements ServerAccount{
+    private Account account;
+    private User user;
+    private Scanner scanner;
+
+    Menu(Account account, User user){
+        this.account = account;
+        this.user = user;
+        scanner = new Scanner(System.in);
+    }
 
     static void printMenu(String[] options){
         for (String option : options){
             System.out.println(option);
         }
-        System.out.println("What would would want to do? (Key in the Command Number)");
-        System.out.print("> "); 
     }
+
     static void printAcc(int userid){
-        ServerAccount serverAcc = new ServerAccount();
-        List<Account> accounts = serverAcc.findUserAccounts(userid);
+        List<Account> accounts = ServerAccount.findUserAccounts(userid);
         System.out.printf("| %-15s | %-20s | %10s %n", "Account Number", "Account NAME", "Total Balance");
         System.out.printf("------------------------------------------------------------%n");
         //To do 
@@ -103,12 +105,110 @@ import Server.ServerAccount;
     }
 
     static void printTranscations(){
-
+        //JR MAMA
     }
-    boolean CreateAccount(int userid);
-    double Deposit(Account acc);
-    boolean Witdraw(Account acc);
-    boolean TransferFunds(Account acc);
-    void ViewTranscation(Account acc);
 
+    public void run(){
+        String[] options = {
+            "1- Create New Account",
+            "2- Deposit",
+            "3- Withdraw",
+            "4- Transfer Funds",
+            "5- View Transcations",
+            "6- Exit"
+        };
+
+        int option = -1;
+        do{
+            printMenu(options);
+            System.out.println("What would would want to do? (Key in the Command Number)");
+            System.out.print("> "); 
+            try {
+                option = scanner.nextInt();
+                switch (option){
+                    case 1:
+                        CreateAccount(user.getUserID());
+                        break;
+                    case 2:
+                        //Deposit();
+                        break;
+                    case 3: 
+                        //Withdraw(); 
+                        break;
+               }
+           }
+           catch (Exception ex){
+               System.out.println("Please enter an integer value between 1 and " + options.length);
+               scanner.next();
+               System.out.println(">");
+           }
+       }while(option != 6);
+    }
+
+    public void CreateAccount(int userid) {
+        AccountService service = new AccountService();
+
+        System.out.println("Key in the Account Name");
+        System.out.print("> ");
+        String accName = scanner.nextLine();
+        System.out.println("Account Descriptions");
+        System.out.print("> ");
+        String accDescString = scanner.nextLine();
+        double amount = 0;
+        boolean isValidInput = false;
+
+        while(!isValidInput){
+            try{
+                System.out.println("Initial Deposit");
+                System.out.print("> ");
+                amount = scanner.nextDouble();
+                NumberChecker.checkNegative(amount);
+                isValidInput = true;
+            }catch(NegativeNumberException e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+        Account acc = service.CreateAccount(userid, accName, accDescString, amount);
+        if(acc != null){
+            System.out.println("Account is Created\n");
+            printAcc(userid);
+        }else{
+            System.out.println("Error in System..\n");
+        }
+    }
+
+    // public double Deposit(Account acc) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'Deposit'");
+    // }
+
+    // public boolean Withdraw(Account acc) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'Witdraw'");
+    // }
+
+    // public boolean TransferFunds(Account acc) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'TransferFunds'");
+    // }
+
+    // public void ViewTranscation(Account acc) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'ViewTranscation'");
+    // }
+}
+
+class NegativeNumberException extends Exception {
+    public NegativeNumberException(String errorMessage) {
+        super(errorMessage);
+    }
+}
+
+class NumberChecker {
+    public static void checkNegative(double number) throws NegativeNumberException {
+        if (number < 0) {
+            throw new NegativeNumberException("Amount cannot be negative!");
+        }
+    }
 }

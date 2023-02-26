@@ -1,19 +1,15 @@
 package Account;
 public class AccountTransaction {
-    private double amount;
-    private Account account;
-    public AccountTransaction(Account account, double amount) {
-        this.account = account;
-        this.amount = amount;
-    }
-    public boolean Deposit(){
+
+    public boolean Deposit(Account account, double amount){
         //Update accBalance
         //Set try catch to see if set will return SQL IO exception
         account.setAvailableBalance(amount);
         //if ok return true
         return true;
     }
-    public boolean Withdraw() throws Exception{
+
+    public boolean Withdraw(Account account, double amount) throws Exception{
         double limit = account.getWithdrawLimit();
         double accBalance = account.getAvailableBalance();
         if(amount > accBalance){
@@ -29,7 +25,7 @@ public class AccountTransaction {
         return true;
     }
 
-    public boolean transferFunds() throws Exception {
+    public boolean transferFunds(Account account, double amount) throws Exception {
         double xferLimit = account.getTransferLimit();
         double accBalance = account.getAvailableBalance();
         if(amount > accBalance){
@@ -43,6 +39,7 @@ public class AccountTransaction {
         //Set the available balance, total balance
         //Can maybe return acc Balance
         return true;
-
     }
+
+    
 }

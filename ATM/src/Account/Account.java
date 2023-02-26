@@ -10,12 +10,13 @@ public class Account {
     private String accName;
     private String description;
     private double holdingBalance;
-    private double availableBalance;
+    protected double availableBalance;
     private double totalBalance;
-    private double transferLimit;
-    private double withdrawLimit;
+    protected double transferLimit;
+    protected double withdrawLimit;
     private Date openingDate;
     private boolean accActive;
+    private AccountTransaction transaction;
 
     public Account(int accID, int userID, String accNo, String accName, String description, double holdingBalance, double availableBalance, double totalBalance, double transferLimit, double withdrawLimit, Date openingDate, boolean accActive) {
         this.accID = accID;
@@ -30,22 +31,7 @@ public class Account {
         this.withdrawLimit = withdrawLimit;
         this.openingDate = openingDate;
         this.accActive = accActive;
-    }
-
-    //For Creating Account
-    public Account(int userID, String accName, String description) {
-        //For Creation of account
-        this.userID = userID;
-        this.accName = accName;
-        this.description = description; //Savings or Current Account?
-        this.openingDate = new Date();
-        this.accActive = true;
-        //Assumption, no initial deposit, no initial setting of limit
-        this.holdingBalance = 0;
-        this.availableBalance =0;
-        this.totalBalance = 0;
-        this.transferLimit = 0;
-        this.withdrawLimit = 0;
+        this.transaction = new AccountTransaction();
     }
 
     //Connect to the db and set the var too
