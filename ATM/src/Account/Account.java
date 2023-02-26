@@ -130,15 +130,9 @@ public class Account {
     public boolean isAccActive() {
         return accActive;
     }
-
-    public static void displayHeader(){
-        System.out.printf("| %-15s | %-20s | %10s %n", "Account Number", "Account NAME", "Total Balance");
-        System.out.printf("------------------------------------------------------------%n");
-    }
     
     //Printing Methods
-    public void display(){
-        
+    public void display(){   
         System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
     }
 }
