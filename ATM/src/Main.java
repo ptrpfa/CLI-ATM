@@ -2,10 +2,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.concurrent.Callable;
 
 import Account.Account;
 import Server.SQLConnect;
+import Server.ServerUser;
+import User.BusinessUser;
+import User.NormalUser;
 import User.User;
 //import Server.ServerUser;
 
@@ -42,37 +46,45 @@ public class Main implements Runnable{
         //AnsiConsole.systemUninstall();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
         commandLine.execute( "Login"); //Change to args if you want do default
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
-        for( CommandLine.ParseResult pr : parseResult.subcommands() )
-        {
-            System.out.println( pr.commandSpec().commandLine()
-                    .getExecutionResult()
-                    .toString() );
-        }//This part have to change
-        //Print Menu
-        //Scan input
-       // Menu menu = new Menu(user);
-        //menu.run();
+        CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
+        // for( CommandLine.ParseResult pr : parseResult.subcommands() )
+        // {
+        User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
+        if(user != null) {
+            System.out.println("Welcome " + user.getUsername() + "\n");
+            Menu menu = new Menu(user);
+            menu.run();
+        }
+        else {
+            System.out.println("The bank will now self destruct");
+            Thread.sleep(5000);
+            System.out.println("Boom");
+            System.exit(-1);
+        }
     }
 
     @CommandLine.Command
-    public String Login(){
+    public User Login(){
         String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
+
         for (String line : banner) {
             //AnsiConsole.systemInstall();
             System.out.println(CommandLine.Help.Ansi.ON.string(line));
             //AnsiConsole.systemUninstall();
         }
+
         Scanner scanner = new Scanner(System.in);
-        //ServerUser testUser = new ServerUser();
+        ServerUser serverUser = new ServerUser();
         //Console console = System.console();
         //do while loop to check login, condition user is null
-        String user = null;
         int counter = 0;
         System.out.printf("欢迎来到大刘银行!\n");
+        User testUser = null; 
+
         do{
             System.out.println("Enter username:");
             String username = scanner.nextLine();
@@ -80,12 +92,28 @@ public class Main implements Runnable{
             String password = scanner.nextLine();
             //Check user details, return user object
             //if(user != null)
+        
+            testUser = serverUser.checkUser(username, password); 
+            
+            if (testUser instanceof NormalUser) {
+                NormalUser user = (NormalUser) testUser;
+                
+                return user;
+            }
+            else if (testUser instanceof BusinessUser) {
+                BusinessUser user = (BusinessUser) testUser;
+                
+                return user;
+            }
+            else {
+                System.out.println("Invalid login try again buto");
+            }
             //return user
             counter++;
-        }while(counter < 3);
+        } while(counter < 1);
         
         scanner.close();
-        return user;
+        return testUser;
     }
 
 

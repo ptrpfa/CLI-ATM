@@ -24,71 +24,73 @@ public class ServerUser {
             String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
             PreparedStatement statement1 = db.prepareStatement(sql);
             ResultSet myRs1 = statement1.executeQuery();
-
-            // Start reading after the title row onwards
-            myRs1.next();
-
-            String tempPassword = AES256.encrypt(password);
-
-            // Process to check if password is correct, start pulling user data from DB
-            if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
-                // ID and type reserved to differentiate and create Normal or Business user
-                int userID = myRs1.getInt("UserID");
-                int userType = myRs1.getInt("UserType");
-
-                //Create User object with default User attributes 
-                user = new User(userID,
-                                myRs1.getString("Username"),
-                                myRs1.getString("PasswordSalt"),
-                                myRs1.getString("PasswordHash"),
-                                myRs1.getString("Email"),
-                                myRs1.getString("Phone"),
-                                myRs1.getString("AddressOne"),
-                                myRs1.getString("AddressTwo"),
-                                myRs1.getString("AddressThree"),
-                                myRs1.getString("PostalCode"),
-                                myRs1.getDate("RegistrationDate"),
-                                myRs1.getInt("UserType"),
-                                myRs1.getBoolean("Active"));
+            
+            if(myRs1.next()) {
+                // Start reading after the title row onwards
+                // myRs1.next();
                 
-                // If user is NormalUser, get extra attributes that NormalUser has
-                if (userType == 1) {
-                    // Template to select "NormalUser" DB for fetching data
-                    String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
-                    PreparedStatement statement2 = db.prepareStatement(sql2);
+                String tempPassword = AES256.encrypt(password);
 
-                    // Prepare to read database of where inputted UserID is located
-                    ResultSet myRs2 = statement2.executeQuery();
+                // Process to check if password is correct, start pulling user data from DB
+                if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
+                    // ID and type reserved to differentiate and create Normal or Business user
+                    int userID = myRs1.getInt("UserID");
+                    int userType = myRs1.getInt("UserType");
 
-                    // Start reading after the title row onwards
-                    myRs2.next();
+                    //Create User object with default User attributes 
+                    user = new User(userID,
+                                    myRs1.getString("Username"),
+                                    myRs1.getString("PasswordSalt"),
+                                    myRs1.getString("PasswordHash"),
+                                    myRs1.getString("Email"),
+                                    myRs1.getString("Phone"),
+                                    myRs1.getString("AddressOne"),
+                                    myRs1.getString("AddressTwo"),
+                                    myRs1.getString("AddressThree"),
+                                    myRs1.getString("PostalCode"),
+                                    myRs1.getDate("RegistrationDate"),
+                                    myRs1.getInt("UserType"),
+                                    myRs1.getBoolean("Active"));
+                    
+                    // If user is NormalUser, get extra attributes that NormalUser has
+                    if (userType == 1) {
+                        // Template to select "NormalUser" DB for fetching data
+                        String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
+                        PreparedStatement statement2 = db.prepareStatement(sql2);
 
-                    // Read from NormalUser DB and load user with saved particulars
-                    user = new NormalUser(user, 
-                                        myRs2.getString("NRIC"),
-                                        myRs2.getString("FirstName"),
-                                        myRs2.getString("MiddleName"),
-                                        myRs2.getString("LastName"),
-                                        myRs2.getString("Gender"),
-                                        myRs2.getDate("Birthday"));
-                }
+                        // Prepare to read database of where inputted UserID is located
+                        ResultSet myRs2 = statement2.executeQuery();
 
-                // If user is BusinessUser, get extra attributes that BusinessUser has
-                else if (userType == 2) {
-                    // Template to select "BusinessUser" DB for fetching data
-                    String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
-                    PreparedStatement statement2 = db.prepareStatement(sql2);
+                        // Start reading after the title row onwards
+                        myRs2.next();
 
-                    // Prepare to read database of where inputted UserID is located
-                    ResultSet myRs2 = statement2.executeQuery();
+                        // Read from NormalUser DB and load user with saved particulars
+                        user = new NormalUser(user, 
+                                            myRs2.getString("NRIC"),
+                                            myRs2.getString("FirstName"),
+                                            myRs2.getString("MiddleName"),
+                                            myRs2.getString("LastName"),
+                                            myRs2.getString("Gender"),
+                                            myRs2.getDate("Birthday"));
+                    }
 
-                    // Start reading after the title row onwards
-                    myRs2.next();
+                    // If user is BusinessUser, get extra attributes that BusinessUser has
+                    else if (userType == 2) {
+                        // Template to select "BusinessUser" DB for fetching data
+                        String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
+                        PreparedStatement statement2 = db.prepareStatement(sql2);
 
-                    // Read from "BusinessUser" DB and load user with saved particulars
-                    user = new BusinessUser(user,
-                                            myRs2.getString("UEN"),
-                                            myRs2.getString("BusinessName"));
+                        // Prepare to read database of where inputted UserID is located
+                        ResultSet myRs2 = statement2.executeQuery();
+
+                        // Start reading after the title row onwards
+                        myRs2.next();
+
+                        // Read from "BusinessUser" DB and load user with saved particulars
+                        user = new BusinessUser(user,
+                                                myRs2.getString("UEN"),
+                                                myRs2.getString("BusinessName"));
+                    }
                 }
             }
         }
@@ -235,34 +237,34 @@ public class ServerUser {
         }
     }
 
-    // public static void main(String[] args) {
-    //     ServerUser serverUser = new ServerUser();
+    public static void main(String[] args) {
+        ServerUser serverUser = new ServerUser();
         
-    //     User testUser = serverUser.checkUser("Na0m1_N30", "0nlyf4ns!"); // NormalUser
-    //     // User testUser = serverUser.checkUser("QA89SL9v", "0nlyf4ns!"); // BusinessUser
+        // User testUser = serverUser.checkUser("Na0m1_N30", "0nlyf4ns!"); // NormalUser
+        User testUser = serverUser.checkUser("QA89SL9v", "0nlyf4ns!"); // BusinessUser
         
-    //     if (testUser instanceof NormalUser) {
-    //         NormalUser user = (NormalUser) testUser;
+        if (testUser instanceof NormalUser) {
+            NormalUser user = (NormalUser) testUser;
             
-    //         user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_NORMAL", user.getPostalCode());
-    //         user.setAllNames(user.getFirstName(), "梁文珊", user.getLastName());
-    //         serverUser.updateUser(user);
+            user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_NORMAL", user.getPostalCode());
+            user.setAllNames(user.getFirstName(), "梁文珊", user.getLastName());
+            serverUser.updateUser(user);
             
-    //         System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName() + " " + user.getMiddleName() + ". " + user.getNRIC());
-    //         System.out.println("You have been a member since " + user.getRegistrationDate());
-    //         System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
-    //     }
-    //     else if (testUser instanceof BusinessUser) {
-    //         BusinessUser user = (BusinessUser) testUser;
+            System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName() + " " + user.getMiddleName() + ". " + user.getNRIC());
+            System.out.println("You have been a member since " + user.getRegistrationDate());
+            System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
+        }
+        else if (testUser instanceof BusinessUser) {
+            BusinessUser user = (BusinessUser) testUser;
             
-    //         user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_BUSINESS", user.getPostalCode());
-    //         user.setBusinessName("Onlyfans.com");
-    //         serverUser.updateUser(user);
+            user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_BUSINESS", user.getPostalCode());
+            user.setBusinessName("Onlyfans.com");
+            serverUser.updateUser(user);
             
-    //         System.out.println("\nWelcome " + user.getBusinessName() + ". Your username is: " + user.getUsername());
-    //         System.out.println("Your company UEN is " + user.getUEN());
-    //     }
-    // }
+            System.out.println("\nWelcome " + user.getBusinessName() + ". Your username is: " + user.getUsername());
+            System.out.println("Your company UEN is " + user.getUEN());
+        }
+    }
 }
 
 /****************************** OLD WORKING METHODS ******************************/

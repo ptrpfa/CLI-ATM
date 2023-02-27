@@ -55,16 +55,13 @@ public class ServerTransactions implements SQLConnect {
         }
     }
     
-
-
     public static void main(String[] args) {
         ServerTransactions Trans = new ServerTransactions();
         List<TransactionDetails> TransList = Trans.findUserAccounts(2318);
+        
         for (int i = 0; i < TransList.size(); i++) {
             System.out.println(TransList.get(i).getTransNo());
             System.out.println(TransList.get(i).getRemarks());
         }
-
     }
-
 }
