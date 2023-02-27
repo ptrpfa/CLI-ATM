@@ -121,4 +121,13 @@ public class Account {
     public void display(){   
         System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
     }
+
+    //Transcations
+    public void deposit(double amount) {
+        this.transaction.Deposit(this, amount);
+    }
+
+    public void withdraw(double amount) throws Exception {
+        this.transaction.Withdraw(this, amount);
+    }
 }

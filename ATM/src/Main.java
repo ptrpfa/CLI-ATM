@@ -54,7 +54,7 @@ public class Main implements Runnable{
         }//This part have to change
         //Print Menu
         //Scan input
-       // Menu menu = new Menu();
+       // Menu menu = new Menu(user);
         //menu.run();
     }
 
