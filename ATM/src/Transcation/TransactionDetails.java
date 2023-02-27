@@ -4,6 +4,7 @@ import java.util.Date;
 public class TransactionDetails {
     private int transID;
     private int accID;
+    private String transno;
     private Date Datetime;
     private Date ValueDatetime;
     private double debit;
@@ -13,9 +14,10 @@ public class TransactionDetails {
     private String Remarks;
 
     //is this only for backend to pull the data and set the data?
-    public TransactionDetails(int transID, int accID, Date datetime, Date valueDatetime, double debit, double credit, double balance, int status, String remarks) {
+    public TransactionDetails(int transID, int accID, String transno, Date datetime, Date valueDatetime, double debit, double credit, double balance, int status, String remarks) {
         this.transID = transID;
         this.accID = accID;
+        this.transno = transno;
         Datetime = datetime;
         ValueDatetime = valueDatetime;
         this.debit = debit;
@@ -59,7 +61,10 @@ public class TransactionDetails {
     }
 
     public void setRemarks(String remarks) {
-        Remarks = remarks;
+        this.Remarks = remarks;
+    }
+    public void setTransno(String transno) {
+        this.transno = transno;
     }
 
     //Getter
@@ -69,6 +74,9 @@ public class TransactionDetails {
 
     public int getAccID() {
         return accID;
+    }
+    public String getTransNo() {
+        return transno;
     }
 
     public Date getDatetime() {
