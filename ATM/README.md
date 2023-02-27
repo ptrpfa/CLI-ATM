@@ -80,9 +80,13 @@ Database.java (class for handling database connections)
 1. Ensure that the database_setup.sql file is downloaded.
 2. On a terminal, import the database using the following command: <br>
    ```
-   mysql -u root -p < database_setup.sql
+   mysql -u root -p < DatabaseSetup.sql
    ```
-
+   Alternatively, run the following commands to first create a blank database, and to populate it: <br>
+   ```
+   mysql -u root -p < Blank_20Feb2023.sql
+   mysql -u root -p OOP_ATM < Migrate_27Feb2023.sql
+   ```
 ### d) Program Usage
 ---
 *<u>Windows Machine</u>*
