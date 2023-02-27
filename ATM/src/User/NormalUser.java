@@ -15,12 +15,24 @@ public class NormalUser extends User {
     public NormalUser() {
     }
 
-    // Constructor taking 17 data from DB including NULLs
+    // Constructor taking data from DB including NULLs
     public NormalUser(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
                       String addressTwo, String addressThree, String postalCode, Date registrationDate, int userType, boolean active, 
                       String NRIC, String firstName, String middleName, String lastName, String gender, Date birthday) {
 
         super(userID, username, passwordSalt, passwordHash, email, phone, addressOne, addressTwo, addressThree, postalCode, registrationDate, userType, active);
+        this.NRIC = NRIC;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.birthday = birthday;
+    }
+
+    // Constructor taking in object type
+    public NormalUser(User user,
+                    String NRIC, String firstName, String middleName, String lastName, String gender, Date birthday) {
+        super(user);
         this.NRIC = NRIC;
         this.firstName = firstName;
         this.middleName = middleName;

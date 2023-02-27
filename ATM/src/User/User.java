@@ -22,10 +22,10 @@ public class User {
     public User() {
     }
 
-    // Constructor taking 11 data from DB including NULLs
+    // Constructor taking data from DB including NULLs
     public User(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
                 String addressTwo, String addressThree, String postalCode, Date registrationDate, int userType, boolean active) { 
-        
+
         this.userID = userID;
         this.username = username;
         this.passwordSalt = passwordSalt;
@@ -39,7 +39,23 @@ public class User {
         this.registrationDate = registrationDate;
         this.userType = userType;
         this.active = active;
-    
+    }
+
+    // Constructor taking in object type
+    public User(User user) { 
+        this.userID = user.userID;
+        this.username = user.username;
+        this.passwordSalt = user.passwordSalt;
+        this.passwordHash = user.passwordHash;
+        this.email = user.email;
+        this.phone = user.phone;
+        this.addressOne = user.addressOne;
+        this.addressTwo = user.addressTwo;
+        this.addressThree = user.addressThree;
+        this.postalCode = user.postalCode;
+        this.registrationDate = user.registrationDate;
+        this.userType = user.userType;
+        this.active = user.active;
     }
 
     // Returns user userID

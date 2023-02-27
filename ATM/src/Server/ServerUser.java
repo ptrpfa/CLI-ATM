@@ -1,252 +1,450 @@
 package Server;
 
 import java.sql.*;
+import java.util.Scanner;
+import java.util.Date;
+
 import User.BusinessUser;
 import User.NormalUser;
 import User.User;
 
-public interface ServerUser extends SQLConnect {
+public class ServerUser {
 
-    // Check username and password, return UserID and userType. 1 = NormalUser, 2 = BusinessUser
-    static User checkUser (String username, String password) {
+    // Check username and password, return User object which is an instance of NormalUser or BusinessUser
+    public User checkUser(String username, String password) {
+        // Initialise connection to DB
         Connection db = SQLConnect.getDBConnection();
-        String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
+        
+        // Declare user object that will be returned for session
         User user = null;
+        
+        // Try to connect to DB
         try {
+            // Template to select "User" DB with inputted username
+            String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
             PreparedStatement statement1 = db.prepareStatement(sql);
-
             ResultSet myRs1 = statement1.executeQuery();
 
+            // Start reading after the title row onwards
             myRs1.next();
 
             String tempPassword = AES256.encrypt(password);
 
+            // Process to check if password is correct, start pulling user data from DB
             if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
+                // ID and type reserved to differentiate and create Normal or Business user
                 int userID = myRs1.getInt("UserID");
                 int userType = myRs1.getInt("UserType");
 
-                //Create the User Object 
-                //Call the methods based on the usertype
-                //
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            SQLConnect.disconnectDB(db);
-        }
-        return user;
-    }
+                //Create User object with default User attributes 
+                user = new User(userID,
+                                myRs1.getString("Username"),
+                                myRs1.getString("PasswordSalt"),
+                                myRs1.getString("PasswordHash"),
+                                myRs1.getString("Email"),
+                                myRs1.getString("Phone"),
+                                myRs1.getString("AddressOne"),
+                                myRs1.getString("AddressTwo"),
+                                myRs1.getString("AddressThree"),
+                                myRs1.getString("PostalCode"),
+                                myRs1.getDate("RegistrationDate"),
+                                myRs1.getInt("UserType"),
+                                myRs1.getBoolean("Active"));
+                
+                // If user is NormalUser, get extra attributes that NormalUser has
+                if (userType == 1) {
+                    // Template to select "NormalUser" DB for fetching data
+                    String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
+                    PreparedStatement statement2 = db.prepareStatement(sql2);
 
+                    // Prepare to read database of where inputted UserID is located
+                    ResultSet myRs2 = statement2.executeQuery();
 
-    // Fetching of user information when normal user logs in
-    static NormalUser findNormalUser(int userID) {
-        Connection db = SQLConnect.getDBConnection();
+                    // Start reading after the title row onwards
+                    myRs2.next();
 
-        // Create default NormalUser object to return user afterwards
-        NormalUser normalUser = new NormalUser();
-
-        // Template to select "User" and "NormalUser" database for fetching data
-        String sql1 = String.format("SELECT * FROM user WHERE UserID = %s", userID);
-        String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
-
-        // Try to connect with inputted UserID
-        try {
-            PreparedStatement statement1 = db.prepareStatement(sql1);
-            PreparedStatement statement2 = db.prepareStatement(sql2);
-
-            // Prepare to read database of where inputted UserID is located
-            ResultSet myRs1 = statement1.executeQuery();
-            ResultSet myRs2 = statement2.executeQuery();
-
-            // Start reading after the title row onwards
-            myRs1.next();
-            myRs2.next();
-
-            // Read from User and NormalUser database and load user with saved particulars
-            normalUser = new NormalUser(userID,
-                                        myRs1.getString("Username"),
-                                        myRs1.getString("PasswordSalt"),
-                                        myRs1.getString("PasswordHash"),
-                                        myRs1.getString("Email"),
-                                        myRs1.getString("Phone"),
-                                        myRs1.getString("AddressOne"),
-                                        myRs1.getString("AddressTwo"),
-                                        myRs1.getString("AddressThree"),
-                                        myRs1.getString("PostalCode"),
-                                        myRs1.getDate("RegistrationDate"),
-                                        myRs1.getInt("UserType"),
-                                        myRs1.getBoolean("Active"),
-
+                    // Read from NormalUser DB and load user with saved particulars
+                    user = new NormalUser(user, 
                                         myRs2.getString("NRIC"),
                                         myRs2.getString("FirstName"),
                                         myRs2.getString("MiddleName"),
                                         myRs2.getString("LastName"),
                                         myRs2.getString("Gender"),
                                         myRs2.getDate("Birthday"));
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            SQLConnect.disconnectDB(db);
-        }
-        return normalUser;
-    }
+                }
 
-    // Fetching of user information when business user logs in
-    static BusinessUser findBusinessUser(int userID) {
-        Connection db = SQLConnect.getDBConnection();
+                // If user is BusinessUser, get extra attributes that BusinessUser has
+                else if (userType == 2) {
+                    // Template to select "BusinessUser" DB for fetching data
+                    String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
+                    PreparedStatement statement2 = db.prepareStatement(sql2);
 
-        // Create default BusinessUser object to return user afterwards
-        BusinessUser businessUser = new BusinessUser();
+                    // Prepare to read database of where inputted UserID is located
+                    ResultSet myRs2 = statement2.executeQuery();
 
-        // Template to select "User" and "BusinessUser" database for fetching data
-        String sql1 = String.format("SELECT * FROM user WHERE UserID = %s", userID);
-        String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
+                    // Start reading after the title row onwards
+                    myRs2.next();
 
-        // Try to connect with inputted UserID
-        try {
-            PreparedStatement statement1 = db.prepareStatement(sql1);
-            PreparedStatement statement2 = db.prepareStatement(sql2);
-
-            // Prepare to read database of where inputted UserID is located
-            ResultSet myRs1 = statement1.executeQuery();
-            ResultSet myRs2 = statement2.executeQuery();
-
-            // Start reading after the title row onwards
-            myRs1.next();
-            myRs2.next();
-
-            // Read from User and NormalUser database and load user with saved particulars
-            businessUser = new BusinessUser(userID,
-                                            myRs1.getString("Username"),
-                                            myRs1.getString("PasswordSalt"),
-                                            myRs1.getString("PasswordHash"),
-                                            myRs1.getString("Email"),
-                                            myRs1.getString("Phone"),
-                                            myRs1.getString("AddressOne"),
-                                            myRs1.getString("AddressTwo"),
-                                            myRs1.getString("AddressThree"),
-                                            myRs1.getString("PostalCode"),
-                                            myRs1.getDate("RegistrationDate"),
-                                            myRs1.getInt("UserType"),
-                                            myRs1.getBoolean("Active"),
-
+                    // Read from "BusinessUser" DB and load user with saved particulars
+                    user = new BusinessUser(user,
                                             myRs2.getString("UEN"),
                                             myRs2.getString("BusinessName"));
+                }
+            }
         }
         catch (SQLException e) {
+            // Check for any SQL connection errors
             e.printStackTrace();
         }
         finally {
+            // Close DB connection
             SQLConnect.disconnectDB(db);
         }
-        return businessUser;
+        return user;
+    }
+    
+    // Updating DBs with latest information
+    public void updateUser(User user) {
+        Connection db = SQLConnect.getDBConnection();
+        
+        // Try to connect to DB
+        try {
+            // Template to select "User" DB for updating data
+            String sql1 = String.format("UPDATE User SET Username = ?, Email = ?, Phone = ?, AddressOne = ?, AddressTwo = ?, AddressThree = ?, PostalCode = ? WHERE UserID = %s", user.getUserID());
+            PreparedStatement statement1 = db.prepareStatement(sql1);
+            
+            // Fill up update statements with latest particulars for "User" DB
+            statement1.setString(1, user.getUsername());
+            statement1.setString(2, user.getEmail());
+            statement1.setString(3, user.getPhone());
+            statement1.setString(4, user.getAddresses(1));
+            statement1.setString(5, user.getAddresses(2));
+            statement1.setString(6, user.getAddresses(3));
+            statement1.setString(7, user.getPostalCode());
+
+            // If user is NormalUser, update specific DB
+            if (user instanceof NormalUser) {
+                NormalUser tempUser = (NormalUser) user;
+                
+                // Template to select "NormalUser" DB for updating data
+                String sql2 = String.format("UPDATE NormalUser SET NRIC = ?, FirstName = ?, MiddleName = ?, LastName = ?, Gender = ? WHERE UserID = %s", tempUser.getUserID());
+                PreparedStatement statement2 = db.prepareStatement(sql2);
+                
+                // Fill up update statements with latest particulars for "NormalUser" DB
+                statement2.setString(1, tempUser.getNRIC());
+                statement2.setString(2, tempUser.getFirstName());
+                statement2.setString(3, tempUser.getMiddleName());
+                statement2.setString(4, tempUser.getLastName());
+                statement2.setString(5, tempUser.getGender());
+
+                // Perform database updates
+                statement1.executeUpdate();
+                statement2.executeUpdate();
+            }
+
+            // If user is BusinessUser, update specific DB
+            else if (user instanceof BusinessUser) {
+                BusinessUser tempUser = (BusinessUser) user;
+
+                // Template to select "BusinessUser" DB for updating data
+                String sql2 = String.format("UPDATE businessuser SET UEN = ?, BusinessName = ? WHERE UserID = %s", tempUser.getUserID());
+                PreparedStatement statement2 = db.prepareStatement(sql2);
+
+                // Fill up update statements with latest particulars for "BusinessUser" DB
+                statement2.setString(1, tempUser.getUEN());
+                statement2.setString(2, tempUser.getBusinessName());
+                
+                // Perform database updates
+                statement1.executeUpdate();
+                statement2.executeUpdate();
+            }
+        }
+        catch (SQLException e) {
+            // Check for any SQL connection errors
+            e.printStackTrace();
+        }
+        finally {
+            // Close DB connection
+            SQLConnect.disconnectDB(db);
+        }
     }
 
-    // Method to update database with latest information
-    static void updateNormalUser(NormalUser normalUser) {
-        Connection db = SQLConnect.getDBConnection();
+    // User creation (METHOD WIP)
+    public void registerUser () {
+        Scanner input = new Scanner(System.in);
 
-        // Template to select "User" and "NormalUser" database for updating data
-        String sql1 = String.format("UPDATE User SET Username = ?, Email = ?, Phone = ?, AddressOne = ?, AddressTwo = ?, AddressThree = ?, PostalCode = ? WHERE UserID = %s", normalUser.getUserID());
-        String sql2 = String.format("UPDATE NormalUser SET NRIC = ?, FirstName = ?, MiddleName = ?, LastName = ?, Gender = ? WHERE UserID = %s", normalUser.getUserID());
+        System.out.print("1. Business user\n2. Normal user\nEnter user type: ");
+        int userType = input.nextInt();
 
-        // Try to connect to "User" and "NormalUser" database
-        try {
-            PreparedStatement statement1 = db.prepareStatement(sql1);
-            PreparedStatement statement2 = db.prepareStatement(sql2);
+        System.out.print("Enter username: ");
+        String username = input.nextLine();
 
-            // Fill up update statements with latest particulars
-            statement1.setString(1, normalUser.getUsername());
-            statement1.setString(2, normalUser.getEmail());
-            statement1.setString(3, normalUser.getPhone());
-            statement1.setString(4, normalUser.getAddresses(1));
-            statement1.setString(5, normalUser.getAddresses(2));
-            statement1.setString(6, normalUser.getAddresses(3));
-            statement1.setString(7, normalUser.getPostalCode());
+        System.out.print("Enter password: ");
+        String password = input.nextLine();
 
-            statement2.setString(1, normalUser.getNRIC());
-            statement2.setString(2, normalUser.getFirstName());
-            statement2.setString(3, normalUser.getMiddleName());
-            statement2.setString(4, normalUser.getLastName());
-            statement2.setString(5, normalUser.getGender());
+        System.out.print("Enter email: ");
+        String email = input.nextLine();
 
-            // Perform database updates
-            statement1.executeUpdate();
-            statement2.executeUpdate();
+        System.out.print("Enter phone: ");
+        int phone = input.nextInt();
+
+        System.out.print("Enter address (Address 1, Address 2, Address 3): ");
+        String address1 = input.nextLine();
+        String address2 = input.nextLine();
+        String address3 = input.nextLine();
+
+        System.out.println("Enter postal code: ");
+        int postalCode = input.nextInt();
+
+        Date registerDate = new Date();
+
+        if (userType == 1){
+            System.out.print("Enter NRIC: ");
+            String NRIC = input.nextLine();
+
+            System.out.print("Enter first name: ");
+            String firstName = input.nextLine();
+
+            System.out.print("Enter last name: ");
+            String lastName = input.nextLine();
+            
+            System.out.print("Enter middle name (If applicable): ");
+            String middleName = input.nextLine();
+
+            System.out.print("1. Male\n2. Female\nSelect gender: ");
+            int genderInt = input.nextInt();
+            
+            if(genderInt == 1) {
+                String gender = "Male";
+            }
+
+            else if(genderInt == 2) {
+                String gender = "Female";
+            }
+
+            System.out.print("Enter DOB:");
+
         }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            SQLConnect.disconnectDB(db);
-        }
-    }
 
-    // Method to update database with latest information
-    static void updateBusinessUser(BusinessUser businessUser) {
-        Connection db = SQLConnect.getDBConnection();
+        else if (userType == 2) {
+            System.out.print("Enter business name");
+            String businessName = input.nextLine();
 
-        // Template to select "User" and "BusinessUser" database for updating data
-        String sql1 = String.format("UPDATE user SET Username = ?, Email = ?, Phone = ?, AddressOne = ?, AddressTwo = ?, AddressThree = ?, PostalCode = ? WHERE UserID = %s", businessUser.getUserID());
-        String sql2 = String.format("UPDATE businessuser SET UEN = ?, BusinessName = ? WHERE UserID = %s", businessUser.getUserID());
-
-        // Try to connect to "User" and "BusinessUser" database
-        try {
-            PreparedStatement statement1 = db.prepareStatement(sql1);
-            PreparedStatement statement2 = db.prepareStatement(sql2);
-
-            // Fill up update statements with latest particulars
-            statement1.setString(1, businessUser.getUsername());
-            statement1.setString(2, businessUser.getEmail());
-            statement1.setString(3, businessUser.getPhone());
-            statement1.setString(4, businessUser.getAddresses(1));
-            statement1.setString(5, businessUser.getAddresses(2));
-            statement1.setString(6, businessUser.getAddresses(3));
-            statement1.setString(7, businessUser.getPostalCode());
-
-            statement2.setString(1, businessUser.getUEN());
-            statement2.setString(2, businessUser.getBusinessName());
-
-            // Perform database updates
-            statement1.executeUpdate();
-            statement2.executeUpdate();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            SQLConnect.disconnectDB(db);
+            System.out.print("Enter UEN: ");
+            String UEN = input.nextLine();
         }
     }
 
     // public static void main(String[] args) {
-    //     ServerUser testUser = new ServerUser();
-
-    //     int[] store = testUser.checkUser("Na0m1_N30", "howtodoinjava.com");
-    //     if(store[1] == 1){
-    //         NormalUser user = testUser.findNormalUser(store[0]);
-
-    //     //    System.out.println(user.getEmail());
-    //     //    user.setUsername("Na0m1_N30");
-    //     //    user.setEmail("naomi@neo.sg");
-    //     //    user.setPhone("+65 91234567");
-    //     //    user.setAddress("Singapore", "SIT", "NYP", "626393");
-
-    //     //    user.setAllNames("Naomi", "梁文珊", "Neo");
-    //     //    user.setNRIC("S3333333X");
-
-    //     //    testUser.updateNormalUser(user);
-
-    //         System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName());
+    //     ServerUser serverUser = new ServerUser();
+        
+    //     User testUser = serverUser.checkUser("Na0m1_N30", "0nlyf4ns!"); // NormalUser
+    //     // User testUser = serverUser.checkUser("QA89SL9v", "0nlyf4ns!"); // BusinessUser
+        
+    //     if (testUser instanceof NormalUser) {
+    //         NormalUser user = (NormalUser) testUser;
+            
+    //         user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_NORMAL", user.getPostalCode());
+    //         user.setAllNames(user.getFirstName(), "梁文珊", user.getLastName());
+    //         serverUser.updateUser(user);
+            
+    //         System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName() + " " + user.getMiddleName() + ". " + user.getNRIC());
     //         System.out.println("You have been a member since " + user.getRegistrationDate());
     //         System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
     //     }
-    //     // else if(store[1] == 2) {
-    //     //     BusinessUser user = testUser.findBusinessUser(store[0]);
-    //     // }
+    //     else if (testUser instanceof BusinessUser) {
+    //         BusinessUser user = (BusinessUser) testUser;
+            
+    //         user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_BUSINESS", user.getPostalCode());
+    //         user.setBusinessName("Onlyfans.com");
+    //         serverUser.updateUser(user);
+            
+    //         System.out.println("\nWelcome " + user.getBusinessName() + ". Your username is: " + user.getUsername());
+    //         System.out.println("Your company UEN is " + user.getUEN());
+    //     }
     // }
 }
+
+/****************************** OLD WORKING METHODS ******************************/
+// // Method to update database with latest information
+// public void updateNormalUser(NormalUser normalUser) {
+//     Connection db = SQLConnect.getDBConnection();
+    
+//     // Template to select "User" and "NormalUser" database for updating data
+//     String sql1 = String.format("UPDATE User SET Username = ?, Email = ?, Phone = ?, AddressOne = ?, AddressTwo = ?, AddressThree = ?, PostalCode = ? WHERE UserID = %s", normalUser.getUserID());
+//     String sql2 = String.format("UPDATE NormalUser SET NRIC = ?, FirstName = ?, MiddleName = ?, LastName = ?, Gender = ? WHERE UserID = %s", normalUser.getUserID());
+    
+//     // Try to connect to "User" and "NormalUser" database
+//     try {
+//         PreparedStatement statement1 = db.prepareStatement(sql1);
+//         PreparedStatement statement2 = db.prepareStatement(sql2);
+        
+//         // Fill up update statements with latest particulars
+//         statement1.setString(1, normalUser.getUsername());
+//         statement1.setString(2, normalUser.getEmail());
+//         statement1.setString(3, normalUser.getPhone());
+//         statement1.setString(4, normalUser.getAddresses(1));
+//         statement1.setString(5, normalUser.getAddresses(2));
+//         statement1.setString(6, normalUser.getAddresses(3));
+//         statement1.setString(7, normalUser.getPostalCode());
+        
+//         statement2.setString(1, normalUser.getNRIC());
+//         statement2.setString(2, normalUser.getFirstName());
+//         statement2.setString(3, normalUser.getMiddleName());
+//         statement2.setString(4, normalUser.getLastName());
+//         statement2.setString(5, normalUser.getGender());
+        
+//         // Perform database updates
+//         statement1.executeUpdate();
+//         statement2.executeUpdate();
+//     }
+//     catch (SQLException e) {
+//         e.printStackTrace();
+//     }
+//     finally {
+//         SQLConnect.disconnectDB(db);
+//     }
+// }
+
+// // Method to update database with latest information
+// public void updateBusinessUser(BusinessUser businessUser) {    
+//     Connection db = SQLConnect.getDBConnection();
+    
+//     // Template to select "User" and "BusinessUser" database for updating data
+//     String sql1 = String.format("UPDATE user SET Username = ?, Email = ?, Phone = ?, AddressOne = ?, AddressTwo = ?, AddressThree = ?, PostalCode = ? WHERE UserID = %s", businessUser.getUserID());
+//     String sql2 = String.format("UPDATE businessuser SET UEN = ?, BusinessName = ? WHERE UserID = %s", businessUser.getUserID());
+    
+//     // Try to connect to "User" and "BusinessUser" database
+//     try {
+//         PreparedStatement statement1 = db.prepareStatement(sql1);
+//         PreparedStatement statement2 = db.prepareStatement(sql2);
+        
+//         // Fill up update statements with latest particulars
+//         statement1.setString(1, businessUser.getUsername());
+//         statement1.setString(2, businessUser.getEmail());
+//         statement1.setString(3, businessUser.getPhone());
+//         statement1.setString(4, businessUser.getAddresses(1));
+//         statement1.setString(5, businessUser.getAddresses(2));
+//         statement1.setString(6, businessUser.getAddresses(3));
+//         statement1.setString(7, businessUser.getPostalCode());
+        
+//         statement2.setString(1, businessUser.getUEN());
+//         statement2.setString(2, businessUser.getBusinessName());
+        
+//         // Perform database updates
+//         statement1.executeUpdate();
+//         statement2.executeUpdate();
+//     }
+//     catch (SQLException e) {
+//         e.printStackTrace();
+//     }
+//     finally {
+//         SQLConnect.disconnectDB(db);
+//     }
+// }
+
+// Fetching of user information when normal user logs in
+// static NormalUser findNormalUser(int userID) {
+    //     Connection db = SQLConnect.getDBConnection();
+
+    //     // Create default NormalUser object to return user afterwards
+    //     NormalUser normalUser = new NormalUser();
+
+    //     // Template to select "User" and "NormalUser" database for fetching data
+    //     String sql1 = String.format("SELECT * FROM user WHERE UserID = %s", userID);
+    //     String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
+
+    //     // Try to connect with inputted UserID
+    //     try {
+    //         PreparedStatement statement1 = db.prepareStatement(sql1);
+    //         PreparedStatement statement2 = db.prepareStatement(sql2);
+
+    //         // Prepare to read database of where inputted UserID is located
+    //         ResultSet myRs1 = statement1.executeQuery();
+    //         ResultSet myRs2 = statement2.executeQuery();
+
+    //         // Start reading after the title row onwards
+    //         myRs1.next();
+    //         myRs2.next();
+
+    //         // Read from User and NormalUser database and load user with saved particulars
+    //         normalUser = new NormalUser(userID,
+    //                                     myRs1.getString("Username"),
+    //                                     myRs1.getString("PasswordSalt"),
+    //                                     myRs1.getString("PasswordHash"),
+    //                                     myRs1.getString("Email"),
+    //                                     myRs1.getString("Phone"),
+    //                                     myRs1.getString("AddressOne"),
+    //                                     myRs1.getString("AddressTwo"),
+    //                                     myRs1.getString("AddressThree"),
+    //                                     myRs1.getString("PostalCode"),
+    //                                     myRs1.getDate("RegistrationDate"),
+    //                                     myRs1.getInt("UserType"),
+    //                                     myRs1.getBoolean("Active"),
+
+    //                                     myRs2.getString("NRIC"),
+    //                                     myRs2.getString("FirstName"),
+    //                                     myRs2.getString("MiddleName"),
+    //                                     myRs2.getString("LastName"),
+    //                                     myRs2.getString("Gender"),
+    //                                     myRs2.getDate("Birthday"));
+    //     }
+    //     catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    //     finally {
+    //         SQLConnect.disconnectDB(db);
+    //     }
+    //     return normalUser;
+    // }
+
+    // Fetching of user information when business user logs in
+    // static BusinessUser findBusinessUser(int userID) {
+    //     Connection db = SQLConnect.getDBConnection();
+
+    //     // Create default BusinessUser object to return user afterwards
+    //     BusinessUser businessUser = new BusinessUser();
+
+    //     // Template to select "User" and "BusinessUser" database for fetching data
+    //     String sql1 = String.format("SELECT * FROM user WHERE UserID = %s", userID);
+    //     String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
+
+    //     // Try to connect with inputted UserID
+    //     try {
+    //         PreparedStatement statement1 = db.prepareStatement(sql1);
+    //         PreparedStatement statement2 = db.prepareStatement(sql2);
+
+    //         // Prepare to read database of where inputted UserID is located
+    //         ResultSet myRs1 = statement1.executeQuery();
+    //         ResultSet myRs2 = statement2.executeQuery();
+
+    //         // Start reading after the title row onwards
+    //         myRs1.next();
+    //         myRs2.next();
+
+    //         // Read from User and NormalUser database and load user with saved particulars
+    //         businessUser = new BusinessUser(userID,
+    //                                         myRs1.getString("Username"),
+    //                                         myRs1.getString("PasswordSalt"),
+    //                                         myRs1.getString("PasswordHash"),
+    //                                         myRs1.getString("Email"),
+    //                                         myRs1.getString("Phone"),
+    //                                         myRs1.getString("AddressOne"),
+    //                                         myRs1.getString("AddressTwo"),
+    //                                         myRs1.getString("AddressThree"),
+    //                                         myRs1.getString("PostalCode"),
+    //                                         myRs1.getDate("RegistrationDate"),
+    //                                         myRs1.getInt("UserType"),
+    //                                         myRs1.getBoolean("Active"),
+
+    //                                         myRs2.getString("UEN"),
+    //                                         myRs2.getString("BusinessName"));
+    //     }
+    //     catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    //     finally {
+    //         SQLConnect.disconnectDB(db);
+    //     }
+    //     return businessUser;
+    // }
