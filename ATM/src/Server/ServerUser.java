@@ -3,16 +3,15 @@ package Server;
 import java.sql.*;
 import User.BusinessUser;
 import User.NormalUser;
+import User.User;
 
-public class ServerUser implements SQLConnect {
+public interface ServerUser extends SQLConnect {
 
     // Check username and password, return UserID and userType. 1 = NormalUser, 2 = BusinessUser
-    public int[] checkUser (String username, String password) {
-        int[] store = new int[2];
-
+    static User checkUser (String username, String password) {
         Connection db = SQLConnect.getDBConnection();
         String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
-
+        User user = null;
         try {
             PreparedStatement statement1 = db.prepareStatement(sql);
 
@@ -22,12 +21,13 @@ public class ServerUser implements SQLConnect {
 
             String tempPassword = AES256.encrypt(password);
 
-            if(username.equals(myRs1.getString("Username")) && tempPassword.equals(myRs1.getString("PasswordHash"))) {
+            if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
                 int userID = myRs1.getInt("UserID");
                 int userType = myRs1.getInt("UserType");
 
-                store[0] = userID;
-                store[1] = userType;
+                //Create the User Object 
+                //Call the methods based on the usertype
+                //
             }
         }
         catch (SQLException e) {
@@ -36,11 +36,12 @@ public class ServerUser implements SQLConnect {
         finally {
             SQLConnect.disconnectDB(db);
         }
-        return store;
+        return user;
     }
 
+
     // Fetching of user information when normal user logs in
-    public NormalUser findNormalUser(int userID) {
+    static NormalUser findNormalUser(int userID) {
         Connection db = SQLConnect.getDBConnection();
 
         // Create default NormalUser object to return user afterwards
@@ -95,7 +96,7 @@ public class ServerUser implements SQLConnect {
     }
 
     // Fetching of user information when business user logs in
-    public BusinessUser findBusinessUser(int userID) {
+    static BusinessUser findBusinessUser(int userID) {
         Connection db = SQLConnect.getDBConnection();
 
         // Create default BusinessUser object to return user afterwards
@@ -146,7 +147,7 @@ public class ServerUser implements SQLConnect {
     }
 
     // Method to update database with latest information
-    public void updateNormalUser(NormalUser normalUser) {
+    static void updateNormalUser(NormalUser normalUser) {
         Connection db = SQLConnect.getDBConnection();
 
         // Template to select "User" and "NormalUser" database for updating data
@@ -186,7 +187,7 @@ public class ServerUser implements SQLConnect {
     }
 
     // Method to update database with latest information
-    public void updateBusinessUser(BusinessUser businessUser) {
+    static void updateBusinessUser(BusinessUser businessUser) {
         Connection db = SQLConnect.getDBConnection();
 
         // Template to select "User" and "BusinessUser" database for updating data
@@ -222,30 +223,30 @@ public class ServerUser implements SQLConnect {
         }
     }
 
-    public static void main(String[] args) {
-        ServerUser testUser = new ServerUser();
+    // public static void main(String[] args) {
+    //     ServerUser testUser = new ServerUser();
 
-        int[] store = testUser.checkUser("Na0m1_N30", "howtodoinjava.com");
-        if(store[1] == 1){
-            NormalUser user = testUser.findNormalUser(store[0]);
+    //     int[] store = testUser.checkUser("Na0m1_N30", "howtodoinjava.com");
+    //     if(store[1] == 1){
+    //         NormalUser user = testUser.findNormalUser(store[0]);
 
-        //    System.out.println(user.getEmail());
-        //    user.setUsername("Na0m1_N30");
-        //    user.setEmail("naomi@neo.sg");
-        //    user.setPhone("+65 91234567");
-        //    user.setAddress("Singapore", "SIT", "NYP", "626393");
+    //     //    System.out.println(user.getEmail());
+    //     //    user.setUsername("Na0m1_N30");
+    //     //    user.setEmail("naomi@neo.sg");
+    //     //    user.setPhone("+65 91234567");
+    //     //    user.setAddress("Singapore", "SIT", "NYP", "626393");
 
-        //    user.setAllNames("Naomi", "梁文珊", "Neo");
-        //    user.setNRIC("S3333333X");
+    //     //    user.setAllNames("Naomi", "梁文珊", "Neo");
+    //     //    user.setNRIC("S3333333X");
 
-        //    testUser.updateNormalUser(user);
+    //     //    testUser.updateNormalUser(user);
 
-            System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName());
-            System.out.println("You have been a member since " + user.getRegistrationDate());
-            System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
-        }
-        // else if(store[1] == 2) {
-        //     BusinessUser user = testUser.findBusinessUser(store[0]);
-        // }
-    }
+    //         System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName());
+    //         System.out.println("You have been a member since " + user.getRegistrationDate());
+    //         System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
+    //     }
+    //     // else if(store[1] == 2) {
+    //     //     BusinessUser user = testUser.findBusinessUser(store[0]);
+    //     // }
+    // }
 }
