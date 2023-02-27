@@ -1,6 +1,8 @@
 import java.util.List;
 import java.util.Scanner;
 
+import javax.xml.transform.Source;
+
 import Account.Account;
 import Account.AccountService;
 import User.User;
@@ -89,6 +91,10 @@ class Menu implements ServerAccount{
         scanner = new Scanner(System.in);
     }
 
+    public List<Account> getAccounts(){
+        return accounts;
+    }
+
     static void printMenu(String[] options){
         for (String option : options){
             System.out.println(option);
@@ -103,7 +109,7 @@ class Menu implements ServerAccount{
             acc.display();
         }
     }
-    static void 
+
     static void printTranscations(){
         //JR MAMA
     }
@@ -133,7 +139,7 @@ class Menu implements ServerAccount{
                         Deposit();
                         break;
                     case 3: 
-                        //Withdraw(); 
+                        Withdraw(); 
                         break;
                }
            }
@@ -143,6 +149,35 @@ class Menu implements ServerAccount{
                System.out.println(">");
            }
        }while(option != 6);
+    }
+    
+    private Account AccountMenu(){
+        //Print out all the accounts and set options number
+        String[] options = new String[accounts.size()];
+        String option;
+        int choice = 0;
+        boolean isValidInput = false;
+
+        for(int i = 1; i <= accounts.size(); i++){
+            option = String.format("%d - %s",i,(accounts.get(i-1)).getAccNo());
+            options[i-1] = option;
+        }
+        //Print the Options
+        printMenu(options);
+
+        while(!isValidInput){
+            System.out.println("Please choose Transcation Account:");
+            System.out.print(">");
+            choice = scanner.nextInt();
+            try{
+                NumberChecker.checkOption(choice, accounts.size());
+                isValidInput = true;
+            }catch(WrongNumberException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        Account acc = accounts.get(choice-1);
+        return acc;
     }
 
     private void CreateAccount() {
@@ -165,7 +200,7 @@ class Menu implements ServerAccount{
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 isValidInput = true;
-            }catch(NegativeNumberException e){
+            }catch(WrongNumberException e){
                 System.out.println(e.getMessage());
             }
         }
@@ -183,28 +218,44 @@ class Menu implements ServerAccount{
     public void Deposit() {
         double amount = 0;
         boolean isValidInput = false;
-
+        //Allow user to choose account
+        Account acc = AccountMenu();
         while(!isValidInput){
             try{
-                //Print out all the accounts and set options number
-
                 System.out.println("Enter Deposit Amount");
                 System.out.print("> ");
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
-                Account acc = accounts.get(1);
                 acc.deposit(amount);
                 isValidInput = true;
-            }catch(NegativeNumberException e){
+            }catch(WrongNumberException e){
                 System.out.println(e.getMessage());
             }
         }
     }
 
-    // public boolean Withdraw(Account acc) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'Witdraw'");
-    // }
+    public void Withdraw() throws Exception {
+        double amount = 0;
+        boolean isValidInput = false;
+        //Allow user to choose account
+        Account acc = AccountMenu();
+
+        while(!isValidInput){
+            try{
+                System.out.println("Enter Withdrawal Amount");
+                System.out.print("> ");
+                amount = scanner.nextDouble();
+                NumberChecker.checkNegative(amount);
+                acc.withdraw(amount);
+                isValidInput = true;
+            }catch(WrongNumberException e){
+                System.out.println(e.getMessage());
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
 
     // public boolean TransferFunds(Account acc) {
     //     // TODO Auto-generated method stub
@@ -217,16 +268,21 @@ class Menu implements ServerAccount{
     // }
 }
 
-class NegativeNumberException extends Exception {
-    public NegativeNumberException(String errorMessage) {
+class WrongNumberException extends Exception {
+    public WrongNumberException(String errorMessage) {
         super(errorMessage);
     }
 }
 
 class NumberChecker {
-    public static void checkNegative(double number) throws NegativeNumberException {
+    public static void checkNegative(double number) throws WrongNumberException {
         if (number < 0) {
-            throw new NegativeNumberException("Amount cannot be negative!");
+            throw new WrongNumberException("Amount cannot be negative!\n");
+        }
+    }
+    public static void checkOption(int number, int max) throws WrongNumberException{
+        if(number > max){
+            throw new WrongNumberException("Wrong Choice lah bang\n");
         }
     }
 }
