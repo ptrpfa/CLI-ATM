@@ -7,8 +7,9 @@ import java.sql.*;
 
 public interface SQLConnect {
     // Specify configurations file
-    public static final String FILEPATH = "../..";
-    public static final String CONFIGURATION_FILE = String.format("%s/settings_prod.config", FILEPATH);
+    // public static final String FILEPATH = "../..";
+    public static final String FILEPATH = "/Users/zicki/Desktop/CSC1109-ATM/ATM";
+    public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
     
     // Connect to databse
     public static Connection getDBConnection() {
