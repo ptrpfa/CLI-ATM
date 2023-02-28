@@ -1,6 +1,9 @@
 USE OOP_ATM;
+-- SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =1;
+-- SELECT * FROM user LIMIT 100; where UserID = "1";
+UPDATE Account SET AccountNo = "407-000000001" where UserID = "1" and AccountID = "3004";
+USE OOP_ATM; SELECT * FROM Account WHERE userid = "1" ;
 
-SELECT * FROM Account WHERE UserID = "834845" ;
 
 -- SELECT * FROM Account;
 

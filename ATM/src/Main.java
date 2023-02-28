@@ -49,19 +49,21 @@ public class Main implements Runnable{
     public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
         commandLine.execute( "Login"); //Change to args if you want do default
+
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
         CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
         // for( CommandLine.ParseResult pr : parseResult.subcommands() )
         // {
         User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
         if(user != null) {
-            System.out.println("Welcome " + user.getUsername() + "\n");
+            System.out.println("\nWelcome " + user.getUsername() + "\n");
+            //Run the Menu
             Menu menu = new Menu(user);
             menu.run();
         }
         else {
-            System.out.println("The bank will now self destruct");
-            Thread.sleep(5000);
+            System.out.println("The bank will now self destruct\n");
+            Thread.sleep(1000);
             System.out.println("Boom");
             System.exit(-1);
         }
@@ -83,37 +85,35 @@ public class Main implements Runnable{
         //do while loop to check login, condition user is null
         int counter = 0;
         System.out.printf("欢迎来到大刘银行!\n");
-        User testUser = null; 
+        User user = null; 
 
         do{
             System.out.println("Enter username:");
             String username = scanner.nextLine();
             System.out.println("Enter password:");
             String password = scanner.nextLine();
-            //Check user details, return user object
-            //if(user != null)
         
-            testUser = serverUser.checkUser(username, password); 
+            user = serverUser.checkUser(username, password); 
             
-            if (testUser instanceof NormalUser) {
-                NormalUser user = (NormalUser) testUser;
-                
-                return user;
+            if (user instanceof NormalUser) {
+                NormalUser newUser = (NormalUser) user;
+    
+                return newUser;
             }
-            else if (testUser instanceof BusinessUser) {
-                BusinessUser user = (BusinessUser) testUser;
+            else if (user instanceof BusinessUser) {
+                BusinessUser newUser = (BusinessUser) user;
                 
-                return user;
+                return newUser;
             }
             else {
                 System.out.println("Invalid login try again buto");
             }
             //return user
             counter++;
-        } while(counter < 1);
+        } while(counter < 3);
         
         scanner.close();
-        return testUser;
+        return user;
     }
 
 

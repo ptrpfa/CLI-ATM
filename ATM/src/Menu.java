@@ -123,7 +123,10 @@ class Menu implements ServerAccount{
             "5- View Transcations",
             "6- Exit"
         };
-
+        //Print Available Accounts
+        System.out.println("\nActive Accounts");
+        printAcc(accounts);
+        System.out.println("\n");
         int option = -1;
         do{
             printMenu(options);
@@ -133,6 +136,7 @@ class Menu implements ServerAccount{
                 option = scanner.nextInt();
                 switch (option){
                     case 1:
+                        scanner.nextLine();
                         CreateAccount();
                         break;
                     case 2:
@@ -180,7 +184,7 @@ class Menu implements ServerAccount{
         return acc;
     }
 
-    private void CreateAccount() {
+    private void CreateAccount() throws InterruptedException {
         AccountService service = new AccountService();
         int userid = user.getUserID();
 
@@ -200,18 +204,24 @@ class Menu implements ServerAccount{
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 isValidInput = true;
+                
             }catch(WrongNumberException e){
                 System.out.println(e.getMessage());
             }
         }
-
+        //Send to server
+        System.out.println("Creating Account " + accName + "...");
         Account acc = service.CreateAccount(userid, accName, accDescString, amount);
+        Thread.sleep(1000);
         if(acc != null){
             System.out.println("Account is Created\n");
             this.accounts.add(acc);
             printAcc(accounts);
+            System.out.println("\n");
+            scanner.nextLine();
         }else{
             System.out.println("Error in System..\n");
+            scanner.nextLine();
         }
     }
 
