@@ -52,8 +52,6 @@ public class Main implements Runnable{
 
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
         CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
-        // for( CommandLine.ParseResult pr : parseResult.subcommands() )
-        // {
         User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
         if(user != null) {
             System.out.println("\nWelcome " + user.getUsername() + "\n");
