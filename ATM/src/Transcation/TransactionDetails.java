@@ -1,6 +1,8 @@
 package Transcation;
 import java.util.Date;
 
+import pl.mjaron.etudes.Int;
+
 public class TransactionDetails {
     private int transID;
     private int accID;
@@ -106,5 +108,17 @@ public class TransactionDetails {
     public String getRemarks() {
         return Remarks;
     }
+
+ //Printing Methods
+ public String[] PrintValues(){   
+    String datetime = Datetime.toString();
+    String[] values = {transno, datetime, Double.toString(debit),Double.toString(credit),Double.toString(balance),Integer.toString(status),Remarks};
+    //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
+    return values;
 }
 
+public static String[] PrintHeaders(){
+    String[] headers = {"Transaction Number", "Date","Debit","Credit","Balance","Status","Remarks"};
+    return headers;
+}
+}

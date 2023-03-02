@@ -10,8 +10,9 @@ import Server.ServerTransactions;
 import Server.ServerUser;
 import Transcation.TransactionDetails;
 
-class Menu implements ServerAccount{
+class Menu implements ServerAccount, ServerTransactions {
     private List<Account> accounts;
+    private List<TransactionDetails> transactions;
     private User user;
     private Scanner scanner;
 
@@ -26,7 +27,11 @@ class Menu implements ServerAccount{
         return accounts;
     }
 
-    public void run(){
+    public List<TransactionDetails> getTransactions() {
+        return transactions;
+    }
+
+    public void run() {
         String[] options = {
                 "1- Create New Account",
                 "2- Deposit",
@@ -36,47 +41,69 @@ class Menu implements ServerAccount{
                 "6- Reset Password",
                 "7- Exit"
         };
-        //Print Available Accounts
+        // Print Available Accounts
         System.out.println("\nActive Accounts..");
         printTable(Account.PrintHeaders(), accounts);
 
         System.out.println("\n");
         int option = -1;
         do {
+            int accountOption = -1;
             printMenu(options);
             System.out.println("What would would want to do? (Key in the Command Number)");
             System.out.print("> ");
             try {
                 option = scanner.nextInt();
                 System.out.println("\n");
-                switch (option){
+                switch (option) {
                     case 1:
                         scanner.nextLine();
                         CreateAccount();
                         break;
                     case 2:
-                        int accountOption = -1;
-                        do{
-                            try{
+                        do {
+                            try {
                                 System.out.println("Please choose Account to transact from...");
                                 printTable(Account.PrintHeaders(), accounts);
                                 System.out.print("\n> ");
                                 accountOption = scanner.nextInt();
                                 NumberChecker.checkOption(accountOption, accounts.size());
-                            }catch(WrongNumberException e){
+                            } catch (WrongNumberException e) {
                                 System.out.println(e.getMessage());
                                 accountOption = -1;
                                 scanner.nextLine();
-                            }catch(InputMismatchException e){
+                            } catch (InputMismatchException e) {
                                 System.out.println("Wrong Input. Try again..\n");
                                 accountOption = -1;
                                 scanner.nextLine();
                             }
-                        }while(accountOption == -1);
+                        } while (accountOption == -1);
                         Deposit(accounts.get(accountOption));
                         break;
-                    case 3: 
-                        //Withdraw(); 
+                    case 3:
+                        // Withdraw();
+                        break;
+                    case 5:
+                        do {
+                            try {
+                                System.out.println("Please choose Account to transact from...");
+                                printTable(Account.PrintHeaders(), accounts);
+                                System.out.print("\n> ");
+                                accountOption = scanner.nextInt();
+                                NumberChecker.checkOption(accountOption, accounts.size());
+                                transactions = ServerTransactions.findUserTransactions(accounts.get(accountOption - 1));
+                                printTable(TransactionDetails.PrintHeaders(), transactions);
+                                System.out.print("\n> ");
+                            } catch (WrongNumberException e) {
+                                System.out.println(e.getMessage());
+                                accountOption = -1;
+                                scanner.nextLine();
+                            } catch (InputMismatchException e) {
+                                System.out.println("Wrong Input. Try again..\n");
+                                accountOption = -1;
+                                scanner.nextLine();
+                            }
+                        } while (accountOption == -1);
                         break;
                     case 6:
                         ServerUser.resetUserPassword(user);
@@ -91,7 +118,7 @@ class Menu implements ServerAccount{
         } while (option != 7);
     }
 
-    //Option 1
+    // Option 1
     private void CreateAccount() throws InterruptedException {
         AccountService service = new AccountService();
         int userid = user.getUserID();
@@ -114,27 +141,27 @@ class Menu implements ServerAccount{
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 isValidInput = true;
-                
-            }catch(WrongNumberException e){
+
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
                 scanner.nextLine();
-            }catch(InputMismatchException e){
+            } catch (InputMismatchException e) {
                 System.out.println("Wrong Input. Try again..");
                 scanner.nextLine();
             }
         }
 
-        //Send to server
+        // Send to server
         System.out.println("Creating Account " + accName + "...");
         Account acc = service.CreateAccount(userid, accName, accDescString, amount);
         Thread.sleep(1000);
-        if(acc != null){
+        if (acc != null) {
             System.out.println("Account is Created\n");
             this.accounts.add(acc);
             printTable(Account.PrintHeaders(), accounts);
             System.out.println("\n");
             scanner.nextLine();
-        }else{
+        } else {
             System.out.println("Error in System..\n");
             scanner.nextLine();
         }
@@ -143,9 +170,9 @@ class Menu implements ServerAccount{
     public void Deposit(Account acc) {
         double amount = 0;
         boolean isValidInput = false;
-        //Allow user to choose account
-        while(!isValidInput){
-            try{
+        // Allow user to choose account
+        while (!isValidInput) {
+            try {
                 System.out.println("Enter Deposit Amount");
                 System.out.print("> ");
                 amount = scanner.nextDouble();
@@ -155,7 +182,7 @@ class Menu implements ServerAccount{
             } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
                 scanner.nextLine();
-            }catch(InputMismatchException e){
+            } catch (InputMismatchException e) {
                 System.out.println("Wrong Input. Try again..");
                 scanner.nextLine();
             }
@@ -163,23 +190,23 @@ class Menu implements ServerAccount{
     }
 
     // public void Withdraw() throws Exception {
-    //     double amount = 0;
-    //     boolean isValidInput = false;
+    // double amount = 0;
+    // boolean isValidInput = false;
 
-    //     while(!isValidInput){
-    //         try{
-    //             System.out.println("Enter Withdrawal Amount");
-    //             System.out.print("> ");
-    //             amount = scanner.nextDouble();
-    //             NumberChecker.checkNegative(amount);
-    //             acc.withdraw(amount);
-    //             isValidInput = true;
-    //         }catch(WrongNumberException e){
-    //             System.out.println(e.getMessage());
-    //         }catch(Exception e){
-    //             System.out.println(e.getMessage());
-    //         }
-    //     }
+    // while(!isValidInput){
+    // try{
+    // System.out.println("Enter Withdrawal Amount");
+    // System.out.print("> ");
+    // amount = scanner.nextDouble();
+    // NumberChecker.checkNegative(amount);
+    // acc.withdraw(amount);
+    // isValidInput = true;
+    // }catch(WrongNumberException e){
+    // System.out.println(e.getMessage());
+    // }catch(Exception e){
+    // System.out.println(e.getMessage());
+    // }
+    // }
 
     // }
 
@@ -190,32 +217,37 @@ class Menu implements ServerAccount{
     // }
 
     // public void ViewTranscation(Account acc) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'ViewTranscation'");
+    // // TODO Auto-generated method stub
+    // throw new UnsupportedOperationException("Unimplemented method
+    // 'ViewTranscation'");
     // }
-    
-    //Template for printing Option Commands
-    public static void printMenu(String[] options){
-        for (String option : options){
+
+    // Template for printing Option Commands
+    public static void printMenu(String[] options) {
+        for (String option : options) {
             System.out.println(option);
         }
     }
 
-    //Template for Printing info
-    public static <T> void printTable(String[] headers, List<T> list){
-        //Get the values
+    // Template for Printing info
+    public static <T> void printTable(String[] headers, List<T> list) {
+        // Get the values
         String[][] values = new String[list.size()][headers.length];
         for (int i = 0; i < list.size(); i++) {
             T item = list.get(i);
-            if(item instanceof Account){
+            if (item instanceof Account) {
                 values[i] = ((Account) item).PrintValues();
+            }
+            
+            if (item instanceof TransactionDetails) {
+                values[i] = ((TransactionDetails) item).PrintValues();
             }
         }
 
         String line;
         // Determine the maximum width of each column
         int[] colWidths = new int[headers.length];
-        int attrLength =  0;
+        int attrLength = 0;
         for (int i = 0; i < headers.length; i++) {
             colWidths[i] = headers[i].length();
             for (int j = 0; j < values.length; j++) {
@@ -223,7 +255,7 @@ class Menu implements ServerAccount{
                 colWidths[i] = Math.max(colWidths[i], attrLength);
             }
         }
-        
+
         // Print the table header
         line = String.format("| %-3s", "No");
         System.out.print(line);
@@ -232,7 +264,7 @@ class Menu implements ServerAccount{
             System.out.print(line);
         }
         System.out.print("|\n");
-        
+
         // Print the horizontal line below the header
         System.out.print("+----");
         for (int i = 0; i < headers.length; i++) {
@@ -240,10 +272,10 @@ class Menu implements ServerAccount{
             System.out.print(line);
         }
         System.out.print("+\n");
-        
+
         // Print the table values
         for (int i = 0; i < values.length; i++) {
-            line = String.format("| %-2d ", i+1);
+            line = String.format("| %-2d ", i + 1);
             System.out.print(line);
             for (int j = 0; j < headers.length; j++) {
                 line = String.format("| %-" + colWidths[j] + "s ", values[i][j]);
