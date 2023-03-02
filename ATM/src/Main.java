@@ -60,9 +60,13 @@ public class Main implements Runnable{
             menu.run();
         }
         else {
-            System.out.println("The bank will now self destruct\n");
+            System.out.println("The bank will now self destruct in 3");
             Thread.sleep(1000);
-            System.out.println("Boom");
+            System.out.print("2\n");
+            Thread.sleep(1000);
+            System.out.print("1\n");
+            Thread.sleep(1000);
+            System.out.print("Boom");
             System.exit(-1);
         }
     }
@@ -81,7 +85,7 @@ public class Main implements Runnable{
         ServerUser serverUser = new ServerUser();
         //Console console = System.console();
         //do while loop to check login, condition user is null
-        int counter = 0;
+        int counter = 2;
         System.out.printf("欢迎来到大刘银行!\n");
         User user = null; 
 
@@ -104,11 +108,11 @@ public class Main implements Runnable{
                 return newUser;
             }
             else {
-                System.out.println("Invalid login try again buto");
+                System.out.println("\nInvalid login. " + counter + " tries left.");
             }
             //return user
-            counter++;
-        } while(counter < 3);
+            counter--;
+        } while(counter >= 0);
         
         scanner.close();
         return user;
