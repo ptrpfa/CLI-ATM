@@ -7,6 +7,7 @@ import Account.AccountService;
 import User.User;
 import Server.ServerAccount;
 import Server.ServerTransactions;
+import Server.ServerUser;
 import Transcation.TransactionDetails;
 
 class Menu implements ServerAccount{
@@ -32,7 +33,8 @@ class Menu implements ServerAccount{
                 "3- Withdraw",
                 "4- Transfer Funds",
                 "5- View Transcations",
-                "6- Exit"
+                "6- Reset Password",
+                "7- Exit"
         };
         //Print Available Accounts
         System.out.println("\nActive Accounts..");
@@ -76,13 +78,17 @@ class Menu implements ServerAccount{
                     case 3: 
                         //Withdraw(); 
                         break;
+                    case 6:
+                        ServerUser.resetUserPassword(user);
+                        // scanner.nextLine();
+                        break;
                 }
             } catch (Exception ex) {
                 System.out.println("Please enter an integer value between 1 and " + options.length);
                 scanner.next();
                 System.out.println(">");
             }
-        } while (option != 6);
+        } while (option != 7);
     }
 
     //Option 1
