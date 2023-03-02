@@ -60,9 +60,9 @@ public class Main implements Runnable{
             menu.run();
         }
         else {
-            System.out.println("The bank will now self destruct");
+            System.out.println("The bank will now self destruct.........");
             Thread.sleep(5000);
-            System.out.println("Boom");
+            System.out.println("9-11 BOOM");
             System.exit(-1);
         }
     }

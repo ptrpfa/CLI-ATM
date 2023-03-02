@@ -7,6 +7,8 @@ import Account.Account;
 import Account.AccountService;
 import User.User;
 import Server.ServerAccount;
+import Server.ServerTransactions;
+import Transcation.TransactionDetails;
 
 // import java.util.Scanner;
 
@@ -79,104 +81,103 @@ import Server.ServerAccount;
 //    }
 // }
 
-class Menu implements ServerAccount{
+class Menu implements ServerAccount {
     private List<Account> accounts;
     private User user;
     private Scanner scanner;
 
-    Menu(User user){
+    Menu(User user) {
         List<Account> accounts = ServerAccount.findUserAccounts(user.getUserID());
         this.accounts = accounts;
         this.user = user;
         scanner = new Scanner(System.in);
     }
 
-    public List<Account> getAccounts(){
+    public List<Account> getAccounts() {
         return accounts;
     }
 
-    static void printMenu(String[] options){
-        for (String option : options){
+    static void printMenu(String[] options) {
+        for (String option : options) {
             System.out.println(option);
         }
     }
 
-    static void printAcc(List<Account> accounts){
+    static void printAcc(List<Account> accounts) {
         System.out.printf("| %-15s | %-20s | %10s %n", "Account Number", "Account NAME", "Total Balance");
         System.out.printf("------------------------------------------------------------%n");
-        //To do 
-        for( Account acc : accounts){   
+        // To do
+        for (Account acc : accounts) {
             acc.display();
         }
     }
 
-    static void printTranscations(){
-        //JR MAMA
+    static void printTranscations() {
+        // JR MAMA
     }
 
-    public void run(){
+    public void run() {
         String[] options = {
-            "1- Create New Account",
-            "2- Deposit",
-            "3- Withdraw",
-            "4- Transfer Funds",
-            "5- View Transcations",
-            "6- Exit"
+                "1- Create New Account",
+                "2- Deposit",
+                "3- Withdraw",
+                "4- Transfer Funds",
+                "5- View Transcations",
+                "6- Exit"
         };
 
         int option = -1;
-        do{
+        do {
             printMenu(options);
             System.out.println("What would would want to do? (Key in the Command Number)");
-            System.out.print("> "); 
+            System.out.print("> ");
             try {
                 option = scanner.nextInt();
-                switch (option){
+                switch (option) {
                     case 1:
                         CreateAccount();
                         break;
                     case 2:
                         Deposit();
                         break;
-                    case 3: 
-                        Withdraw(); 
+                    case 3:
+                        Withdraw();
                         break;
-               }
-           }
-           catch (Exception ex){
-               System.out.println("Please enter an integer value between 1 and " + options.length);
-               scanner.next();
-               System.out.println(">");
-           }
-       }while(option != 6);
+                }
+            } catch (Exception ex) {
+                System.out.println("Please enter an integer value between 1 and " + options.length);
+                scanner.next();
+                System.out.println(">");
+            }
+        } while (option != 6);
     }
-    
-    private Account AccountMenu(){
-        //Print out all the accounts and set options number
+
+    private Account AccountMenu() {
+        // Print out all the accounts and set options number
         String[] options = new String[accounts.size()];
         String option;
         int choice = 0;
         boolean isValidInput = false;
 
-        for(int i = 1; i <= accounts.size(); i++){
-            option = String.format("%d - %s",i,(accounts.get(i-1)).getAccNo());
-            options[i-1] = option;
+        for (int i = 1; i <= accounts.size(); i++) {
+            option = String.format("%d - %s", i, (accounts.get(i - 1)).getAccNo());
+            options[i - 1] = option;
         }
-        //Print the Options
+        // Print the Options
         printMenu(options);
 
-        while(!isValidInput){
+        while (!isValidInput) {
             System.out.println("Please choose Transcation Account:");
             System.out.print(">");
             choice = scanner.nextInt();
-            try{
+            try {
                 NumberChecker.checkOption(choice, accounts.size());
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
             }
         }
-        Account acc = accounts.get(choice-1);
+        Account acc = accounts.get(choice - 1);
         return acc;
     }
 
@@ -193,24 +194,24 @@ class Menu implements ServerAccount{
         double amount = 0;
         boolean isValidInput = false;
 
-        while(!isValidInput){
-            try{
+        while (!isValidInput) {
+            try {
                 System.out.println("Initial Deposit");
                 System.out.print("> ");
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
             }
         }
 
         Account acc = service.CreateAccount(userid, accName, accDescString, amount);
-        if(acc != null){
+        if (acc != null) {
             System.out.println("Account is Created\n");
             this.accounts.add(acc);
             printAcc(accounts);
-        }else{
+        } else {
             System.out.println("Error in System..\n");
         }
     }
@@ -218,17 +219,17 @@ class Menu implements ServerAccount{
     public void Deposit() {
         double amount = 0;
         boolean isValidInput = false;
-        //Allow user to choose account
+        // Allow user to choose account
         Account acc = AccountMenu();
-        while(!isValidInput){
-            try{
+        while (!isValidInput) {
+            try {
                 System.out.println("Enter Deposit Amount");
                 System.out.print("> ");
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 acc.deposit(amount);
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -237,20 +238,20 @@ class Menu implements ServerAccount{
     public void Withdraw() throws Exception {
         double amount = 0;
         boolean isValidInput = false;
-        //Allow user to choose account
+        // Allow user to choose account
         Account acc = AccountMenu();
 
-        while(!isValidInput){
-            try{
+        while (!isValidInput) {
+            try {
                 System.out.println("Enter Withdrawal Amount");
                 System.out.print("> ");
                 amount = scanner.nextDouble();
                 NumberChecker.checkNegative(amount);
                 acc.withdraw(amount);
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
-            }catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -258,14 +259,11 @@ class Menu implements ServerAccount{
     }
 
     // public boolean TransferFunds(Account acc) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'TransferFunds'");
+    // // TODO Auto-generated method stub
+    // throw new UnsupportedOperationException("Unimplemented method
+    // 'TransferFunds'");
     // }
 
-    // public void ViewTranscation(Account acc) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'ViewTranscation'");
-    // }
 }
 
 class WrongNumberException extends Exception {
@@ -280,8 +278,9 @@ class NumberChecker {
             throw new WrongNumberException("Amount cannot be negative!\n");
         }
     }
-    public static void checkOption(int number, int max) throws WrongNumberException{
-        if(number > max){
+
+    public static void checkOption(int number, int max) throws WrongNumberException {
+        if (number > max) {
             throw new WrongNumberException("Wrong Choice lah bang\n");
         }
     }

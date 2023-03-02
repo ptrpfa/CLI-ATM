@@ -37,7 +37,7 @@ public class ServerTransactions implements SQLConnect {
         }
         return Transactions;
     }
-    
+    /*
     //Create Transaction
     public void createNewTransaction(int accID) {
         String sql = String.format(
@@ -54,6 +54,7 @@ public class ServerTransactions implements SQLConnect {
             SQLConnect.disconnectDB(db);
         }
     }
+    */
     
     public static void main(String[] args) {
         ServerTransactions Trans = new ServerTransactions();
