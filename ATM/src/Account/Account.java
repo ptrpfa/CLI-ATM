@@ -118,8 +118,15 @@ public class Account {
     }
     
     //Printing Methods
-    public void display(){   
-        System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
+    public String[] PrintValues(){   
+        String[] values = {accNo, accName, Double.toString(availableBalance)};
+        //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
+        return values;
+    }
+    
+    public static String[] PrintHeaders(){
+        String[] headers = {"Account No", "Account Name", "Available Balance"};
+        return headers;
     }
 
     //Transcations

@@ -50,7 +50,7 @@ public interface ServerAccount extends SQLConnect{
         int accNo = 0;
 
         String insertsql = "INSERT INTO account VALUES(NULL,?,?,?,?,0,?,?,0,0,?,1)";
-        String getAccNoSQL = "SELECT MAX(RIGHT(AccountNo, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
+        String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
         
         Connection db = SQLConnect.getDBConnection();
         
@@ -62,13 +62,13 @@ public interface ServerAccount extends SQLConnect{
             ps = db.prepareStatement(getAccNoSQL);
             rs = ps.executeQuery();
             if(rs.next()){
-                accNo = rs.getInt(1)+1;
+                accNo = Integer.parseInt(rs.getString(1))+1;
             }
-
+            String accIDString = String.format("407-%09d",accNo); 
             //Insert into db
             ps = db.prepareStatement(insertsql,  Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userid);
-            ps.setString(2, "407-" + accNo);
+            ps.setString(2, accIDString);
             ps.setString(3, accName);
             ps.setString(4, description);
             ps.setDouble(5, initialDeposit);
@@ -79,7 +79,7 @@ public interface ServerAccount extends SQLConnect{
                 rs = ps.getGeneratedKeys();
                 if(rs.next()){
                     int accID = rs.getInt(1);
-                    acc =  new Account(accID, userid, "407-"+ accNo, accName, description, 0, initialDeposit, initialDeposit, 0, 0, timestamp, true);
+                    acc =  new Account(accID, userid, accIDString, accName, description, 0, initialDeposit, initialDeposit, 0, 0, timestamp, true);
                     return acc;
                 }
             }
@@ -89,6 +89,6 @@ public interface ServerAccount extends SQLConnect{
         } finally {
             SQLConnect.disconnectDB(db);
         }
-        return null;
+        return acc;
     }
 }
