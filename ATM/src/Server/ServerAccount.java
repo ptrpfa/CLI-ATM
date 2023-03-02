@@ -51,20 +51,22 @@ public interface ServerAccount extends SQLConnect{
 
         String insertsql = "INSERT INTO account VALUES(NULL,?,?,?,?,0,?,?,0,0,?,1)";
         String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
-        
         Connection db = SQLConnect.getDBConnection();
         
         PreparedStatement ps;
         ResultSet rs;
         Account acc = null;
-        try{
+        try{            
             //Get last Acc no
             ps = db.prepareStatement(getAccNoSQL);
             rs = ps.executeQuery();
             if(rs.next()){
-                accNo = Integer.parseInt(rs.getString(1))+1;
+                if(rs.getString(1) != null){
+                    accNo = Integer.parseInt(rs.getString(1))+1;
+                }
             }
-            String accIDString = String.format("407-%09d",accNo); 
+            String accIDString = String.format("607-%09d",accNo); 
+           
             //Insert into db
             ps = db.prepareStatement(insertsql,  Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userid);
@@ -86,9 +88,14 @@ public interface ServerAccount extends SQLConnect{
 
         }catch (SQLException e) {
             e.printStackTrace();
+        
+        }catch(Exception e){
+            e.printStackTrace();
+
         } finally {
             SQLConnect.disconnectDB(db);
         }
+
         return acc;
     }
 }
