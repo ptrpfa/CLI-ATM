@@ -105,7 +105,16 @@ public class User {
         String date = formatter.format(this.registrationDate);
         return date;
     }
-    
+  
+    public int getActive() {
+        if(this.active == true) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
     // Hold userID 
     public void setUserID(int ID) {
         this.userID = ID;
@@ -147,5 +156,14 @@ public class User {
     // Hold registration date
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public void setActive(int active){
+        if(active == 1) {
+            this.active = true;
+        }
+        else{
+            this.active = false;
+        }
     }
 }
