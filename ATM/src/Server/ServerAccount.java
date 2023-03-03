@@ -98,4 +98,32 @@ public interface ServerAccount extends SQLConnect{
 
         return acc;
     }
+    public static boolean AccountDeposit(int userID, int accID, double amount){
+
+        Connection db = SQLConnect.getDBConnection();
+        try{
+            // Get the current value from the table
+            Statement stmt = db.createStatement();
+            String sql = String.format("SELECT AvailableBalance, TotalBalance FROM Account WHERE UserId = %d AND AccountID = %d", userID, accID);
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            double availableBalance = rs.getDouble("AvailableBalance");
+            double totalBalance = rs.getDouble("TotalBalance");
+            
+            //Update Database
+            sql = String.format("UPDATE Account SET AvailableBalance = ?, TotalBalance = ? WHERE UserId = %d AND AccountID = %d", userID, accID);
+            availableBalance += amount;
+            totalBalance += amount;
+
+            PreparedStatement updateStmt = db.prepareStatement(sql);
+            updateStmt.setDouble(1, availableBalance);
+            updateStmt.setDouble(2, totalBalance);
+            updateStmt.executeUpdate();
+
+            return true;
+        }catch(SQLException e){
+            System.out.println("Error occurred: " + e.getMessage());
+        }
+        return false;
+    }
 }

@@ -1,12 +1,19 @@
 package Account;
-public class AccountTransaction {
 
-    public boolean Deposit(Account account, double amount){
+import Server.ServerAccount;
+
+public class AccountTransaction implements ServerAccount{
+
+    public void Deposit(Account account, double amount){
         //Update accBalance
-        //Set try catch to see if set will return SQL IO exception
-        account.setAvailableBalance(amount);
-        //if ok return true
-        return true;
+        boolean result = ServerAccount.AccountDeposit(account.getUserID(), account.getAccID(), amount);
+        
+        //If Server updated
+        if(result){
+            account.setAvailableBalance(amount);
+        }else{
+            throw new TransactionError("Error in system...");
+        }
     }
 
     public boolean Withdraw(Account account, double amount) throws Exception{
@@ -41,5 +48,11 @@ public class AccountTransaction {
         return true;
     }
 
-    
+    public static class TransactionError extends RuntimeException{
+        public TransactionError(String message) {
+            super(message);
+        }
+    }        
 }
+
+
