@@ -2,12 +2,14 @@ package Server;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import Account.Account;
 import Transcation.TransactionDetails;
 import java.sql.*;
 
-public class ServerTransactions implements SQLConnect {
-    public List<TransactionDetails> findUserAccounts(int accID) {
-        String sql = String.format("SELECT * FROM transaction WHERE AccountID = %s", accID);
+public interface ServerTransactions extends SQLConnect {
+    public static List<TransactionDetails> findUserTransactions(Account account) {
+        String sql = String.format("SELECT * FROM transaction WHERE AccountID = %s", account.getAccID());
         Connection db = SQLConnect.getDBConnection();
         List<TransactionDetails> Transactions = new ArrayList<>();
         try {
@@ -55,14 +57,5 @@ public class ServerTransactions implements SQLConnect {
         }
     }
     */
-    
-    public static void main(String[] args) {
-        ServerTransactions Trans = new ServerTransactions();
-        List<TransactionDetails> TransList = Trans.findUserAccounts(2318);
-        
-        for (int i = 0; i < TransList.size(); i++) {
-            System.out.println(TransList.get(i).getTransNo());
-            System.out.println(TransList.get(i).getRemarks());
-        }
-    }
 }
+    
