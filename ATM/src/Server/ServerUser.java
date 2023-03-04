@@ -2,9 +2,6 @@ package Server;
 
 import java.sql.*;
 import java.util.Scanner;
-
-import javax.swing.Action;
-
 import java.util.Date;
 
 import User.BusinessUser;
@@ -246,23 +243,26 @@ public class ServerUser {
 
     // Method to reset user password
     public static void resetUserPassword(User user) {
-        Connection db = SQLConnect.getDBConnection();
+        int passwordTries = 2;
         
-        // Try to connect to DB
-        try {
-            String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
-            PreparedStatement statement1 = db.prepareStatement(sql1);
-            ResultSet myRs1 = statement1.executeQuery();
+        do {
+            Connection db = SQLConnect.getDBConnection();
+            // Try to connect to DB
+            try {
+                String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
+                PreparedStatement statement1 = db.prepareStatement(sql1);
+                ResultSet myRs1 = statement1.executeQuery();
 
-            myRs1.next();
+                myRs1.next();
 
-            Scanner input = new Scanner(System.in);
-            System.out.print("Enter old password: ");
-            String oldPassword = input.nextLine();
+                Scanner input = new Scanner(System.in);
+                System.out.print("Enter old password: ");
+                String oldPassword = input.nextLine();
 
-            String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
+                String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
 
-            if(oldPassword.equals(DBPassword)) {
+                PassChecker.checkPassword(oldPassword, DBPassword);
+
                 System.out.print("Enter new password: ");
                 String newPassword1 = input.nextLine();
 
@@ -284,75 +284,39 @@ public class ServerUser {
                         // Perform database updates
                         statement.executeUpdate();
 
-                        System.out.println("Password resetted successfully!\n");
+                        System.out.println("\nPassword resetted successfully!\n");
+                        passwordTries = -1;
                         break;
                     }
                     System.out.print("Password did not match! Please try again " + (3-i) + " tries left.\n");
                 }
             }
-            else {
-                System.out.println("Incorrect password.");
+            catch (SQLException e) {
+                // Check for any SQL connection errors
+                e.printStackTrace();
             }
-            input.close();
-        }
-        catch (SQLException e) {
-            // Check for any SQL connection errors
-            e.printStackTrace();
-        }
-        finally {
-            // Close DB connection
-            SQLConnect.disconnectDB(db);
-        }
-    }
-
-    public static void main(String[] args) {
-        ServerUser serverUser = new ServerUser();
-        
-        // User testUser = serverUser.checkUser("Na0m1_N30", "0nlyf4ns!"); // NormalUser
-        User testUser = serverUser.checkUser("Liu Kai Ping", "testest"); // BusinessUser
-        
-        if (testUser instanceof NormalUser) {
-            // NormalUser user = (NormalUser) testUser;
-            
-            // user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_NORMAL", user.getPostalCode());
-            // user.setAllNames(user.getFirstName(), "梁文珊", user.getLastName());
-            // serverUser.updateUser(user);
-            
-            // System.out.println("\nGood day Mr/Ms " + user.getLastName() + ", " + user.getFirstName() + " " + user.getMiddleName() + ". " + user.getNRIC());
-            // System.out.println("You have been a member since " + user.getRegistrationDate());
-            // System.out.println("Your birthday is coming soon! At: " + user.getBirthday());
-        }
-        else if (testUser instanceof BusinessUser) {
-            BusinessUser user = (BusinessUser) testUser;
-            
-            serverUser.resetUserPassword(user);
-            // user.setAddress(user.getAddresses(1), user.getAddresses(2), "TEST_ADDRESS_BUSINESS", user.getPostalCode());
-            // user.setBusinessName("Onlyfans.com");
-            // serverUser.updateUser(user);
-            
-            // System.out.println("\nWelcome " + user.getBusinessName() + ". Your username is: " + user.getUsername());
-            // System.out.println("Your company UEN is " + user.getUEN());
-            // System.out.println("Your user activity is: " + user.getActive());
-        }
+            catch (WrongPasswordException e){
+                System.out.println(e.getMessage() + passwordTries + " tries left.\n");
+            }
+            finally {
+                // Close DB connection
+                SQLConnect.disconnectDB(db);
+            }
+            passwordTries--;
+        } while (passwordTries >= 0);
     }
 }
 
-class WrongNumberException extends Exception {
-    public WrongNumberException(String errorMessage) {
+class WrongPasswordException extends Exception {
+    public WrongPasswordException(String errorMessage) {
         super(errorMessage);
     }
 }
 
-class NumberChecker {
-    public static void checkNegative(double number) throws WrongNumberException {
-        if (number < 0) {
-            throw new WrongNumberException("Amount cannot be negative!\n");
-        }
-    }
-
-    public static void checkOption(int number, int max) throws WrongNumberException {
-        if (number > max) {
-            throw new WrongNumberException("Wrong Choice lah bang\n");
+class PassChecker {
+    public static void checkPassword(String oldPass, String newPass) throws WrongPasswordException {
+        if (!oldPass.equals(newPass)) {
+            throw new WrongPasswordException("Incorrect password! ");
         }
     }
 }

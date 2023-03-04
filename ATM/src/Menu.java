@@ -41,13 +41,15 @@ class Menu implements ServerAccount, ServerTransactions {
                 "6- Reset Password",
                 "7- Exit"
         };
-        // Print Available Accounts
-        System.out.println("\nActive Accounts..");
-        printTable(Account.PrintHeaders(), accounts);
 
-        System.out.println("\n");
         int option = -1;
+
         do {
+            // Print Available Accounts
+            System.out.println("\nActive Accounts..");
+            printTable(Account.PrintHeaders(), accounts);
+    
+            System.out.println("\n");
             int accountOption = -1;
             printMenu(options);
             System.out.println("What would would want to do? (Key in the Command Number)");
@@ -78,7 +80,7 @@ class Menu implements ServerAccount, ServerTransactions {
                                 scanner.nextLine();
                             }
                         } while (accountOption == -1);
-                        Deposit(accounts.get(accountOption));
+                        Deposit(accounts.get(accountOption - 1));
                         break;
                     case 3:
                         // Withdraw();
@@ -86,14 +88,18 @@ class Menu implements ServerAccount, ServerTransactions {
                     case 5:
                         do {
                             try {
-                                System.out.println("Please choose Account to transact from...");
+                                // Print account table
+                                System.out.println("Please choose Account to view transactions from...");
                                 printTable(Account.PrintHeaders(), accounts);
+
+                                // Get user input on account to view
                                 System.out.print("\n> ");
                                 accountOption = scanner.nextInt();
                                 NumberChecker.checkOption(accountOption, accounts.size());
+
+                                // Print transactions table
                                 transactions = ServerTransactions.findUserTransactions(accounts.get(accountOption - 1));
                                 printTable(TransactionDetails.PrintHeaders(), transactions);
-                                System.out.print("\n> ");
                             } catch (WrongNumberException e) {
                                 System.out.println(e.getMessage());
                                 accountOption = -1;
@@ -107,7 +113,6 @@ class Menu implements ServerAccount, ServerTransactions {
                         break;
                     case 6:
                         ServerUser.resetUserPassword(user);
-                        // scanner.nextLine();
                         break;
                 }
             } catch (Exception ex) {
