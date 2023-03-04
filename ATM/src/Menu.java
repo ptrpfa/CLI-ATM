@@ -99,7 +99,50 @@ class Menu implements ServerAccount, ServerTransactions {
 
                                 // Print transactions table
                                 transactions = ServerTransactions.findUserTransactions(accounts.get(accountOption - 1));
-                                printTable(TransactionDetails.PrintHeaders(), transactions);
+                                
+                                boolean view = true;
+                                int pageCount = 1;
+                                int pageStart = 0;
+                                int pageEnd = 10;
+
+                                while(view){
+                                    int pages = transactions.size() / 10;
+                                    
+                                    try{
+                                        List<TransactionDetails> tempList = transactions.subList(pageStart, pageEnd);
+                                        printTable(TransactionDetails.PrintHeaders(), tempList);
+
+                                        System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages);
+                                        System.out.print("\n\n1- Back");
+                                        System.out.print("\n2- Next");
+                                        System.out.println("\n3- Return to menu");
+                                        System.out.print(">");
+                                        int pageOption = scanner.nextInt();
+                                        NumberChecker.checkOption(pageOption, 3);
+                                        
+                                        if(pageOption == 1){
+                                            int pageCountTemp = pageCount - 1;
+                                            NumberChecker.checkPageValidity(pageCountTemp, pages);
+                                            pageCount--;
+                                            pageStart = pageStart - 10;
+                                            pageEnd = pageEnd - 10;
+                                        }
+                                        else if(pageOption == 2){
+                                            int pageCountTemp = pageCount + 1;
+                                            NumberChecker.checkPageValidity(pageCountTemp, pages);
+                                            pageCount++;
+                                            pageStart = pageStart + 10;
+                                            pageEnd = pageEnd + 10;
+                                        }
+                                        else if(pageOption == 3){
+                                            view = false;
+                                        }
+                                    } catch (WrongNumberException e) {
+                                        System.out.println(e.getMessage());
+                                        scanner.nextLine();
+                                    }
+                                }
+
                             } catch (WrongNumberException e) {
                                 System.out.println(e.getMessage());
                                 accountOption = -1;
@@ -307,6 +350,15 @@ class NumberChecker {
     public static void checkOption(int number, int max) throws WrongNumberException {
         if (number > max) {
             throw new WrongNumberException("Wrong Choice lah bang\n");
+        }
+    }
+
+    public static void checkPageValidity(int requested, int max) throws WrongNumberException {
+        if (requested < 1) {
+            throw new WrongNumberException("Unable to proceed to page requested\n");
+        }
+        if (requested > max) {
+            throw new WrongNumberException("Unable to proceed to page requested\n");
         }
     }
 }

@@ -37,6 +37,13 @@ public interface ServerTransactions extends SQLConnect {
         } finally {
             SQLConnect.disconnectDB(db);
         }
+
+        // Reverse list to view from latest transaction first
+        for (int k = 0, j = Transactions.size() - 1; k < j; k++)
+        {
+            Transactions.add(k, Transactions.remove(j));
+        }
+
         return Transactions;
     }
     /*
