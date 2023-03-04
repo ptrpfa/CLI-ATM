@@ -88,7 +88,7 @@ class Menu implements ServerAccount, ServerTransactions {
                     case 5:
                         do {
                             try {
-                                // Print account table
+                                // Prints account table
                                 System.out.println("Please choose Account to view transactions from...");
                                 printTable(Account.PrintHeaders(), accounts);
 
@@ -100,18 +100,22 @@ class Menu implements ServerAccount, ServerTransactions {
                                 // Print transactions table
                                 transactions = ServerTransactions.findUserTransactions(accounts.get(accountOption - 1));
                                 
+                                // Loop controllers and counter
                                 boolean view = true;
                                 int pageCount = 1;
                                 int pageStart = 0;
                                 int pageEnd = 10;
 
+                                // Loop as long as user still wants to continue
                                 while(view){
+                                    // Get number of transaction pages
                                     int pages = transactions.size() / 10;
                                     
                                     try{
                                         List<TransactionDetails> tempList = transactions.subList(pageStart, pageEnd);
                                         printTable(TransactionDetails.PrintHeaders(), tempList);
 
+                                        // Display menu and check for valid input of 1 - 3
                                         System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages);
                                         System.out.print("\n\n1- Back");
                                         System.out.print("\n2- Next");
@@ -120,6 +124,8 @@ class Menu implements ServerAccount, ServerTransactions {
                                         int pageOption = scanner.nextInt();
                                         NumberChecker.checkOption(pageOption, 3);
                                         
+                                        // Checks if user tries to go below min or beyond max number of pages
+                                        // Increase/Decrease page counter and page displays
                                         if(pageOption == 1){
                                             int pageCountTemp = pageCount - 1;
                                             NumberChecker.checkPageValidity(pageCountTemp, pages);
@@ -134,6 +140,7 @@ class Menu implements ServerAccount, ServerTransactions {
                                             pageStart = pageStart + 10;
                                             pageEnd = pageEnd + 10;
                                         }
+                                        // Exit transaction viewing
                                         else if(pageOption == 3){
                                             view = false;
                                         }
@@ -155,6 +162,7 @@ class Menu implements ServerAccount, ServerTransactions {
                         } while (accountOption == -1);
                         break;
                     case 6:
+                        // Calls user reset password menu and process
                         ServerUser.resetUserPassword(user);
                         break;
                 }
