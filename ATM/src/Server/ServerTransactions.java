@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Account.Account;
-import Transcation.TransactionDetails;
+import Transaction.TransactionDetails;
+
 import java.sql.*;
 
 public interface ServerTransactions extends SQLConnect {

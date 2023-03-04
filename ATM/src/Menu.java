@@ -8,7 +8,7 @@ import User.User;
 import Server.ServerAccount;
 import Server.ServerTransactions;
 import Server.ServerUser;
-import Transcation.TransactionDetails;
+import Transaction.TransactionDetails;
 
 class Menu implements ServerAccount, ServerTransactions {
     private List<Account> accounts;
@@ -37,7 +37,7 @@ class Menu implements ServerAccount, ServerTransactions {
                 "2- Deposit",
                 "3- Withdraw",
                 "4- Transfer Funds",
-                "5- View Transcations",
+                "5- View Transactions",
                 "6- Reset Password",
                 "7- Exit"
         };
@@ -164,6 +164,7 @@ class Menu implements ServerAccount, ServerTransactions {
                     case 6:
                         // Calls user reset password menu and process
                         ServerUser.resetUserPassword(user);
+                        // ServerUser.deactivateUser(user);
                         break;
                 }
             } catch (Exception ex) {
@@ -222,7 +223,7 @@ class Menu implements ServerAccount, ServerTransactions {
             scanner.nextLine();
         }
     }
-
+    
     public void Deposit(Account acc) {
         double amount = 0;
         boolean isValidInput = false;
@@ -272,10 +273,10 @@ class Menu implements ServerAccount, ServerTransactions {
     // 'TransferFunds'");
     // }
 
-    // public void ViewTranscation(Account acc) {
+    // public void ViewTransaction(Account acc) {
     // // TODO Auto-generated method stub
     // throw new UnsupportedOperationException("Unimplemented method
-    // 'ViewTranscation'");
+    // 'ViewTransaction'");
     // }
 
     // Template for printing Option Commands
@@ -362,10 +363,7 @@ class NumberChecker {
     }
 
     public static void checkPageValidity(int requested, int max) throws WrongNumberException {
-        if (requested < 1) {
-            throw new WrongNumberException("Unable to proceed to page requested\n");
-        }
-        if (requested > max) {
+        if ((requested < 1) || (requested > max)) {
             throw new WrongNumberException("Unable to proceed to page requested\n");
         }
     }

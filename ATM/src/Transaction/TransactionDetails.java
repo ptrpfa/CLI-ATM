@@ -1,4 +1,4 @@
-package Transcation;
+package Transaction;
 import java.util.Date;
 
 import pl.mjaron.etudes.Int;
