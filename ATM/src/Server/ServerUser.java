@@ -2,7 +2,6 @@ package Server;
 
 import java.sql.*;
 import java.util.Scanner;
-import java.util.Date;
 
 import User.BusinessUser;
 import User.NormalUser;
@@ -11,70 +10,70 @@ import User.User;
 public class ServerUser {
 
     // Method to create user (METHOD WIP)
-    public void registerUser() {
-        Scanner input = new Scanner(System.in);
+    // public void registerUser() {
+    //     Scanner input = new Scanner(System.in);
 
-        System.out.print("1. Business user\n2. Normal user\nEnter user type: ");
-        int userType = input.nextInt();
+    //     System.out.print("1. Business user\n2. Normal user\nEnter user type: ");
+    //     int userType = input.nextInt();
 
-        System.out.print("Enter username: ");
-        String username = input.nextLine();
+    //     System.out.print("Enter username: ");
+    //     String username = input.nextLine();
 
-        System.out.print("Enter password: ");
-        String password = input.nextLine();
+    //     System.out.print("Enter password: ");
+    //     String password = input.nextLine();
 
-        System.out.print("Enter email: ");
-        String email = input.nextLine();
+    //     System.out.print("Enter email: ");
+    //     String email = input.nextLine();
 
-        System.out.print("Enter phone: ");
-        int phone = input.nextInt();
+    //     System.out.print("Enter phone: ");
+    //     int phone = input.nextInt();
 
-        System.out.print("Enter address (Address 1, Address 2, Address 3): ");
-        String address1 = input.nextLine();
-        String address2 = input.nextLine();
-        String address3 = input.nextLine();
+    //     System.out.print("Enter address (Address 1, Address 2, Address 3): ");
+    //     String address1 = input.nextLine();
+    //     String address2 = input.nextLine();
+    //     String address3 = input.nextLine();
 
-        System.out.println("Enter postal code: ");
-        int postalCode = input.nextInt();
+    //     System.out.println("Enter postal code: ");
+    //     int postalCode = input.nextInt();
 
-        Date registerDate = new Date();
+    //     Date registerDate = new Date();
 
-        if (userType == 1){
-            System.out.print("Enter NRIC: ");
-            String NRIC = input.nextLine();
+    //     if (userType == 1){
+    //         System.out.print("Enter NRIC: ");
+    //         String NRIC = input.nextLine();
 
-            System.out.print("Enter first name: ");
-            String firstName = input.nextLine();
+    //         System.out.print("Enter first name: ");
+    //         String firstName = input.nextLine();
 
-            System.out.print("Enter last name: ");
-            String lastName = input.nextLine();
+    //         System.out.print("Enter last name: ");
+    //         String lastName = input.nextLine();
             
-            System.out.print("Enter middle name (If applicable): ");
-            String middleName = input.nextLine();
+    //         System.out.print("Enter middle name (If applicable): ");
+    //         String middleName = input.nextLine();
 
-            System.out.print("1. Male\n2. Female\nSelect gender: ");
-            int genderInt = input.nextInt();
+    //         System.out.print("1. Male\n2. Female\nSelect gender: ");
+    //         int genderInt = input.nextInt();
             
-            if(genderInt == 1) {
-                String gender = "Male";
-            }
+    //         if(genderInt == 1) {
+    //             String gender = "Male";
+    //         }
 
-            else if(genderInt == 2) {
-                String gender = "Female";
-            }
+    //         else if(genderInt == 2) {
+    //             String gender = "Female";
+    //         }
 
-            System.out.print("Enter DOB:");
+    //         System.out.print("Enter DOB:");
 
-        }
+    //     }
 
-        else if (userType == 2) {
-            System.out.print("Enter business name");
-            String businessName = input.nextLine();
+    //     else if (userType == 2) {
+    //         System.out.print("Enter business name");
+    //         String businessName = input.nextLine();
 
-            System.out.print("Enter UEN: ");
-            String UEN = input.nextLine();
-        }
-    }
+    //         System.out.print("Enter UEN: ");
+    //         String UEN = input.nextLine();
+    //     }
+    // }
 
     // Method to check username and password, return User object which is an instance of NormalUser or BusinessUser
     public User checkUser(String username, String password) {
@@ -176,7 +175,7 @@ public class ServerUser {
     }
     
     // Method to update DBs with latest information
-    public void updateUser(User user) {
+    public static void updateUser(User user) {
         Connection db = SQLConnect.getDBConnection();
         
         // Try to connect to DB
@@ -238,6 +237,156 @@ public class ServerUser {
         finally {
             // Close DB connection
             SQLConnect.disconnectDB(db);
+        }
+    }
+
+    public static void getNewUpdates(User user) {
+        Scanner input = new Scanner(System.in);
+        int updateChoice = 0;
+        int max = 7;
+        String newUpdate;
+
+        while(updateChoice <= 1 || updateChoice >= max) {
+            System.out.println("\nWhich user detail would you like to update..\n");
+            System.out.println("1- Username");
+            System.out.println("2- Email");
+            System.out.println("3- Phone");
+            System.out.println("4- Address One");
+            System.out.println("5- Address Two");
+            System.out.println("6- Address Three");
+            System.out.println("7- Postal Code");
+
+            if (user instanceof NormalUser) {
+                max = 12;
+                System.out.println("8- NRIC");
+                System.out.println("9- First Name");
+                System.out.println("10- Middle Name");
+                System.out.println("11- Last Name");
+                System.out.println("12- Gender");
+            }
+
+            if (user instanceof BusinessUser) {
+                max = 9;
+                System.out.println("8- UEN");
+                System.out.println("9- Business Name");
+            }
+            
+            System.out.println("\nWhat do you want to do?");
+            System.out.print("> ");
+            updateChoice = input.nextInt();
+        }
+
+        switch(updateChoice) {
+            case 1:
+                System.out.println("Current username: " + user.getUsername());
+                System.out.print("Enter new username: ");
+                newUpdate = input.next();
+                user.setUsername(newUpdate);
+                
+                break;
+            case 2:
+                System.out.println("Current email: " + user.getEmail());
+                System.out.print("Enter new email: ");
+                newUpdate = input.next();
+                user.setEmail(newUpdate);
+                
+                break;
+            case 3:
+                System.out.println("Current phone: " + user.getPhone());
+                System.out.print("Enter new phone: ");
+                newUpdate = input.next();
+                user.setPhone(newUpdate);
+                
+                break;
+            case 4:
+                System.out.println("Current address one: " + user.getAddresses(1));
+                System.out.print("Enter new address one: ");
+                newUpdate = input.next();
+                user.setAddress(newUpdate, user.getAddresses(2), user.getAddresses(3), user.getPostalCode());
+                
+                break;
+            case 5:
+                System.out.println("Current address two: " + user.getAddresses(2));
+                System.out.print("Enter new address two: ");
+                newUpdate = input.next();
+                user.setAddress(user.getAddresses(1), newUpdate, user.getAddresses(3), user.getPostalCode());
+                
+                break;
+            case 6:
+                System.out.println("Current address three: " + user.getAddresses(3));
+                System.out.print("Enter new address three: ");
+                newUpdate = input.next();
+                user.setAddress(user.getAddresses(1), user.getAddresses(2), newUpdate, user.getPostalCode());
+                
+                break;
+            case 7:
+                System.out.println("Current postal code: " + user.getPostalCode());
+                System.out.print("Enter new postal code: ");
+                newUpdate = input.next();
+                user.setAddress(user.getAddresses(1), user.getAddresses(2), user.getAddresses(3), newUpdate);
+                
+                break;
+            case 8:
+                if (user instanceof NormalUser) {
+                    NormalUser tempUser = (NormalUser) user;
+
+                    System.out.println("Current NRIC: " + tempUser.getNRIC());
+                    System.out.print("Enter new NRIC: ");
+                    newUpdate = input.next();
+                    tempUser.setNRIC(newUpdate);
+                }
+                if (user instanceof BusinessUser) {
+                    BusinessUser tempUser = (BusinessUser) user;
+                    System.out.println("Current UEN: " + tempUser.getUEN());
+                    System.out.print("Enter new UEN: ");
+                    newUpdate = input.next();
+                    tempUser.setUEN(newUpdate);
+                }
+
+                break;
+            case 9:
+                if (user instanceof NormalUser) {
+                    NormalUser tempUser = (NormalUser) user;
+
+                    System.out.println("Current first name: " + tempUser.getFirstName());
+                    System.out.print("Enter new first name: ");
+                    newUpdate = input.next();
+                    tempUser.setAllNames(newUpdate, tempUser.getMiddleName(), tempUser.getLastName());
+                }
+                if (user instanceof BusinessUser) {
+                    BusinessUser tempUser = (BusinessUser) user;
+                    System.out.println("Current business name: " + tempUser.getBusinessName());
+                    System.out.print("Enter new business name: ");
+                }
+
+                break;
+            case 10:
+                NormalUser tempUser = (NormalUser) user;
+
+                System.out.println("Current middle name: " + tempUser.getFirstName());
+                System.out.print("Enter new middle name: ");
+                newUpdate = input.next();
+                tempUser.setAllNames(newUpdate, newUpdate, tempUser.getLastName());
+
+                break;
+            case 11:
+                NormalUser tempUser2 = (NormalUser) user;
+
+                System.out.println("Current last name: " + tempUser2.getLastName());
+                System.out.print("Enter new last name: ");
+                newUpdate = input.next();
+                tempUser2.setAllNames(tempUser2.getFirstName(), tempUser2.getMiddleName(), newUpdate);
+
+                break;
+            case 12:
+                NormalUser tempUser3 = (NormalUser) user;
+
+                System.out.println("Current gender: " + tempUser3.getGender());
+                System.out.print("Enter new gender: ");
+                newUpdate = input.next();
+                tempUser3.setGender(newUpdate);
+
+                break;
         }
     }
 

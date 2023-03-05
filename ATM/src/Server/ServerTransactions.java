@@ -1,7 +1,12 @@
 package Server;
 
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+import com.mysql.cj.xdevapi.Result;
 
 import Account.Account;
 import Transaction.TransactionDetails;
@@ -9,8 +14,9 @@ import Transaction.TransactionDetails;
 import java.sql.*;
 
 public interface ServerTransactions extends SQLConnect {
+    // Get transactions for specific account
     public static List<TransactionDetails> findUserTransactions(Account account) {
-        String sql = String.format("SELECT * FROM transaction WHERE AccountID = %s", account.getAccID());
+        String sql = String.format("SELECT * FROM Transaction WHERE AccountID = %s", account.getAccID());
         Connection db = SQLConnect.getDBConnection();
         List<TransactionDetails> Transactions = new ArrayList<>();
         try {
@@ -47,23 +53,55 @@ public interface ServerTransactions extends SQLConnect {
 
         return Transactions;
     }
-    /*
-    //Create Transaction
-    public void createNewTransaction(int accID) {
-        String sql = String.format(
-                "INSERT INTO transaction(AccountID,TransactionNo,Datetime,ValueDatetime,Debit,Credit,Balance,Status,Remarks) VALUES (?,?,?,?,?,?,?,?,?)");
-        Connection db = SQLConnect.getDBConnection();
-        List<TransactionDetails> CreateTransactions = new ArrayList<>();
-        try {
-            PreparedStatement statement = db.prepareStatement(sql);
-            statement.setInt(1, accID);
 
+    //Create Transaction
+    public static void createNewTransaction(TransactionDetails transaction) {
+        String sql = String.format("INSERT INTO Transaction (AccountID, TransactionNo, Datetime, ValueDatetime, Debit, Credit, Balance, Status, Remarks) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)");
+        String countQuery = "SELECT count(*) FROM Transaction";
+        
+        Connection db = SQLConnect.getDBConnection();
+        try {
+            // Template for 2 statements. 1 for Insertion, 1 for Reading Queries
+            PreparedStatement statement = db.prepareStatement(sql);
+            PreparedStatement countStatement = db.prepareStatement(countQuery);
+            ResultSet countRS = countStatement.executeQuery();
+
+            countRS.next();
+            int transactionNo = countRS.getInt(1);
+
+            // Fill up update statements with latest particulars for "Transaction" DB
+            statement.setInt(1, transaction.getAccID());
+            statement.setString(2, Integer.toString(transactionNo));
+            statement.setDate(3, transaction.getValueDatetime());
+            statement.setDouble(4, transaction.getDebit());
+            statement.setDouble(5, transaction.getCredit());
+            statement.setDouble(6, transaction.getBalance());
+            statement.setInt(7, transaction.getStatus());
+            statement.setString(8, transaction.getRemarks());
+
+            // Insert into latest row of DB
+            int rowsInserted = statement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("A new user was inserted successfully!");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             SQLConnect.disconnectDB(db);
         }
     }
-    */
+
+//     public static void main(String[] args) {
+//         /* Pretend this is work class where user does a transaction */
+//         // Create new transaction, store in transaction object
+//         // Send transaction object to method that adds to DB
+//         TransactionDetails transaction;
+//         Scanner input = new Scanner(System.in);
+
+//         System.out.println("Enter amount to deposit (debit): ");
+//         double amount = input.nextDouble();
+
+//         createNewTransaction(transaction);
+//     }
 }
     

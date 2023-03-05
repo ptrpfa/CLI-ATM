@@ -1,5 +1,5 @@
 package Transaction;
-import java.util.Date;
+import java.sql.Date;
 
 import pl.mjaron.etudes.Int;
 
@@ -20,24 +20,21 @@ public class TransactionDetails {
         this.transID = transID;
         this.accID = accID;
         this.transno = transno;
-        Datetime = datetime;
-        ValueDatetime = valueDatetime;
+        this.Datetime = datetime;
+        this.ValueDatetime = valueDatetime;
         this.debit = debit;
         this.credit = credit;
         this.balance = balance;
         this.status = status;
-        Remarks = remarks;
+        this.Remarks = remarks;
     }
+    
     //Pull data for this accID
     public TransactionDetails(int accID) {
         this.accID = accID;
     }
-    //Methods
-    private boolean UpdateStatus(){
-        return true;
-    }
-    //Setters (Omit allow setting accID and transID) <- only backend can set
 
+    //Setters (Omit allow setting accID and transID) <- only backend can set
     public void setDatetime(Date datetime) {
         Datetime = datetime;
     }
@@ -109,16 +106,25 @@ public class TransactionDetails {
         return Remarks;
     }
 
- //Printing Methods
- public String[] PrintValues(){   
-    String datetime = Datetime.toString();
-    String[] values = {transno, datetime, Double.toString(debit),Double.toString(credit),Double.toString(balance),Integer.toString(status),Remarks};
-    //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
-    return values;
-}
+    // Methods
+    private boolean UpdateStatus(){
+        return true;
+    }
 
-public static String[] PrintHeaders(){
-    String[] headers = {"Transaction Number", "Date","Debit","Credit","Balance","Status","Remarks"};
-    return headers;
-}
+    public void updateBalance() {
+        this.balance = this.balance + this.debit;
+    }
+
+    //Printing Methods
+    public String[] PrintValues(){   
+        String datetime = Datetime.toString();
+        String[] values = {transno, datetime, Double.toString(debit),Double.toString(credit),Double.toString(balance),Integer.toString(status),Remarks};
+        //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
+        return values;
+    }
+
+    public static String[] PrintHeaders(){
+        String[] headers = {"Transaction Number", "Date", "Debit", "Credit", "Balance", "Status", "Remarks"};
+        return headers;
+    }
 }

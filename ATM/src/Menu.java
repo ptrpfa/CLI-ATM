@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -42,7 +43,7 @@ class Menu implements ServerAccount, ServerTransactions {
                 "7- Exit"
         };
         String[] userOptions = {
-            "1- Reset Password",
+            "\n1- Reset Password",
             "2- Update User Account",
             "3- Deactivate User Account",
             "4- Return to menu"
@@ -58,7 +59,7 @@ class Menu implements ServerAccount, ServerTransactions {
             System.out.println("\n");
             int accountOption = -1;
             printMenu(options);
-            System.out.println("What do you want to do? (Key in the Command Number)");
+            System.out.println("\nWhat do you want to do? (Key in the Command Number)");
             System.out.print("> ");
 
             try {
@@ -70,7 +71,11 @@ class Menu implements ServerAccount, ServerTransactions {
                         try {
                             int userOption = -1;
                             do {
-                                System.out.println("Request to edit user details");
+                                System.out.println("Request to edit user details..");
+                                List<User> userList = new ArrayList<>();
+                                userList.add(user);
+
+                                printTable(User.PrintHeaders(), userList);
                                 printMenu(userOptions);
                                 System.out.println();
                                 System.out.println("What do you want to do?");
@@ -86,6 +91,8 @@ class Menu implements ServerAccount, ServerTransactions {
 
                                     // Calls user update menu and process
                                     case 2:
+                                        ServerUser.getNewUpdates(user);
+                                        ServerUser.updateUser(user);
                                         break;
 
                                     // Calls user deactivation menu and process
@@ -347,6 +354,10 @@ class Menu implements ServerAccount, ServerTransactions {
             
             if (item instanceof TransactionDetails) {
                 values[i] = ((TransactionDetails) item).PrintValues();
+            }
+
+            if (item instanceof User) {
+                values[i] = ((User) item).PrintValues();
             }
         }
 
