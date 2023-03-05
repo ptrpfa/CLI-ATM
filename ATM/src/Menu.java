@@ -33,13 +33,19 @@ class Menu implements ServerAccount, ServerTransactions {
 
     public void run() {
         String[] options = {
-                "1- Create New Account",
-                "2- Deposit",
-                "3- Withdraw",
-                "4- Transfer Funds",
-                "5- View Transactions",
-                "6- Reset Password",
+                "1- Edit User Details",
+                "2- Create New Account",
+                "3- Deposit",
+                "4- Withdraw",
+                "5- Transfer Funds",
+                "6- View Transactions",
                 "7- Exit"
+        };
+        String[] userOptions = {
+            "1- Reset Password",
+            "2- Update User Account",
+            "3- Deactivate User Account",
+            "4- Return to menu"
         };
 
         int option = -1;
@@ -52,17 +58,61 @@ class Menu implements ServerAccount, ServerTransactions {
             System.out.println("\n");
             int accountOption = -1;
             printMenu(options);
-            System.out.println("What would would want to do? (Key in the Command Number)");
+            System.out.println("What do you want to do? (Key in the Command Number)");
             System.out.print("> ");
+
             try {
                 option = scanner.nextInt();
                 System.out.println("\n");
-                switch (option) {
+                switch(option) {
+                    // View user settings
                     case 1:
+                        try {
+                            int userOption = -1;
+                            do {
+                                System.out.println("Request to edit user details");
+                                printMenu(userOptions);
+                                System.out.println();
+                                System.out.println("What do you want to do?");
+                                System.out.print("> ");
+                                userOption = scanner.nextInt();
+                                NumberChecker.checkOption(userOption, userOptions.length);
+
+                                switch(userOption) {
+                                    // Calls user reset password menu and process
+                                    case 1:
+                                        ServerUser.resetUserPassword(user);
+                                        break;
+
+                                    // Calls user update menu and process
+                                    case 2:
+                                        break;
+
+                                    // Calls user deactivation menu and process
+                                    case 3:
+                                        ServerUser.deactivateUser(user);
+                                        break;
+                                }                            
+                            } while (userOption != 4);
+                        } catch (WrongNumberException e) {
+                            System.out.println(e.getMessage());
+                            accountOption = -1;
+                            scanner.nextLine();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Wrong Input. Try again..\n");
+                            accountOption = -1;
+                            scanner.nextLine();
+                        }
+                        break;
+
+                    // Create new account
+                    case 2:
                         scanner.nextLine();
                         CreateAccount();
                         break;
-                    case 2:
+
+                    // Deposit funds
+                    case 3:
                         do {
                             try {
                                 System.out.println("Please choose Account to transact from...");
@@ -82,10 +132,14 @@ class Menu implements ServerAccount, ServerTransactions {
                         } while (accountOption == -1);
                         Deposit(accounts.get(accountOption - 1));
                         break;
-                    case 3:
+
+                    // Withdraw funds
+                    case 4:
                         // Withdraw();
                         break;
-                    case 5:
+
+                    // View account transactions
+                    case 6:
                         do {
                             try {
                                 // Prints account table
@@ -120,7 +174,7 @@ class Menu implements ServerAccount, ServerTransactions {
                                         System.out.print("\n\n1- Back");
                                         System.out.print("\n2- Next");
                                         System.out.println("\n3- Return to menu");
-                                        System.out.print(">");
+                                        System.out.print("> ");
                                         int pageOption = scanner.nextInt();
                                         NumberChecker.checkOption(pageOption, 3);
                                         
@@ -160,11 +214,6 @@ class Menu implements ServerAccount, ServerTransactions {
                                 scanner.nextLine();
                             }
                         } while (accountOption == -1);
-                        break;
-                    case 6:
-                        // Calls user reset password menu and process
-                        ServerUser.resetUserPassword(user);
-                        // ServerUser.deactivateUser(user);
                         break;
                 }
             } catch (Exception ex) {
@@ -314,7 +363,7 @@ class Menu implements ServerAccount, ServerTransactions {
         }
 
         // Print the table header
-        line = String.format("| %-3s", "No");
+        line = String.format("\n| %-3s", "No");
         System.out.print(line);
         for (int i = 0; i < headers.length; i++) {
             line = String.format("| %-" + colWidths[i] + "s ", headers[i]);
@@ -358,13 +407,13 @@ class NumberChecker {
 
     public static void checkOption(int number, int max) throws WrongNumberException {
         if (number > max) {
-            throw new WrongNumberException("Wrong Choice lah bang\n");
+            throw new WrongNumberException("\nWrong choice lah bang");
         }
     }
 
     public static void checkPageValidity(int requested, int max) throws WrongNumberException {
         if ((requested < 1) || (requested > max)) {
-            throw new WrongNumberException("Unable to proceed to page requested\n");
+            throw new WrongNumberException("\nUnable to proceed to page requested");
         }
     }
 }

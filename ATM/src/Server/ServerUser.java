@@ -243,53 +243,67 @@ public class ServerUser {
 
     // Method to reset user password
     public static void resetUserPassword(User user) {
+        // Loop counter where user only allowed 3 tries
         int passwordTries = 2;
         
         do {
             Connection db = SQLConnect.getDBConnection();
             // Try to connect to DB
             try {
+                // Template to select "User" DB for retrieving data
                 String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
                 PreparedStatement statement1 = db.prepareStatement(sql1);
                 ResultSet myRs1 = statement1.executeQuery();
 
                 myRs1.next();
 
-                System.out.print("Request to reset password\n");
+                // Get old password input for security feature
+                System.out.print("\nRequest to reset password\n");
                 Scanner input = new Scanner(System.in);
                 System.out.print("Enter old password: ");
                 String oldPassword = input.nextLine();
 
+                // Get old password from DB
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
 
+                // Check old password with DB password. If match continue, else throw exception
                 PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
 
-                System.out.print("Enter new password: ");
+                // Get new password input
+                System.out.print("\nEnter new password: ");
                 String newPassword1 = input.nextLine();
 
+                // Secondary loop counter where user have 3 tries to confirm new password
                 for(int i = 1; i < 4; i++) {
                     // Template to select "User" DB for updating data
                     String sql2 = String.format("UPDATE User SET PasswordHash = ? WHERE UserID = %s", user.getUserID());
                     PreparedStatement statement = db.prepareStatement(sql2);
 
-                    System.out.print("Confirm new password: ");
+                    // Get confirmed new password input
+                    System.out.print("\nConfirm new password: ");
                     String newPassword2 = input.nextLine();
 
+                    // Check new password matches twice. If match continue, else reduce tries by 1
                     if(newPassword1.equals(newPassword2)){
+                        // Encrpyts new password and set it for updating to DB
                         newPassword1 = AES256.encrypt(newPassword2);
-
                         user.setPasswordHash(newPassword1);
-
                         statement.setString(1, newPassword1);
 
                         // Perform database updates
                         statement.executeUpdate();
 
+                        // Prints successful message and breaks out of loop and method
                         System.out.println("\nPassword resetted successfully!\n");
                         passwordTries = -1;
                         break;
                     }
-                    System.out.print("Password did not match! Please try again " + (3-i) + " tries left.\n");
+                    
+                    System.out.print("Passwords did not match! Please try again. " + (3-i) + " tries left.\n");
+                 
+                    if(i == 3){
+                        passwordTries = 0;
+                    }
                 }
             }
             catch (SQLException e) {
@@ -297,11 +311,17 @@ public class ServerUser {
                 e.printStackTrace();
             }
             catch (WrongPasswordException e){
+                // Check for password mismatch
                 System.out.println(e.getMessage());
             }
             finally {
                 // Close DB connection
                 SQLConnect.disconnectDB(db);
+            }
+            // If confirm new password fails 3 times, print message and break from loop
+            if(passwordTries == 0) {
+                passwordTries = -1;
+                System.out.print("\nPassword reset request aborted.\n\n");
             }
             passwordTries--;
         } while (passwordTries >= 0);
@@ -309,6 +329,7 @@ public class ServerUser {
 
     // Method to deactivate user from DB
     public static void deactivateUser(User user) throws InterruptedException {
+        // Loop counter where user only allowed 3 tries
         int passwordTries = 2;
         int deactivationOption1 = 0;
         int deactivationOption2 = 0;
@@ -317,26 +338,31 @@ public class ServerUser {
             Connection db = SQLConnect.getDBConnection();
             // Try to connect to DB
             try {
+                // Template to select "User" DB for retrieving data
                 String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
                 PreparedStatement statement1 = db.prepareStatement(sql1);
                 ResultSet myRs1 = statement1.executeQuery();
 
                 myRs1.next();
 
-                System.out.print("Deactivation of user account\n");
+                // Get old password input for security feature
+                System.out.print("\nDeactivation of user account\n");
                 Scanner input = new Scanner(System.in);
                 System.out.print("Enter password: ");
                 String oldPassword = input.nextLine();
 
+                // Get old password from DB
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
 
+                // Check old password with DB password. If match continue, else throw exception
                 PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
             
+                // Template to select "User" DB for updating data
                 String sql2 = String.format("UPDATE User SET Active = ? WHERE UserID = %s", user.getUserID());
                 PreparedStatement statement = db.prepareStatement(sql2);
 
+                // Display menu and checks for valid input of 1 - 2
                 System.out.print("\n");
-                // Display menu and check for valid input of 1 - 2
                 while(deactivationOption1 != 1 && deactivationOption1 != 2) {
                     System.out.print("Activation of user account can only be done on administrator side.");
                     System.out.print("\nAre you sure you want to deactivate your user account? ");
@@ -350,7 +376,7 @@ public class ServerUser {
                     }
                 }
                 
-                // If user wants to deactivate user account
+                // If user wants to deactivate user account and checks for valid input of 1 - 2
                 if(deactivationOption1 == 1) {
                     while(deactivationOption2 != 1 && deactivationOption2 != 2) {
                         System.out.print("\nConfirm deactivation? ");
@@ -376,12 +402,12 @@ public class ServerUser {
                         System.exit(1);
                     }
                     
-                    // User confirms not to deactivate user
+                    // Else, user confirms not to deactivate user account and prints abort message
                     deactivationOption1 = 2;
                 }
-                if(deactivationOption1 == 2){
-                    System.out.println("\nUser account deactivation request aborted");
-                    passwordTries = -1;
+                // If, user decides not to deactivate user account
+                if(deactivationOption1 == 2) {
+                    passwordTries = 0;
                 }
             }
             catch (WrongPasswordException e) {
@@ -395,6 +421,11 @@ public class ServerUser {
             finally {
                 // Close DB connection
                 SQLConnect.disconnectDB(db);
+            }
+            // If password tries fails 3 times or user decides not to deactivate user account
+            if(passwordTries == 0){
+                System.out.println("\nUser account deactivation request aborted.\n");
+                passwordTries = -1;
             }
             passwordTries--;
         } while (passwordTries >= 0);
@@ -410,7 +441,7 @@ class WrongPasswordException extends Exception {
 class PassChecker {
     public static void checkPassword(String oldPass, String newPass, int tries) throws WrongPasswordException {
         if (!oldPass.equals(newPass)) {
-            throw new WrongPasswordException("Incorrect password! " + tries + " tries left.\n");
+            throw new WrongPasswordException("Incorrect password! " + tries + " tries left.");
         }
     }
     public static void checkOption(int number, int max) throws WrongPasswordException {
