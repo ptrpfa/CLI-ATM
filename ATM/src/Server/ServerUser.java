@@ -12,67 +12,203 @@ public class ServerUser {
 
     // Method to create user (METHOD WIP)
     public void registerUser() {
-        Scanner input = new Scanner(System.in);
+        Scanner input = new Scanner(System.in).useDelimiter(",\\s*");
+        int userID;
+        String username;
+        String passwordSalt;
+        String passwordHash;
+        String email;
+        String phone;
+        String addressOne;
+        String addressTwo;
+        String addressThree;
+        String postalCode;
+        Date registrationDate;
+        int userType = 0;
+        boolean active = true;
 
-        System.out.print("1. Business user\n2. Normal user\nEnter user type: ");
-        int userType = input.nextInt();
+        // Auto generate userID
+        
+        // Auto generate salt (maybe call function from AES?)
+
+        do{
+            System.out.print("Enter user type\n");
+            System.out.print("1- Business user");
+            System.out.print("2- Normal user\nEnter user type: ");
+            System.out.print("> ");
+            userType = input.nextInt();
+        } while (userType != 1 & userType != 2);
 
         System.out.print("Enter username: ");
-        String username = input.nextLine();
+        username = input.nextLine();
 
         System.out.print("Enter password: ");
-        String password = input.nextLine();
+        String passwordTemp = input.nextLine();
+        passwordHash = AES256.encrypt(passwordTemp);
 
         System.out.print("Enter email: ");
-        String email = input.nextLine();
+        email = input.nextLine();
 
         System.out.print("Enter phone: ");
-        int phone = input.nextInt();
+        phone = input.nextLine();
 
-        System.out.print("Enter address (Address 1, Address 2, Address 3): ");
-        String address1 = input.nextLine();
-        String address2 = input.nextLine();
-        String address3 = input.nextLine();
+        System.out.print("Enter addresses separated by commas (eg: Address 1, Address 2, Address 3): ");
+        addressOne = input.next();
+        addressTwo = input.next();
+        addressThree = input.next();
 
         System.out.println("Enter postal code: ");
-        int postalCode = input.nextInt();
+        postalCode = input.nextLine();
 
-        Date registerDate = new Date();
+        registrationDate = new Date();
 
         if (userType == 1){
+            String NRIC;
+            String firstName;
+            String middleName;
+            String lastName;
+            String gender = "";
+            Date birthday;
+
             System.out.print("Enter NRIC: ");
-            String NRIC = input.nextLine();
-
+            NRIC = input.nextLine();
+            
             System.out.print("Enter first name: ");
-            String firstName = input.nextLine();
-
+            firstName = input.nextLine();
+            
             System.out.print("Enter last name: ");
-            String lastName = input.nextLine();
+            lastName = input.nextLine();
             
             System.out.print("Enter middle name (If applicable): ");
-            String middleName = input.nextLine();
-
-            System.out.print("1. Male\n2. Female\nSelect gender: ");
-            int genderInt = input.nextInt();
+            middleName = input.nextLine();
+            
+            int genderInt = 0;
+            do {
+                System.out.println("Are you a:");
+                System.out.print("1- Male");
+                System.out.println("2- Female");
+                System.out.println("> ");
+                genderInt = input.nextInt();
+            } while (genderInt != 1 & genderInt != 2);
             
             if(genderInt == 1) {
-                String gender = "Male";
+                gender = "Male";
             }
-
+            
             else if(genderInt == 2) {
-                String gender = "Female";
+                gender = "Female";
             }
+            
+            System.out.print("Enter DOB (dd/MM/yyyy): ");
+            String birthdayTemp = input.nextLine();
+            // Convert birthday to ddMMyyyy formay for SQL
 
-            System.out.print("Enter DOB:");
+            NormalUser newUser = new NormalUser(userID, username, passwordSalt, passwordHash, email, phone, addressOne, 
+                                                addressTwo, addressThree, postalCode, registrationDate, userType, active, 
+                                                NRIC, firstName, middleName, lastName, gender, birthday);
 
+            createUser(newUser);
         }
 
         else if (userType == 2) {
-            System.out.print("Enter business name");
-            String businessName = input.nextLine();
+            String UEN;
+            String businessName;
 
             System.out.print("Enter UEN: ");
-            String UEN = input.nextLine();
+            UEN = input.nextLine();
+
+            System.out.print("Enter business name");
+            businessName = input.nextLine();
+
+            BusinessUser newUser = new BusinessUser(userID, username, passwordSalt, passwordHash, email, phone, addressOne, 
+                                                    addressTwo, addressThree, postalCode, registrationDate, userType, active, 
+                                                    UEN, businessName);
+        }
+    }
+
+    // Method to add new user into DB
+    public static void createUser(User user) {
+        // Initialise connection to DB
+        Connection db = SQLConnect.getDBConnection();
+
+        // Try to connect to DB
+        try {
+            // Fill up update statements with latest particulars for "NormalUser" DB
+            String sql1 = "INSERT INTO User (UserID, PasswordSalt, PasswordHash, Email, Phone, AddressOne," +
+                         "AddressTwo, AddressThree, PostalCode, RegistrationDate, UserType, Active)" + 
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement1 = db.prepareStatement(sql1);
+
+            // Fill up update statements with latest particulars for "NormalUser" DB
+            statement1.setInt(1, user.getUserID());
+            statement1.setString(2, user.getPasswordSalt());
+            statement1.setString(3, user.getPasswordHash());
+            statement1.setString(4, user.getEmail());
+            statement1.setString(5, user.getPhone());
+            statement1.setString(6, user.getAddresses(1));
+            statement1.setString(7, user.getAddresses(2));
+            statement1.setString(8, user.getAddresses(3));
+            statement1.setString(9, user.getPostalCode());
+            statement1.setDate(10, user.getRegistrationDate());
+            statement1.setInt(11, user.getUserType());
+            statement1.setInt(12, user.getActive());
+
+
+            // Check if normal user, insert into NormalUser DB
+            if (user instanceof NormalUser) {
+                NormalUser newUser = (NormalUser) user;
+
+                String sql2 = "INSERT INTO NormalUser (NRIC, FirstName, MiddleName, LastName, Gender, Birthday) VALUES (?, ?, ?, ?, ?, ?)";
+                PreparedStatement statement2 = db.prepareStatement(sql2);
+
+                // Fill up update statements with latest particulars for "NormalUser" DB
+                statement2.setString(1, newUser.getNRIC());
+                statement2.setString(2, newUser.getFirstName());
+                statement2.setString(3, newUser.getMiddleName());
+                statement2.setString(4, newUser.getLastName());
+                statement2.setString(5, newUser.getGender());
+                statement2.setDate(6, newUser.getBirthday());
+
+                int rowsInserted1 = statement1.executeUpdate();
+                int rowsInserted2 = statement2.executeUpdate();
+
+                if (rowsInserted1 > 0) {
+                   System.out.println("A new row in User database was inserted successfully!");
+                }
+                if (rowsInserted2 > 0) {
+                    System.out.println("A new row in NormalUser database was inserted successfully!");
+                }
+            }
+
+            // Check if business user, insert into BusinessUser DB
+            if (user instanceof BusinessUser) {
+                BusinessUser newUser = (BusinessUser) user;
+
+                String sql = "INSERT INTO BusinessUser (UEN, BusinessName )VALUES (?, ?)";
+                PreparedStatement statement2 = db.prepareStatement(sql);
+    
+                // Fill up update statements with latest particulars for "BusinessUser" DB
+                statement2.setString(1, newUser.getUEN());
+                statement2.setString(2, newUser.getBusinessName());
+
+                int rowsInserted1 = statement1.executeUpdate();
+                int rowsInserted2 = statement2.executeUpdate();
+
+                if (rowsInserted1 > 0) {
+                    System.out.println("A new row in User database was inserted successfully!");
+                }
+                if (rowsInserted2 > 0) {
+                    System.out.println("A new row in BusinessUser database was inserted successfully!");
+                }
+            }
+        }
+        catch (SQLException e) {
+            // Check for any SQL connection errors
+            e.printStackTrace();
+        }
+        finally {
+            // Close DB connection
+            SQLConnect.disconnectDB(db);
         }
     }
 
@@ -241,6 +377,7 @@ public class ServerUser {
         }
     }
 
+    // Method to display update options and get new information
     public static void getNewUpdates(User user) {
         Scanner input = new Scanner(System.in);
         int updateChoice = 0;

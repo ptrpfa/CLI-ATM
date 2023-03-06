@@ -73,6 +73,16 @@ public class User {
         return this.username;
     }
 
+    // Returns user password salt
+    public String getPasswordSalt() {
+        return this.passwordSalt;
+    }
+
+    // Returns user hashed password
+    public String getPasswordHash() {
+        return this.passwordHash;
+    }
+
     // Returns user email 
     public String getEmail() {
         return this.email;
@@ -111,6 +121,11 @@ public class User {
         return date;
     }
   
+    // Returns user type
+    public int getUserType() {
+        return this.userType;
+    }
+
     public int getActive() {
         if(this.active == true) {
             return 1;

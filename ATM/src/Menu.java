@@ -68,14 +68,17 @@ class Menu implements ServerAccount, ServerTransactions {
                 switch(option) {
                     // View user settings
                     case 1:
-                        try {
-                            int userOption = -1;
-                            do {
+                        int userOption = -1;
+                        
+                        do {
+                            try {
+                                // Display user particulars
                                 System.out.println("Request to edit user details..");
                                 List<User> userList = new ArrayList<>();
                                 userList.add(user);
-
                                 printTable(User.PrintHeaders(), userList);
+                                
+                                // Display user options and get request
                                 printMenu(userOptions);
                                 System.out.println();
                                 System.out.println("What do you want to do?");
@@ -83,6 +86,7 @@ class Menu implements ServerAccount, ServerTransactions {
                                 userOption = scanner.nextInt();
                                 NumberChecker.checkOption(userOption, userOptions.length);
 
+                                // Find request selection
                                 switch(userOption) {
                                     // Calls user reset password menu and process
                                     case 1:
@@ -100,16 +104,16 @@ class Menu implements ServerAccount, ServerTransactions {
                                         ServerUser.deactivateUser(user);
                                         break;
                                 }                            
-                            } while (userOption != 4);
-                        } catch (WrongNumberException e) {
-                            System.out.println(e.getMessage());
-                            accountOption = -1;
-                            scanner.nextLine();
-                        } catch (InputMismatchException e) {
-                            System.out.println("Wrong Input. Try again..\n");
-                            accountOption = -1;
-                            scanner.nextLine();
-                        }
+                            } catch (WrongNumberException e) {
+                                System.out.println(e.getMessage());
+                                accountOption = -1;
+                                scanner.nextLine();
+                            } catch (InputMismatchException e) {
+                                System.out.println("Wrong Input. Try again..\n");
+                                accountOption = -1;
+                                scanner.nextLine();
+                            }
+                        } while (userOption != 4);
                         break;
 
                     // Create new account
@@ -164,20 +168,30 @@ class Menu implements ServerAccount, ServerTransactions {
                                 // Loop controllers and counter
                                 boolean view = true;
                                 int pageCount = 1;
-                                int pageStart = 0;
-                                int pageEnd = 10;
+                                int pageFirstElement = 0;
+                                int pageLastElement = 10;
+                                int pages1 = 1;
 
+                                // Set first element of page and increment/decrement by 10 if user inputs 2 = next, 1 = back
+                                pageFirstElement = (pages1 - 1) * 10;
+                                
+                                // Get number of transaction pages for page viewer
+                                int pages2 = transactions.size() / 10;
+                                if(transactions.size() % 10 != 0){
+                                    pages2 = pages2 + 1;
+                                }
+                                
                                 // Loop as long as user still wants to continue
                                 while(view){
-                                    // Get number of transaction pages
-                                    int pages = transactions.size() / 10;
+                                    // Get last element of page either 10 per list or remaining of list
+                                    pageLastElement = Math.min(pageFirstElement + 10, transactions.size());
                                     
                                     try{
-                                        List<TransactionDetails> tempList = transactions.subList(pageStart, pageEnd);
+                                        List<TransactionDetails> tempList = transactions.subList(pageFirstElement, pageLastElement);
                                         printTable(TransactionDetails.PrintHeaders(), tempList);
 
                                         // Display menu and check for valid input of 1 - 3
-                                        System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages);
+                                        System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
                                         System.out.print("\n\n1- Back");
                                         System.out.print("\n2- Next");
                                         System.out.println("\n3- Return to menu");
@@ -189,17 +203,15 @@ class Menu implements ServerAccount, ServerTransactions {
                                         // Increase/Decrease page counter and page displays
                                         if(pageOption == 1){
                                             int pageCountTemp = pageCount - 1;
-                                            NumberChecker.checkPageValidity(pageCountTemp, pages);
+                                            NumberChecker.checkPageValidity(pageCountTemp, pages2);
                                             pageCount--;
-                                            pageStart = pageStart - 10;
-                                            pageEnd = pageEnd - 10;
+                                            pageFirstElement = pageFirstElement - 10;
                                         }
                                         else if(pageOption == 2){
                                             int pageCountTemp = pageCount + 1;
-                                            NumberChecker.checkPageValidity(pageCountTemp, pages);
+                                            NumberChecker.checkPageValidity(pageCountTemp, pages2);
                                             pageCount++;
-                                            pageStart = pageStart + 10;
-                                            pageEnd = pageEnd + 10;
+                                            pageFirstElement = pageFirstElement + 10;
                                         }
                                         // Exit transaction viewing
                                         else if(pageOption == 3){
