@@ -223,7 +223,7 @@ public class ServerUser {
         // Try to connect to DB
         try {
             // Template to select "User" DB with inputted username
-            String sql = String.format("SELECT * FROM user WHERE Username = '%s'", username);
+            String sql = String.format("SELECT * FROM User WHERE Username = '%s'", username);
             PreparedStatement statement1 = db.prepareStatement(sql);
             ResultSet myRs1 = statement1.executeQuery();
             
@@ -261,7 +261,7 @@ public class ServerUser {
                     // If user is NormalUser, get extra attributes that NormalUser has
                     if (userType == 1) {
                         // Template to select "NormalUser" DB for fetching data
-                        String sql2 = String.format("SELECT * FROM normaluser WHERE UserID = %s", userID);
+                        String sql2 = String.format("SELECT * FROM NormalUser WHERE UserID = %s", userID);
                         PreparedStatement statement2 = db.prepareStatement(sql2);
 
                         // Prepare to read database of where inputted UserID is located
@@ -283,7 +283,7 @@ public class ServerUser {
                     // If user is BusinessUser, get extra attributes that BusinessUser has
                     else if (userType == 2) {
                         // Template to select "BusinessUser" DB for fetching data
-                        String sql2 = String.format("SELECT * FROM businessuser WHERE UserID = %s", userID);
+                        String sql2 = String.format("SELECT * FROM BusinessUser WHERE UserID = %s", userID);
                         PreparedStatement statement2 = db.prepareStatement(sql2);
 
                         // Prepare to read database of where inputted UserID is located
@@ -355,7 +355,7 @@ public class ServerUser {
                 BusinessUser tempUser = (BusinessUser) user;
 
                 // Template to select "BusinessUser" DB for updating data
-                String sql2 = String.format("UPDATE businessuser SET UEN = ?, BusinessName = ? WHERE UserID = %s", tempUser.getUserID());
+                String sql2 = String.format("UPDATE BusinessUser SET UEN = ?, BusinessName = ? WHERE UserID = %s", tempUser.getUserID());
                 PreparedStatement statement2 = db.prepareStatement(sql2);
 
                 // Fill up update statements with latest particulars for "BusinessUser" DB
@@ -544,7 +544,7 @@ public class ServerUser {
             // Try to connect to DB
             try {
                 // Template to select "User" DB for retrieving data
-                String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
+                String sql1 = String.format("SELECT * FROM User WHERE Username = '%s'", user.getUsername());
                 PreparedStatement statement1 = db.prepareStatement(sql1);
                 ResultSet myRs1 = statement1.executeQuery();
 
@@ -632,7 +632,7 @@ public class ServerUser {
             // Try to connect to DB
             try {
                 // Template to select "User" DB for retrieving data
-                String sql1 = String.format("SELECT * FROM user WHERE Username = '%s'", user.getUsername());
+                String sql1 = String.format("SELECT * FROM User WHERE Username = '%s'", user.getUsername());
                 PreparedStatement statement1 = db.prepareStatement(sql1);
                 ResultSet myRs1 = statement1.executeQuery();
 

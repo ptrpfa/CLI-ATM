@@ -10,7 +10,7 @@ import Account.Account;
 public interface ServerAccount extends SQLConnect{
 
     public static List<Account> findUserAccounts(int userID){
-        String sql = String.format("SELECT * FROM account WHERE UserID = %s",userID);
+        String sql = String.format("SELECT * FROM Account WHERE UserID = %s",userID);
         Connection db = SQLConnect.getDBConnection();
         List<Account> accounts = new ArrayList<>();
         try {
@@ -49,7 +49,7 @@ public interface ServerAccount extends SQLConnect{
         Timestamp timestamp = new Timestamp(datetime.getTime());
         int accNo = 0;
 
-        String insertsql = "INSERT INTO account VALUES(NULL,?,?,?,?,0,?,?,1000,1000,?,1)";
+        String insertsql = "INSERT INTO Account VALUES(NULL,?,?,?,?,0,?,?,1000,1000,?,1)";
         String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
         Connection db = SQLConnect.getDBConnection();
         
