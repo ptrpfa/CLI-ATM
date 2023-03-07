@@ -27,10 +27,10 @@ public class AccountTransaction implements ServerAccount{
         double totalBalance = account.getTotalBalance();
         if(amount > availableBalance){
             //Cannot withdraw more than the account balance
-            throw new TransactionError("*****不够钱啦！*****\n*****Withdrawal Terminated!*****");
+            throw new TransactionError("*****Not Enough Money*****\n*****Withdrawal Terminated!*****");
         }else if(amount > limit){
             //Cannot withdraw more than WithdrawLimit
-            throw new TransactionError("*****达到提权限额！*****\n*****Withdrawal Terminated!*****");
+            throw new TransactionError("*****Withdraw Limit Reached*****\n*****Withdrawal Terminated!*****");
         }
         //Checks all true
         boolean result = ServerAccount.AccountWithdrawal(account.getUserID(), account.getAccID(), availableBalance, totalBalance, amount);

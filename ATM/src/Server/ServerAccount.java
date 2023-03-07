@@ -49,7 +49,7 @@ public interface ServerAccount extends SQLConnect{
         Timestamp timestamp = new Timestamp(datetime.getTime());
         int accNo = 0;
 
-        String insertsql = "INSERT INTO account VALUES(NULL,?,?,?,?,0,?,?,0,0,?,1)";
+        String insertsql = "INSERT INTO account VALUES(NULL,?,?,?,?,0,?,?,1000,1000,?,1)";
         String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
         Connection db = SQLConnect.getDBConnection();
         
