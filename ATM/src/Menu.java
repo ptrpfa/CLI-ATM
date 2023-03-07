@@ -1,6 +1,6 @@
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 import Account.Account;
@@ -9,7 +9,7 @@ import Account.AccountTransaction.TransactionError;
 import User.User;
 import Server.ServerAccount;
 import Server.ServerTransactions;
-import Transcation.TransactionDetails;
+import Transaction.TransactionDetails;
 
 class Menu implements ServerAccount, ServerTransactions {
     private List<Account> accounts;
@@ -29,12 +29,19 @@ class Menu implements ServerAccount, ServerTransactions {
 
     public void run(){
         String[] options = {
-            "1- Create New Account",
-            "2- Deposit",
-            "3- Withdraw",
-            "4- Transfer Funds",
-            "5- View Transcations",
-            "6- Exit"
+            "1- Edit User Details",
+            "2- Create New Account",
+            "3- Deposit",
+            "4- Withdraw",
+            "5- Transfer Funds",
+            "6- View Transactions",
+            "7- Exit"
+        };
+        String[] userOptions = {
+            "1- Reset Password",
+            "2- Update User Account",
+            "3- Deactivate User Account",
+            "4- Return to menu"
         };
         scanner = new Scanner(System.in);
         // Print Available Accounts
@@ -53,17 +60,59 @@ class Menu implements ServerAccount, ServerTransactions {
                 scanner.nextLine();
                 switch (option){
                     case 1:
-                        CreateAccount();
+                        int userOption = -1;
+                        
+                        do {
+                            try {
+                                // Display user particulars
+                                System.out.println("Request to edit user details..");
+                                List<User> userList = new ArrayList<>();
+                                userList.add(user);
+                                printTable(User.PrintHeaders(), userList);
+                                
+                                // Display user options and get request
+                                printMenu(userOptions);
+                                userOption = promptForInput("What do you want to do?", Integer.class);
+                                checkOption(userOption, userOptions.length);
+
+                                // Find request selection
+                                switch(userOption) {
+                                    // Calls user reset password menu and process
+                                    case 1:
+                                        ServerUser.resetUserPassword(user);
+                                        break;
+
+                                    // Calls user update menu and process
+                                    case 2:
+                                        ServerUser.getNewUpdates(user);
+                                        ServerUser.updateUser(user);
+                                        break;
+
+                                    // Calls user deactivation menu and process
+                                    case 3:
+                                        ServerUser.deactivateUser(user);
+                                        break;
+                                }                            
+                            } catch (WrongNumberException e) {
+                                //Thrown by checkOption
+                                System.out.println(e.getMessage());
+                            }
+
+                        } while (userOption != 4);
                         break;
 
                     case 2:
+                        CreateAccount();
+                        break;
+
+                    case 3:
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             Deposit(accounts.get(accountOption-1));
                         }
                         break;
                         
-                    case 3: 
+                    case 4: 
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             Withdraw(accounts.get(accountOption-1));
@@ -91,7 +140,99 @@ class Menu implements ServerAccount, ServerTransactions {
                     //         }
                     //     } while (accountOption == -1);
                     //     break;
-                    case 6:
+                    
+                    // View account transactions
+            //         case 6:
+            //             do {
+            //                 try {
+            //                     // Prints account table
+            //                     System.out.println("Please choose Account to view transactions from...");
+            //                     printTable(Account.PrintHeaders(), accounts);
+
+            //                     // Get user input on account to view
+            //                     System.out.print("\n> ");
+            //                     accountOption = scanner.nextInt();
+            //                     NumberChecker.checkOption(accountOption, accounts.size());
+
+            //                     // Print transactions table
+            //                     transactions = ServerTransactions.findUserTransactions(accounts.get(accountOption - 1));
+                                
+            //                     // Loop controllers and counter
+            //                     boolean view = true;
+            //                     int pageCount = 1;
+            //                     int pageFirstElement = 0;
+            //                     int pageLastElement = 10;
+            //                     int pages1 = 1;
+
+            //                     // Set first element of page and increment/decrement by 10 if user inputs 2 = next, 1 = back
+            //                     pageFirstElement = (pages1 - 1) * 10;
+                                
+            //                     // Get number of transaction pages for page viewer
+            //                     int pages2 = transactions.size() / 10;
+            //                     if(transactions.size() % 10 != 0){
+            //                         pages2 = pages2 + 1;
+            //                     }
+                                
+            //                     // Loop as long as user still wants to continue
+            //                     while(view){
+            //                         // Get last element of page either 10 per list or remaining of list
+            //                         pageLastElement = Math.min(pageFirstElement + 10, transactions.size());
+                                    
+            //                         try{
+            //                             List<TransactionDetails> tempList = transactions.subList(pageFirstElement, pageLastElement);
+            //                             printTable(TransactionDetails.PrintHeaders(), tempList);
+
+            //                             // Display menu and check for valid input of 1 - 3
+            //                             System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
+            //                             System.out.print("\n\n1- Back");
+            //                             System.out.print("\n2- Next");
+            //                             System.out.println("\n3- Return to menu");
+            //                             System.out.print("> ");
+            //                             int pageOption = scanner.nextInt();
+            //                             NumberChecker.checkOption(pageOption, 3);
+                                        
+            //                             // Checks if user tries to go below min or beyond max number of pages
+            //                             // Increase/Decrease page counter and page displays
+            //                             if(pageOption == 1){
+            //                                 int pageCountTemp = pageCount - 1;
+            //                                 NumberChecker.checkPageValidity(pageCountTemp, pages2);
+            //                                 pageCount--;
+            //                                 pageFirstElement = pageFirstElement - 10;
+            //                             }
+            //                             else if(pageOption == 2){
+            //                                 int pageCountTemp = pageCount + 1;
+            //                                 NumberChecker.checkPageValidity(pageCountTemp, pages2);
+            //                                 pageCount++;
+            //                                 pageFirstElement = pageFirstElement + 10;
+            //                             }
+            //                             // Exit transaction viewing
+            //                             else if(pageOption == 3){
+            //                                 view = false;
+            //                             }
+            //                         } catch (WrongNumberException e) {
+            //                             System.out.println(e.getMessage());
+            //                             scanner.nextLine();
+            //                         }
+            //                     }
+
+            //                 } catch (WrongNumberException e) {
+            //                     System.out.println(e.getMessage());
+            //                     accountOption = -1;
+            //                     scanner.nextLine();
+            //                 } catch (InputMismatchException e) {
+            //                     System.out.println("Wrong Input. Try again..\n");
+            //                     accountOption = -1;
+            //                     scanner.nextLine();
+            //                 }
+            //             } while (accountOption == -1);
+            //             break;
+            //     }
+            // } catch (Exception ex) {
+            //     System.out.println("Please enter an integer value between 1 and " + options.length);
+            //     scanner.next();
+            //     System.out.println(">");
+            // }
+                    case 7:
                         //Clean up
                         scanner.close();
                         break;
@@ -215,10 +356,10 @@ class Menu implements ServerAccount, ServerTransactions {
     //     throw new UnsupportedOperationException("Unimplemented method 'TransferFunds'");
     // }
 
-    // public void ViewTranscation(Account acc) {
+    // public void ViewTransaction(Account acc) {
     // // TODO Auto-generated method stub
     // throw new UnsupportedOperationException("Unimplemented method
-    // 'ViewTranscation'");
+    // 'ViewTransaction'");
     // }
     
     /*
@@ -298,6 +439,10 @@ class Menu implements ServerAccount, ServerTransactions {
             if (item instanceof TransactionDetails) {
                 values[i] = ((TransactionDetails) item).PrintValues();
             }
+
+            if (item instanceof User) {
+                values[i] = ((User) item).PrintValues();
+            }
         }
 
         String line;
@@ -313,7 +458,7 @@ class Menu implements ServerAccount, ServerTransactions {
         }
 
         // Print the table header
-        line = String.format("| %-3s", "No");
+        line = String.format("\n| %-3s", "No");
         System.out.print(line);
         for (int i = 0; i < headers.length; i++) {
             line = String.format("| %-" + colWidths[i] + "s ", headers[i]);
@@ -368,7 +513,13 @@ class Menu implements ServerAccount, ServerTransactions {
 
     public static void checkOption(int number, int max) throws WrongNumberException {
         if (number > max) {
-            throw new WrongNumberException("Wrong Choice lah bang\n");
+            throw new WrongNumberException("\nWrong choice lah bang");
+        }
+    }
+
+    public static void checkPageValidity(int requested, int max) throws WrongNumberException {
+        if ((requested < 1) || (requested > max)) {
+            throw new WrongNumberException("\nUnable to proceed to page requested");
         }
     }
 

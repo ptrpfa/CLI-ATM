@@ -3,6 +3,8 @@ package User;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import Server.AES256;
+
 public class User {
     private int userID;
     private String username;
@@ -17,6 +19,7 @@ public class User {
     private Date registrationDate;
     private int userType;
     private boolean active;
+    private String censoredPass;
 
     // Test
     public User() {
@@ -39,6 +42,7 @@ public class User {
         this.registrationDate = registrationDate;
         this.userType = userType;
         this.active = active;
+        censoredPass = censoredPass();
     }
 
     // Constructor taking in object type
@@ -56,6 +60,7 @@ public class User {
         this.registrationDate = user.registrationDate;
         this.userType = user.userType;
         this.active = user.active;
+        censoredPass = censoredPass();
     }
 
     // Returns user userID
@@ -66,6 +71,16 @@ public class User {
     // Returns user username
     public String getUsername() {
         return this.username;
+    }
+
+    // Returns user password salt
+    public String getPasswordSalt() {
+        return this.passwordSalt;
+    }
+
+    // Returns user hashed password
+    public String getPasswordHash() {
+        return this.passwordHash;
     }
 
     // Returns user email 
@@ -106,6 +121,11 @@ public class User {
         return date;
     }
   
+    // Returns user type
+    public int getUserType() {
+        return this.userType;
+    }
+
     public int getActive() {
         if(this.active == true) {
             return 1;
@@ -165,5 +185,44 @@ public class User {
         else{
             this.active = false;
         }
+    }
+
+    public String censoredPass() {        
+        String decryptedPass = AES256.decrypt(passwordHash);
+        int half = decryptedPass.length() / 2;
+
+        String censoredText = censor(decryptedPass, half + 1);
+
+        return censoredText;
+        }
+
+    public String censor(String text, int n) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+
+        if (n < 1 || n > text.length()) {
+            return text;
+        }
+
+        String censorString = "";
+        for (int i = 0; i < n; i++) {
+            censorString += "*";
+        }
+
+        String censoredText = censorString + text.substring(n);
+
+        return censoredText;
+    }
+
+    //Printing Methods
+    public String[] PrintValues(){   
+        String[] values = {Integer.toString(userID), username, censoredPass, email, phone, addressOne, addressTwo, addressThree, postalCode};
+        return values;
+    }
+
+    public static String[] PrintHeaders(){
+        String[] headers = {"UserID", "Username", "Password", "Email", "Phone", "Address One", "Address Two", "Address Three", "Postal Code"};
+        return headers;
     }
 }

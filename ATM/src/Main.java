@@ -108,7 +108,7 @@ public class Main implements Runnable{
                 return newUser;
             }
             else {
-                System.out.println("\nInvalid login. " + counter + " tries left.");
+                System.out.println("Invalid login. " + counter + " tries left.\n");
             }
             //return user
             counter--;

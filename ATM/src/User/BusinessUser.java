@@ -1,6 +1,6 @@
 package User;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class BusinessUser extends User{
     private String UEN;
