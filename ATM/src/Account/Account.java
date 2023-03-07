@@ -134,7 +134,7 @@ public class Account {
         this.transaction.Deposit(this, amount);
     }
 
-    public void withdraw(double amount) throws Exception {
+    public void withdraw(double amount){
         this.transaction.Withdraw(this, amount);
     }
 }

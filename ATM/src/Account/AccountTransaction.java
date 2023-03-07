@@ -6,30 +6,45 @@ public class AccountTransaction implements ServerAccount{
 
     public void Deposit(Account account, double amount){
         //Update accBalance
-        boolean result = ServerAccount.AccountDeposit(account.getUserID(), account.getAccID(), amount);
+        double availableBalance = account.getAvailableBalance();
+        double totalBalance = account.getTotalBalance();
+        boolean result = ServerAccount.AccountDeposit(account.getUserID(), account.getAccID(), availableBalance, totalBalance, amount);
         
         //If Server updated
         if(result){
-            account.setAvailableBalance(amount);
+            availableBalance += amount;
+            totalBalance += amount;
+            account.setAvailableBalance(availableBalance);
+            account.setTotalBalance(totalBalance);
         }else{
             throw new TransactionError("Error in system...");
         }
     }
 
-    public boolean Withdraw(Account account, double amount) throws Exception{
+    public void Withdraw(Account account, double amount){
         double limit = account.getWithdrawLimit();
-        double accBalance = account.getAvailableBalance();
-        if(amount > accBalance){
+        double availableBalance = account.getAvailableBalance();
+        double totalBalance = account.getTotalBalance();
+        if(amount > availableBalance){
             //Cannot withdraw more than the account balance
-            throw new Exception("*****不够钱啦！*****\n*****Transaction Terminated!*****");
+            throw new TransactionError("*****不够钱啦！*****\n*****Withdrawal Terminated!*****");
         }else if(amount > limit){
             //Cannot withdraw more than WithdrawLimit
-            throw new Exception("*****达到提权限额！*****\n*****Transaction Terminated!*****");
+            throw new TransactionError("*****达到提权限额！*****\n*****Withdrawal Terminated!*****");
         }
-        //DB query to change the availableBalance
-        //Set the available balance, total balance
-        //Can maybe return acc Balance
-        return true;
+        //Checks all true
+        boolean result = ServerAccount.AccountWithdrawal(account.getUserID(), account.getAccID(), availableBalance, totalBalance, amount);
+
+        //If Server updated
+        if(result){
+            availableBalance -= amount;
+            totalBalance -= amount;
+            account.setAvailableBalance(availableBalance);
+            account.setTotalBalance(totalBalance);
+        }else{
+            throw new TransactionError("Error in system...");
+        }
+    
     }
 
     public boolean transferFunds(Account account, double amount) throws Exception {

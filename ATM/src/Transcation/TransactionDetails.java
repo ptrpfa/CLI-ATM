@@ -1,8 +1,6 @@
 package Transcation;
 import java.util.Date;
 
-import pl.mjaron.etudes.Int;
-
 public class TransactionDetails {
     private int transID;
     private int accID;

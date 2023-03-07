@@ -2,6 +2,7 @@
 
 
 SELECT * FROM `OOP_ATM`.`Account` WHERE userid =1 LIMIT 1000;
+DELETE FROM `OOP_ATM`.`Account` WHERE userid =1 AND AccountID =3018;
 UPDATE `OOP_ATM`.`Account` SET AvailableBalance = 100, TotalBalance = 5000 WHERE UserId = 1 AND AccountID = 1;
 -- SELECT * FROM `OOP_ATM`.`NormalUser` LIMIT 1000;
 SELECT * FROM `OOP_ATM`.`BusinessUser` LIMIT 1000;
