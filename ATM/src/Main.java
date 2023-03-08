@@ -1,12 +1,5 @@
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.concurrent.Callable;
 
-import Account.Account;
-import Server.SQLConnect;
 import Server.ServerUser;
 import User.BusinessUser;
 import User.NormalUser;
@@ -17,7 +10,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 // import picocli.jansi.graalvm.AnsiConsole;
-import picocli.CommandLine.Help.TextTable.Cell;
 
 //Common Header Banner
 @Command(name = "bank-teller", header = {
