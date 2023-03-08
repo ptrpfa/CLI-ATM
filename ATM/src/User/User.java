@@ -188,7 +188,7 @@ public class User {
     }
 
     public String censoredPass() {        
-        String decryptedPass = AES256.decrypt(passwordHash);
+        String decryptedPass = AES256.decrypt(passwordHash, passwordSalt);
         int half = decryptedPass.length() / 2;
 
         String censoredText = censor(decryptedPass, half + 1);
