@@ -1,5 +1,6 @@
 package Server;
 
+import java.security.SecureRandom;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -9,6 +10,7 @@ import User.NormalUser;
 import User.User;
 
 public class ServerUser {
+    private static final int SALT_LENGTH = 16;
 
     // Method to create user (METHOD WIP)
     public void registerUser() {
@@ -26,11 +28,7 @@ public class ServerUser {
         Date registrationDate;
         int userType = 0;
         boolean active = true;
-
-        // Auto generate userID
         
-        // Auto generate salt (maybe call function from AES?)
-
         do{
             System.out.print("Enter user type\n");
             System.out.print("1- Business user");
@@ -44,7 +42,9 @@ public class ServerUser {
 
         System.out.print("Enter password: ");
         String passwordTemp = input.nextLine();
-        passwordHash = AES256.encrypt(passwordTemp);
+        String salt = generateSalt();
+        passwordSalt = salt;
+        passwordHash = AES256.encrypt(passwordTemp, salt);
 
         System.out.print("Enter email: ");
         email = input.nextLine();
@@ -103,7 +103,7 @@ public class ServerUser {
             String birthdayTemp = input.nextLine();
             // Convert birthday to ddMMyyyy formay for SQL
 
-            NormalUser newUser = new NormalUser(userID, username, passwordSalt, passwordHash, email, phone, addressOne, 
+            NormalUser newUser = new NormalUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                 addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                 NRIC, firstName, middleName, lastName, gender, birthday);
 
@@ -120,7 +120,7 @@ public class ServerUser {
             System.out.print("Enter business name");
             businessName = input.nextLine();
 
-            BusinessUser newUser = new BusinessUser(userID, username, passwordSalt, passwordHash, email, phone, addressOne, 
+            BusinessUser newUser = new BusinessUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                     addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                     UEN, businessName);
         }
@@ -136,22 +136,20 @@ public class ServerUser {
             // Fill up update statements with latest particulars for "NormalUser" DB
             String sql1 = "INSERT INTO User (UserID, PasswordSalt, PasswordHash, Email, Phone, AddressOne," +
                          "AddressTwo, AddressThree, PostalCode, RegistrationDate, UserType, Active)" + 
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                         "VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement1 = db.prepareStatement(sql1);
 
-            // Fill up update statements with latest particulars for "NormalUser" DB
-            statement1.setInt(1, user.getUserID());
-            statement1.setString(2, user.getPasswordSalt());
-            statement1.setString(3, user.getPasswordHash());
-            statement1.setString(4, user.getEmail());
-            statement1.setString(5, user.getPhone());
-            statement1.setString(6, user.getAddresses(1));
-            statement1.setString(7, user.getAddresses(2));
-            statement1.setString(8, user.getAddresses(3));
-            statement1.setString(9, user.getPostalCode());
-            statement1.setDate(10, user.getRegistrationDate());
-            statement1.setInt(11, user.getUserType());
-            statement1.setInt(12, user.getActive());
+            // Fill up update statements with latest particulars for "NormalUser" DB1            statement1.setString(1, user.getPasswordSalt());
+            statement1.setString(1, user.getPasswordHash());
+            statement1.setString(2, user.getEmail());
+            statement1.setString(3, user.getPhone());
+            statement1.setString(4, user.getAddresses(1));
+            statement1.setString(5, user.getAddresses(2));
+            statement1.setString(6, user.getAddresses(3));
+            statement1.setString(7, user.getPostalCode());
+            statement1.setDate(8, user.getRegistrationDate());
+            statement1.setInt(9, user.getUserType());
+            statement1.setInt(10, user.getActive());
 
 
             // Check if normal user, insert into NormalUser DB
@@ -723,6 +721,15 @@ public class ServerUser {
             passwordTries--;
         } while (passwordTries >= 0);
     }
+
+    public static String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[SALT_LENGTH];
+        random.nextBytes(salt);
+        String str = new String(salt);
+        return str;
+    }
+
 }
 
 class WrongPasswordException extends Exception {
