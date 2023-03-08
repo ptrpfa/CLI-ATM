@@ -13,5 +13,5 @@ UPDATE `OOP_ATM`.`Account` SET AvailableBalance = 100, TotalBalance = 5000 WHERE
 SELECT * FROM `OOP_ATM`.`Transaction` WHERE AccountID = 1 LIMIT 1000;
 
 -- SELECT * FROM `OOP_ATM`.`ChequeAccount` WHERE AccountID = 3 LIMIT 1000;
--- SELECT * FROM `OOP_ATM`.`Cheque` LIMIT 1000;
+SELECT * FROM `OOP_ATM`.`Cheque` LIMIT 1000;
 -- SELECT * FROM `OOP_ATM`.`ChequeTransaction` LIMIT 1000;
