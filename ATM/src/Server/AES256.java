@@ -6,12 +6,14 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 // import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
 public class AES256 {
     private static final String SECRET_KEY = "kaiping_best";
+    private static final int SALT_LENGTH = 16;
 
     public static String encrypt(String strToEncrypt, String salt) {
         try {
@@ -52,17 +54,24 @@ public class AES256 {
         }
         return null;
     }
+    
+    public static String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[SALT_LENGTH];
+        random.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+    }
 
-    // public static void main(String[] args) {
-    //     String originalString = "howtodoinjava.com";
-    //     String salt = generateSalt();
-    //     System.out.println("the salt is " + salt);
+    public static void main(String[] args) {
+        String originalString = "howtodoinjava.com";
+        String salt = generateSalt();
+        System.out.println("the salt is " + salt);
 
-    //     String encryptedString = AES256.encrypt(originalString, salt);
-    //     String decryptedString = AES256.decrypt(encryptedString, salt);
+        String encryptedString = AES256.encrypt(originalString, salt);
+        String decryptedString = AES256.decrypt(encryptedString, salt);
 
-    //     System.out.println(originalString);
-    //     System.out.println(encryptedString);
-    //     System.out.println(decryptedString);
-    // }
+        System.out.println(originalString);
+        System.out.println(encryptedString);
+        System.out.println(decryptedString);
+    }
 }
