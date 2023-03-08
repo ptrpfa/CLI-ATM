@@ -9,6 +9,9 @@ public interface SQLConnect {
     // Specify configurations file
     public static final String FILEPATH = "ATM";
     public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
+
+    // // Just comment this out when using the cloud
+    // public static final String CONFIGURATION_FILE = String.format("%s/local_settings.config", FILEPATH);
     
     // Connect to databse
     public static Connection getDBConnection() {
