@@ -14,7 +14,7 @@ public class SMS {
     public static boolean sendSMS(String receiverNo, String messageBody) {
         
         // Initialise message delivery boolean
-        boolean delivered = true; // set to true for now
+        boolean delivered = false;
         
         // Read API keys from settings file
         String apiKeys[] = Settings.getTwilioAPIKeys();
@@ -26,13 +26,11 @@ public class SMS {
 
             // Create and send an SMS message
             Message message = Message.creator(new PhoneNumber(receiverNo), new PhoneNumber(senderNo), messageBody).create();
-            String messageSID = message.getSid();
-            System.out.println(messageSID);
 
-            // Send HTTP request and get response to check message delivery status
-            // something here...
-            ;;;
-
+            // Check if message was successfully sent
+            if(message.getErrorCode() == null) {
+                delivered = true;
+            }
         }
         catch(AuthenticationException e) {
             System.out.println("Twilio authentication error! " + e);
@@ -48,12 +46,9 @@ public class SMS {
         return delivered;
     }
 
-
     // Program entrypoint (for testing)
     public static void main(String[] args) {
-        sendSMS("+6585933198", "hi");
-        System.out.println("hello");
-
+        sendSMS("+6585933198", "hello");
     }
 
 }
