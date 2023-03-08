@@ -54,8 +54,8 @@ public class Settings {
     // Function to read Twilio API keys from the configuration file
     public static String[] getTwilioAPIKeys() {
 
-        // Initialise two-element array
-        String keys[] = new String[2];
+        // Initialise array
+        String keys[] = new String[3];
 
         // Create a FileInputSteam object to read configuration settings file
         FileInputStream settingsFile = null;
@@ -75,6 +75,7 @@ public class Settings {
             // Create API keys from settings
             keys[0] = propSettings.getProperty("ACCOUNT_SID");
             keys[1] = propSettings.getProperty("AUTH_TOKEN");
+            keys[2] = propSettings.getProperty("PHONE_NO");
         } 
         catch(Exception e){
             e.printStackTrace();
