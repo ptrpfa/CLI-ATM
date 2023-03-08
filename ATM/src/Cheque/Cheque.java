@@ -108,4 +108,10 @@ public class Cheque {
     public static void clearance() {
         
     }
+
+    public static String[] PrintHeaders(){
+        String[] headers = {"Cheque ID", "FROM", "TO", "FROM Transaction Number", "TO Transaction Number", "Cheque No", "Value", "Date", "Status"};
+        return headers;
+    }
 }
+

@@ -2,6 +2,8 @@ package Server;
 
 import java.security.SecureRandom;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
@@ -10,7 +12,6 @@ import User.NormalUser;
 import User.User;
 
 public class ServerUser {
-    private static final int SALT_LENGTH = 16;
 
     // Method to create user (METHOD WIP)
     public void registerUser() {
@@ -42,7 +43,7 @@ public class ServerUser {
 
         System.out.print("Enter password: ");
         String passwordTemp = input.nextLine();
-        String salt = generateSalt();
+        String salt = AES256.generateSalt();
         passwordSalt = salt;
         passwordHash = AES256.encrypt(passwordTemp, salt);
 
@@ -232,8 +233,8 @@ public class ServerUser {
                     System.out.println("\nYour account is inactive. Please contact the bank administrator.");
                     System.exit(1);
                 }
-                    
-                String tempPassword = AES256.encrypt(password);
+
+                String tempPassword = AES256.encrypt(password, myRs1.getString("PasswordSalt"));
 
                 // Process to check if password is correct, start pulling user data from DB
                 if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
@@ -555,7 +556,7 @@ public class ServerUser {
                 String oldPassword = input.nextLine();
 
                 // Get old password from DB
-                String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
+                String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
 
                 // Check old password with DB password. If match continue, else throw exception
                 PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
@@ -577,7 +578,7 @@ public class ServerUser {
                     // Check new password matches twice. If match continue, else reduce tries by 1
                     if(newPassword1.equals(newPassword2)){
                         // Encrpyts new password and set it for updating to DB
-                        newPassword1 = AES256.encrypt(newPassword2);
+                        newPassword1 = AES256.encrypt(newPassword2, myRs1.getString("PasswordSalt"));
                         user.setPasswordHash(newPassword1);
                         statement.setString(1, newPassword1);
 
@@ -643,7 +644,7 @@ public class ServerUser {
                 String oldPassword = input.nextLine();
 
                 // Get old password from DB
-                String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"));
+                String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
 
                 // Check old password with DB password. If match continue, else throw exception
                 PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
@@ -722,14 +723,17 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
-    public static String generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[SALT_LENGTH];
-        random.nextBytes(salt);
-        String str = new String(salt);
-        return str;
+    public static Date convertToSqlDate(String inputDate) throws ParseException {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
+        java.util.Date utilDate = inputFormat.parse(inputDate);
+        return new Date(utilDate.getTime());
     }
 
+    public static void main(String[] args) throws ParseException {
+        String inputDate = "31-12-2022";
+        Date sqlDate = convertToSqlDate(inputDate);
+        System.out.println("SQL Date: " + sqlDate);
+    }
 }
 
 class WrongPasswordException extends Exception {

@@ -8,9 +8,12 @@ import Account.AccountService;
 import Account.AccountTransaction.TransactionError;
 import User.User;
 import Server.ServerAccount;
+import Server.ServerCheque;
 import Server.ServerTransactions;
 import Server.ServerUser;
 import Transaction.TransactionDetails;
+import Cheque.Cheque;
+
 
 class Menu implements ServerAccount, ServerTransactions {
     private List<Account> accounts;
@@ -110,6 +113,13 @@ class Menu implements ServerAccount, ServerTransactions {
                         break;
 
                     case 7:
+                        accountOption = chooseAccount();
+                        if(accountOption != -1){
+                            ViewCheques(accounts.get(accountOption-1));
+                        }
+                        break;
+
+                    case 8:
                         //Clean up
                         scanner.close();
                         break;
@@ -346,6 +356,82 @@ class Menu implements ServerAccount, ServerTransactions {
         //End of while loop
         System.out.print("\n");
     }
+
+    //Option 7
+    private void ViewCheques(Account account){
+        // Print transactions table
+        List<Cheque> Cheques = ServerCheque.findUserCheques(account);
+
+        // Loop controllers and counter
+        boolean view = true;
+        int pageCount = 1;
+        int pageFirstElement = 0;
+        int pageLastElement = 10;
+        int pages1 = 1;
+
+        // Set first element of page and increment/decrement by 10 if user inputs 2 = next, 1 = back
+        pageFirstElement = (pages1 - 1) * 10;
+
+        // Get number of transaction pages for page viewer
+        int pages2 = Cheques.size() / 10;
+        if(Cheques.size() % 10 != 0){
+            pages2 = pages2 + 1;
+        }
+
+        // Loop as long as user still wants to continue
+        while(view){
+            // Get last element of page either 10 per list or remaining of list
+            pageLastElement = Math.min(pageFirstElement + 10, Cheques.size());
+
+            try{
+                List<Cheque> tempList = Cheques.subList(pageFirstElement, pageLastElement);
+                printTable(Cheque.PrintHeaders(), tempList);
+
+                // Display menu and check for valid input of 1 - 3
+                System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
+                System.out.print("\n\n1- Back");
+                System.out.print("\n2- Next");
+                System.out.println("\n3- Return to menu");
+                System.out.print("> ");
+                int pageOption = scanner.nextInt();
+                checkOption(pageOption, 3);
+
+                // Checks if user tries to go below min or beyond max number of pages
+                // Increase/Decrease page counter and page displays
+                if(pageOption == 1){
+                    int pageCountTemp = pageCount - 1;
+                    checkPageValidity(pageCountTemp, pages2);
+                    pageCount--;
+                    pageFirstElement = pageFirstElement - 10;
+                }
+                else if(pageOption == 2){
+                    int pageCountTemp = pageCount + 1;
+                    checkPageValidity(pageCountTemp, pages2);
+                    pageCount++;
+                    pageFirstElement = pageFirstElement + 10;
+                }
+                // Exit transaction viewing
+                else if(pageOption == 3){
+                    view = false;
+                }
+            }catch(WrongNumberException e){
+                //Thrown by checkOption
+                System.out.println(e.getMessage());
+            }
+        }
+        //End of while loop
+        System.out.print("\n");
+    }
+
+
+
+
+
+
+
+
+
+
 
     // public boolean TransferFunds(Account acc) {
     //     // TODO Auto-generated method stub
