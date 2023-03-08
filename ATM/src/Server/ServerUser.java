@@ -222,10 +222,11 @@ public class ServerUser {
         // Try to connect to DB
         try {
             // Template to select "User" DB with inputted username
-            String sql = String.format("SELECT * FROM User WHERE Username = '%s'", username);
+            String sql = "SELECT * FROM User WHERE username = ?";
             PreparedStatement statement1 = db.prepareStatement(sql);
+            statement1.setString(1, username);
             ResultSet myRs1 = statement1.executeQuery();
-            
+
             // Start reading after title row onwards
             if(myRs1.next()){
                 // Check whether user is deactivated, disallow login if disabled
@@ -233,9 +234,7 @@ public class ServerUser {
                     System.out.println("\nYour account is inactive. Please contact the bank administrator.");
                     System.exit(1);
                 }
-
                 String tempPassword = AES256.encrypt(password, myRs1.getString("PasswordSalt"));
-
                 // Process to check if password is correct, start pulling user data from DB
                 if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
                     // ID and type reserved to differentiate and create Normal or Business user
