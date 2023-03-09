@@ -565,6 +565,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 values[i] = ((User) item).PrintValues();
             }
         }
+        
         String line;
         // Determine the maximum width of each column
         int[] colWidths = new int[headers.length];
