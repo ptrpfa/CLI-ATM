@@ -222,10 +222,11 @@ public class ServerUser {
         // Try to connect to DB
         try {
             // Template to select "User" DB with inputted username
-            String sql = String.format("SELECT * FROM User WHERE Username = '%s'", username);
+            String sql = "SELECT * FROM User WHERE username = ?";
             PreparedStatement statement1 = db.prepareStatement(sql);
+            statement1.setString(1, username);
             ResultSet myRs1 = statement1.executeQuery();
-            
+
             // Start reading after title row onwards
             if(myRs1.next()){
                 // Check whether user is deactivated, disallow login if disabled
@@ -233,9 +234,7 @@ public class ServerUser {
                     System.out.println("\nYour account is inactive. Please contact the bank administrator.");
                     System.exit(1);
                 }
-
                 String tempPassword = AES256.encrypt(password, myRs1.getString("PasswordSalt"));
-
                 // Process to check if password is correct, start pulling user data from DB
                 if(tempPassword.equals(myRs1.getString("PasswordHash"))) {
                     // ID and type reserved to differentiate and create Normal or Business user
@@ -620,7 +619,7 @@ public class ServerUser {
     }
 
     // Method to deactivate user from DB
-    public static void deactivateUser(User user) throws InterruptedException {
+    public static void deactivateUser(User user){
         // Loop counter where user only allowed 3 tries
         int passwordTries = 2;
         int deactivationOption1 = 0;
@@ -690,8 +689,13 @@ public class ServerUser {
                         statement.executeUpdate();
                         System.out.print("\nUser account has been deactivated.");
                         System.out.print("\nNow logging out...");
-                        Thread.sleep(1000);
-                        System.exit(1);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            System.out.println(e.getMessage());
+                        }finally{
+                            System.exit(1);
+                        }
                     }
                     
                     // Else, user confirms not to deactivate user account and prints abort message

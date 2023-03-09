@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+import Server.SMS;
 import Server.ServerUser;
 import User.BusinessUser;
 import User.NormalUser;
@@ -48,7 +49,7 @@ public class Main implements Runnable{
         if(user != null) {
             System.out.println("\nWelcome " + user.getUsername() + "\n");
             //Run the Menu
-            Menu menu = new Menu(user);
+            BankMenu menu = new BankMenu(user);
             menu.run();
         }
         else {
@@ -88,18 +89,18 @@ public class Main implements Runnable{
             String password = scanner.nextLine();
         
             user = serverUser.checkUser(username, password); 
-            
-            if (user instanceof NormalUser) {
-                NormalUser newUser = (NormalUser) user;
-    
-                return newUser;
-            }
-            else if (user instanceof BusinessUser) {
-                BusinessUser newUser = (BusinessUser) user;
-                
-                return newUser;
-            }
-            else {
+            if(user != null){
+                //OTP
+                //SMS.sendSMS("+6585933198", "hello");
+                if (user instanceof NormalUser) {
+                    NormalUser newUser = (NormalUser) user;
+                    return newUser;
+                }
+                else if (user instanceof BusinessUser) {
+                    BusinessUser newUser = (BusinessUser) user;
+                    return newUser;
+                }
+            }else { //No User
                 System.out.println("Invalid login. " + counter + " tries left.\n");
             }
             //return user
