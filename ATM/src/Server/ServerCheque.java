@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Cheque.Cheque;
+import Cheque.ChequeAccount;
 import Account.Account;
 import Cheque.ChequeTransaction;
 
@@ -11,7 +12,16 @@ import java.sql.*;
 
 public interface ServerCheque extends SQLConnect {
     // Get transactions for specific account
-    public static List<Cheque> findUserCheques(Account account) {
+    public static List<Cheque> findUserCheques(ChequeAccount chequeAccount, ChequeTransaction chequeTransaction) {
+
+        ChequeAccount chequeAccount = new ChequeAccount (int ID, int chequeID, accountID.getAccID(), int type) {
+            this.ID = ID;
+            this.chequeID = chequeID;
+            this.accountID = accountID;
+            this.type = type;
+        }
+
+
         String sql = String.format("SELECT * FROM Cheque WHERE AccountID = %s", account.getAccID());
         Connection db = SQLConnect.getDBConnection();
         List<Cheque> Cheques = new ArrayList<>();
