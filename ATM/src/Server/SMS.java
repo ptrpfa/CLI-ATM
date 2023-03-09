@@ -47,8 +47,8 @@ public class SMS {
     }
 
     // Program entrypoint (for testing)
-    public static void main(String[] args) {
-        sendSMS("+6585933198", "hello");
-    }
+    // public static void main(String[] args) {
+    //     sendSMS("+6597325244", "hello from alexander binder AG AH AHA AG AH");
+    // }
 
 }
