@@ -47,20 +47,29 @@ public class AccountTransaction implements ServerAccount{
     
     }
 
-    public boolean transferFunds(Account account, double amount) throws Exception {
-        double xferLimit = account.getTransferLimit();
-        double accBalance = account.getAvailableBalance();
+    public void transferFunds(Account IssuingAccount, Account RecievingAccount, double amount){
+        double xferLimit = IssuingAccount.getTransferLimit();
+        double accBalance = IssuingAccount.getAvailableBalance();
+        double totalBalance = IssuingAccount.getTotalBalance();
         if(amount > accBalance){
             //Cannot withdraw more than the account balance
-            throw new Exception("*****不够钱，你转这么多kan！*****\n*****Transaction Terminated!*****");
+            throw new TransactionError("*****不够钱，你转这么多kan！*****\n*****Transaction Terminated!*****");
         }else if(amount > xferLimit){
             //Cannot withdraw more than WithdrawLimit
-            throw new Exception("*****不够钱转账！*****\n*****Transaction Terminated!*****");
+            throw new TransactionError("*****不够钱转账！*****\n*****Transaction Terminated!*****");
         }
         //DB query to change the availableBalance
-        //Set the available balance, total balance
-        //Can maybe return acc Balance
-        return true;
+        boolean result = ServerAccount.TransferFunds(IssuingAccount, RecievingAccount, amount);
+        if(result){ //Transfer Successful
+            IssuingAccount.setAvailableBalance(accBalance-amount);
+            IssuingAccount.setTotalBalance(totalBalance-amount);
+            accBalance = RecievingAccount.getAvailableBalance();
+            totalBalance = RecievingAccount.getTotalBalance();
+            RecievingAccount.setAvailableBalance(accBalance+amount);
+            RecievingAccount.setTotalBalance(accBalance+amount);
+        }else{ //Transfer Failed    
+            throw new TransactionError("Transaction at Server failed");
+        } 
     }
 
     public static class TransactionError extends RuntimeException{

@@ -127,7 +127,6 @@ public class Account {
         return headers;
     }
 
-
     //Transcations
     public void deposit(double amount) {
         this.transaction.Deposit(this, amount);
@@ -137,5 +136,7 @@ public class Account {
         this.transaction.Withdraw(this, amount);
     }
 
-    
+    public void transferFunds(Account RecivingAccount, double amount){
+        this.transaction.transferFunds(this, RecivingAccount, amount);
+    }
 }

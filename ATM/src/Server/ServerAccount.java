@@ -245,4 +245,49 @@ public interface ServerAccount extends SQLConnect{
         return false;
         
     }
+
+    public static boolean TransferFunds(Account IssuingAccount, Account ReceivingAccount, double amount){
+        Connection db = SQLConnect.getDBConnection();
+
+        try{
+            String issuingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Issuing
+            String recievingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Recieving
+            
+            //Prepare the issuingAccount Details
+            PreparedStatement updateStmt = db.prepareStatement(issuingSQL);
+            double availableBalance = IssuingAccount.getAvailableBalance();
+            double totalBalance = IssuingAccount.getTotalBalance();
+
+            updateStmt.setDouble(1, (availableBalance-amount));
+            updateStmt.setDouble(2, (totalBalance - amount));
+            updateStmt.setInt(3,IssuingAccount.getUserID());
+            updateStmt.setInt(4, IssuingAccount.getAccID());
+            int row = updateStmt.executeUpdate(); 
+
+            if(row < 0 ){ //< 0, never update
+                return false;
+            }
+
+            //Prepare the RecievingAccount Details
+            updateStmt = db.prepareStatement(recievingSQL);
+            availableBalance = ReceivingAccount.getAvailableBalance();
+            totalBalance = ReceivingAccount.getTotalBalance();
+
+            updateStmt.setDouble(1, (availableBalance+amount));
+            updateStmt.setDouble(2, (totalBalance+amount));
+            updateStmt.setInt(3, ReceivingAccount.getUserID());
+            updateStmt.setInt(4, ReceivingAccount.getAccID());
+            row = updateStmt.executeUpdate(); 
+
+            if(row < 0 ){ //< 0, never update
+                return false;
+            }
+
+            //Create Transaction Details, check above methods
+            return true;
+        }catch(SQLException e){
+            System.out.println("Error occurred: " + e.getMessage());
+        }
+        return false;
+    }
 }

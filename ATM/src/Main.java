@@ -91,7 +91,7 @@ public class Main implements Runnable{
             user = serverUser.checkUser(username, password); 
             if(user != null){
                 //OTP
-                SMS.sendSMS("+6585933198", "hello");
+                //SMS.sendSMS("+6585933198", "hello");
                 if (user instanceof NormalUser) {
                     NormalUser newUser = (NormalUser) user;
                     return newUser;

@@ -133,7 +133,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                                         Withdraw(account);
                                         break;
                                     case TRANSFER_FUNDS:
-                                        // TODO
+                                        TransferFunds(account);
                                         break;
                                     case VIEW_TRANSACTIONS:
                                         ViewTransaction(account);
@@ -337,8 +337,57 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     }
 
     // Option 6
-    private void TransferFunds(Account acc) {
-        // TODO
+    private void TransferFunds(Account IssuingAccount) { //Recieve the IssuingAccount from Run
+        String[] transferCommand = {
+            "1- Transfer funds between own Accounts",
+            "2- Transfer funds to another Account"
+        };
+
+        boolean isValidInput = false;
+        while (!isValidInput) {
+            printMenu(transferCommand);
+            System.out.println();
+            try{
+                int transactionOption = promptForInput("Which Transaction Operation?", Integer.class);
+                //Check if transOption is within the size of the transferCommand
+                checkOption(transactionOption, transferCommand.length);
+                switch(transactionOption){
+                    case 1://Transfer to Own Account
+                        System.out.println("Select the Recieving Account...");
+                        int accountOption = chooseAccount();
+                        Account RecivingAccount = accounts.get(accountOption - 1);
+                        double transferAmount = 0;
+                        while (transferAmount == 0) { //Loop till transfer amount correct
+                            try {
+                                //Get Transfer Amount
+                                transferAmount = promptForInput("Transfer Amount:", Double.class);
+                                if(transferAmount == 0){
+                                    System.out.println("Unable to proceed with amount keyed. Try again");
+                                }else{
+                                    validateAmount(transferAmount);
+                                    //Send to AccountTransaction Method
+                                    IssuingAccount.transferFunds(RecivingAccount, transferAmount);
+                                }
+                            }catch(WrongNumberException e){
+                                System.out.println(e.getMessage());
+                            }catch(GoBackException e){
+                                break;
+                            }
+                        }
+                        break;
+                    case 2://Transfer to others accuount
+                        break;
+                    default:
+                        System.out.println("Wrong Input. Try Again.");
+                        break;
+                }
+                isValidInput = true;
+            }catch(WrongNumberException e){
+                System.out.println(e.getMessage());
+            }catch(GoBackException e){
+                return;
+            }
+        }
     }
 
     // Option 7
