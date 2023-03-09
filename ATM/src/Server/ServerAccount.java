@@ -19,23 +19,26 @@ public interface ServerAccount extends SQLConnect{
             ResultSet rs= statement.executeQuery();  
             
             while (rs.next()) {
-                Timestamp timestamp = rs.getTimestamp("OpeningDate");
-                java.util.Date datetime = new java.util.Date(timestamp.getTime());
-                //Create the Acc object
-                Account acc = new Account(rs.getInt("AccountID"),
-                                          rs.getInt("UserID"),
-                                          rs.getString("AccountNo"),
-                                          rs.getString("Name"),
-                                          rs.getString("Description"),
-                                          rs.getDouble("HoldingBalance"),
-                                          rs.getDouble("AvailableBalance"),
-                                          rs.getDouble("TotalBalance"),
-                                          rs.getDouble("TransferLimit"),
-                                          rs.getDouble("WithdrawalLimit"),
-                                          datetime,
-                                          rs.getBoolean("Active"));
+                boolean active = rs.getBoolean("Active");
+                if(active){ 
+                    Timestamp timestamp = rs.getTimestamp("OpeningDate");
+                    java.util.Date datetime = new java.util.Date(timestamp.getTime());
+                    //Create the Acc object
+                    Account acc = new Account(rs.getInt("AccountID"),
+                                            rs.getInt("UserID"),
+                                            rs.getString("AccountNo"),
+                                            rs.getString("Name"),
+                                            rs.getString("Description"),
+                                            rs.getDouble("HoldingBalance"),
+                                            rs.getDouble("AvailableBalance"),
+                                            rs.getDouble("TotalBalance"),
+                                            rs.getDouble("TransferLimit"),
+                                            rs.getDouble("WithdrawalLimit"),
+                                            datetime,
+                                            active);
 
-                accounts.add(acc);
+                    accounts.add(acc);
+                }
             } 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -111,11 +114,14 @@ public interface ServerAccount extends SQLConnect{
             PreparedStatement updateStmt = db.prepareStatement(sql);
             updateStmt.setDouble(1, availableBalance);
             updateStmt.setDouble(2, totalBalance);
-            updateStmt.executeUpdate();
+            int row = updateStmt.executeUpdate();
 
+            if(row < 0){
+                return false;
+            }
             /*Create New Transaction*/
             //Get Last TransactNo
-            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction` WHERE  AccountID = 1";
+            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM Transaction WHERE  AccountID = " + accID;
             updateStmt = db.prepareStatement(getTransactNoSQL);
             ResultSet rs = updateStmt.executeQuery();
             int transactionNo = 0;
@@ -137,7 +143,6 @@ public interface ServerAccount extends SQLConnect{
             String year = yearFormat.format(currentDate);
             //Format TransactionNo
             String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
-
             //Insert into Transaction Table
             sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,?,0,?,1,NULL)");
             updateStmt = db.prepareStatement(sql);
@@ -147,7 +152,7 @@ public interface ServerAccount extends SQLConnect{
             updateStmt.setTimestamp(4, Timestamp.valueOf(transactDate));
             updateStmt.setDouble(5, amount);
             updateStmt.setDouble(6, availableBalance);
-            int row = updateStmt.executeUpdate(); 
+            row = updateStmt.executeUpdate(); 
 
             if(row > 0 ){
                 return true;
@@ -170,10 +175,15 @@ public interface ServerAccount extends SQLConnect{
             PreparedStatement updateStmt = db.prepareStatement(sql);
             updateStmt.setDouble(1, availableBalance);
             updateStmt.setDouble(2, totalBalance);
-            updateStmt.executeUpdate();
-/*Create New Transaction*/
+            int row = updateStmt.executeUpdate();
+
+            if(row < 0){
+                return false;
+            }
+
+            /*Create New Transaction*/
             //Get Last TransactNo
-            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction` WHERE  AccountID = 1";
+            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction` WHERE  AccountID =" + accID;
             updateStmt = db.prepareStatement(getTransactNoSQL);
             ResultSet rs = updateStmt.executeQuery();
             int transactionNo = 0;
@@ -195,7 +205,6 @@ public interface ServerAccount extends SQLConnect{
             String year = yearFormat.format(currentDate);
             //Format TransactionNo
             String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
-
             //Insert into Transaction Table
             sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,0,?,?,1,NULL)");
             updateStmt = db.prepareStatement(sql);
@@ -205,7 +214,7 @@ public interface ServerAccount extends SQLConnect{
             updateStmt.setTimestamp(4, Timestamp.valueOf(transactDate));
             updateStmt.setDouble(5, amount);
             updateStmt.setDouble(6, availableBalance);
-            int row = updateStmt.executeUpdate(); 
+            row = updateStmt.executeUpdate(); 
 
             if(row > 0 ){
                 return true;
@@ -215,5 +224,25 @@ public interface ServerAccount extends SQLConnect{
             System.out.println("Error occurred: " + e.getMessage());
         }
         return false;
+    }
+
+    public static boolean DeleteAccount(int userID, int accID){
+        Connection db = SQLConnect.getDBConnection();
+
+        try{
+            String sql = "UPDATE Account SET Active=0 WHERE UserID=? AND AccountID=?";
+            PreparedStatement updateStmt = db.prepareStatement(sql);
+            updateStmt.setInt(1, userID);
+            updateStmt.setInt(2, accID);
+            int row = updateStmt.executeUpdate(); 
+
+            if(row > 0 ){
+                return true;
+            }
+        }catch(SQLException e){
+            System.out.println("Error occurred: " + e.getMessage());
+        }
+        return false;
+        
     }
 }

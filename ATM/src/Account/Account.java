@@ -1,8 +1,6 @@
 package Account;
 import java.util.Date;
 
-import pl.mjaron.etudes.Table;
-
 public class Account {
     private int accID;
     private int userID;

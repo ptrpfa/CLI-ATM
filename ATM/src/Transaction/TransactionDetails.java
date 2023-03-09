@@ -13,7 +13,6 @@ public class TransactionDetails {
     private int status;
     private String Remarks;
 
-    //is this only for backend to pull the data and set the data?
     public TransactionDetails(int transID, int accID, String transno, Date datetime, Date valueDatetime, double debit, double credit, double balance, int status, String remarks) {
         this.transID = transID;
         this.accID = accID;
@@ -24,7 +23,11 @@ public class TransactionDetails {
         this.credit = credit;
         this.balance = balance;
         this.status = status;
-        this.Remarks = remarks;
+        if(remarks == null){
+            this.Remarks = "NIL";
+        }else{
+            this.Remarks = remarks;
+        }    
     }
     
     //Pull data for this accID

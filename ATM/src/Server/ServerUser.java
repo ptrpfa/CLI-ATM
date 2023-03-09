@@ -619,7 +619,7 @@ public class ServerUser {
     }
 
     // Method to deactivate user from DB
-    public static void deactivateUser(User user) throws InterruptedException {
+    public static void deactivateUser(User user){
         // Loop counter where user only allowed 3 tries
         int passwordTries = 2;
         int deactivationOption1 = 0;
@@ -689,8 +689,13 @@ public class ServerUser {
                         statement.executeUpdate();
                         System.out.print("\nUser account has been deactivated.");
                         System.out.print("\nNow logging out...");
-                        Thread.sleep(1000);
-                        System.exit(1);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            System.out.println(e.getMessage());
+                        }finally{
+                            System.exit(1);
+                        }
                     }
                     
                     // Else, user confirms not to deactivate user account and prints abort message

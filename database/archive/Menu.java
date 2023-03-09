@@ -16,13 +16,15 @@ import Cheque.Cheque;
 
 
 class Menu implements ServerAccount, ServerTransactions {
-    private List<Account> accounts;
+    private List<Account> accounts = null;
     private User user;
     private Scanner scanner;
 
     Menu(User user){
         List<Account> accounts = ServerAccount.findUserAccounts(user.getUserID());
-        this.accounts = accounts;
+        if(!accounts.isEmpty()){
+            this.accounts = accounts;
+        }
         this.user = user;
     }
 
@@ -34,17 +36,23 @@ class Menu implements ServerAccount, ServerTransactions {
         String[] options = {
             "1- Edit User Details",
             "2- Create New Account",
-            "3- Deposit",
-            "4- Withdraw",
-            "5- Transfer Funds",
-            "6- View Transactions",
-            "7- Exit"
+            "3- Delete An Account",
+            "4- Deposit",
+            "5- Withdraw",
+            "6- Transfer Funds",
+            "7- View Transactions",
+            "8- View Cheques",
+            "9- Exit"
         };
 
         scanner = new Scanner(System.in);
-        // Print Available Accounts
-        System.out.println("Active Accounts..");
-        printTable(Account.PrintHeaders(), accounts);
+        if(!accounts.isEmpty()){
+            // Print Available Accounts
+            System.out.println("Active Accounts..");
+            printTable(Account.PrintHeaders(), accounts);
+        }else{
+            System.out.println("No Active Accounts...");
+        }
 
         int option = -1, accountOption = -1;
         do {
@@ -64,22 +72,30 @@ class Menu implements ServerAccount, ServerTransactions {
                     case 2:
                         CreateAccount();
                         break;
-
+                    
                     case 3:
+                        accountOption = chooseAccount();
+                        if(accountOption != -1){
+                            DeleteAccount(accounts.get(accountOption-1));
+                        }
+                        break;
+                        
+
+                    case 4:
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             Deposit(accounts.get(accountOption-1));
                         }
                         break;
                         
-                    case 4: 
+                    case 5: 
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             Withdraw(accounts.get(accountOption-1));
                         }
                         break;
                     
-                    case 5:
+                    case 6:
                         
                     // case 5:
                     //     do {
@@ -105,21 +121,21 @@ class Menu implements ServerAccount, ServerTransactions {
                     //     break;
                     
                     // View account transactions
-                    case 6:
+                    case 7:
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             ViewTransaction(accounts.get(accountOption-1));
                         }
                         break;
 
-                    case 7:
+                    case 8:
                         accountOption = chooseAccount();
                         if(accountOption != -1){
                             ViewCheques(accounts.get(accountOption-1));
                         }
                         break;
 
-                    case 8:
+                    case 9:
                         //Clean up
                         scanner.close();
                         break;
@@ -185,6 +201,10 @@ class Menu implements ServerAccount, ServerTransactions {
             } catch (WrongNumberException e) {
                 //Thrown by checkOption
                 System.out.println(e.getMessage());
+            }catch(EmptyTableException e){
+                //Thrown by PrintTable
+                System.out.println(e.getMessage());
+                userOption = 4;
             }
 
         } while (userOption != 4);
@@ -194,7 +214,6 @@ class Menu implements ServerAccount, ServerTransactions {
     // Option 2
     private void CreateAccount() throws InterruptedException {
 
-        AccountService service = new AccountService();
         int userid = user.getUserID();
         String accName = null, accDescString = null;
         double amount = 0;
@@ -224,7 +243,12 @@ class Menu implements ServerAccount, ServerTransactions {
         if (acc != null) {
             System.out.println("Account is Created\n");
             this.accounts.add(acc);
-            printTable(Account.PrintHeaders(), accounts);
+            try{ 
+                printTable(Account.PrintHeaders(), accounts);
+            }catch(EmptyTableException e){
+                e.printStackTrace();
+                return;
+            }
         } else {
             System.out.println("Error in System..\n");
         }
@@ -232,6 +256,17 @@ class Menu implements ServerAccount, ServerTransactions {
     }
 
     //Option 3
+    private void DeleteAccount(Account acc){
+        boolean result = service.closeAccount(acc.getUserID(), acc.getAccID());
+        if(!result){
+            System.out.println("Error...");
+        }else{
+            //Update Accountlist
+            accounts.remove(acc);
+        }
+    }
+
+    //Option 4
     private void Deposit(Account acc) throws InterruptedException {
         double amount = 0;
         boolean isValidInput = false;
@@ -247,11 +282,8 @@ class Menu implements ServerAccount, ServerTransactions {
                 printTable(Account.PrintHeaders(), accounts);
 
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            }catch(WrongNumberException | TransactionError | EmptyTableException e){
                 //Throw by validateAmount()
-                System.out.println(e.getMessage());
-            }catch(TransactionError e){
-                //Throw by acc.deposit()
                 System.out.println(e.getMessage());
             }catch(GoBackException e){
                 return;
@@ -260,7 +292,7 @@ class Menu implements ServerAccount, ServerTransactions {
         }
     }
 
-    //Option 4
+    //Option 5
     private void Withdraw(Account acc) throws InterruptedException{
         double amount = 0;
         boolean isValidInput = false;
@@ -278,11 +310,8 @@ class Menu implements ServerAccount, ServerTransactions {
                 printTable(Account.PrintHeaders(), accounts);
 
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            }catch(WrongNumberException | TransactionError | EmptyTableException e){
                 //Throw by validateAmount()
-                System.out.println(e.getMessage());
-            }catch(TransactionError e){
-                //Throw by acc.deposit()
                 System.out.println(e.getMessage());
             }catch(GoBackException e){
                 return;
@@ -291,7 +320,7 @@ class Menu implements ServerAccount, ServerTransactions {
         }
     }
 
-    //Option 6
+    //Option 7
     private void ViewTransaction(Account account){
         // Print transactions table
         List<TransactionDetails> transactions = ServerTransactions.findUserTransactions(account);
@@ -351,13 +380,16 @@ class Menu implements ServerAccount, ServerTransactions {
             }catch(WrongNumberException e){
                 //Thrown by checkOption
                 System.out.println(e.getMessage());
+            }catch(EmptyTableException e){
+                e.printStackTrace();
+                break;
             }
         }
         //End of while loop
         System.out.print("\n");
     }
 
-    //Option 7
+    //Option 8
     private void ViewCheques(Account account){
         // Print transactions table
         List<Cheque> Cheques = ServerCheque.findUserCheques(account);
@@ -417,21 +449,14 @@ class Menu implements ServerAccount, ServerTransactions {
             }catch(WrongNumberException e){
                 //Thrown by checkOption
                 System.out.println(e.getMessage());
+            }catch(EmptyTableException e){
+                e.printStackTrace();
+                break;
             }
         }
         //End of while loop
         System.out.print("\n");
     }
-
-
-
-
-
-
-
-
-
-
 
     // public boolean TransferFunds(Account acc) {
     //     // TODO Auto-generated method stub
@@ -510,6 +535,9 @@ class Menu implements ServerAccount, ServerTransactions {
      * Template for Printing info
     */
     private static <T> void printTable(String[] headers, List<T> list) {
+        if(list.isEmpty()){
+            throw new EmptyTableException("List is Empty.");
+        }
         // Get the values
         String[][] values = new String[list.size()][headers.length];
         for (int i = 0; i < list.size(); i++) {
@@ -607,6 +635,12 @@ class Menu implements ServerAccount, ServerTransactions {
 
     private static class GoBackException extends RuntimeException  {
         public GoBackException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
+    private static class EmptyTableException extends RuntimeException{
+        public EmptyTableException(String errorMessage) {
             super(errorMessage);
         }
     }

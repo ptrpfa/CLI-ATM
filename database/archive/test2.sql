@@ -2,7 +2,7 @@
 -- -- UPDATE `OOP_ATM`.`User` SET Active = 1 WHERE UserID = 1;
 
 
-SELECT * FROM `OOP_ATM`.`Account` WHERE AccountNo = '409-000611074';
+SELECT * FROM `OOP_ATM`.`Account` WHERE UserID = '5';
 SELECT * FROM `OOP_ATM`.`Transaction` WHERE AccountID = 1 ORDER BY TransactionID DESC LIMIT 1;
 UPDATE `OOP_ATM`.`User` SET PasswordHash = 'ArfxhNgHlBIduqJuHKkoXEb91opTkVZBz2E019JlMfI=', PasswordSalt = 'Y71q44QlBWZtBKjCCNPoOA==' where userid =1;
 SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction` WHERE  AccountID = 1 LIMIT 4;

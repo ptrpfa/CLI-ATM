@@ -48,7 +48,7 @@ public class Main implements Runnable{
         if(user != null) {
             System.out.println("\nWelcome " + user.getUsername() + "\n");
             //Run the Menu
-            Menu menu = new Menu(user);
+            BankMenu menu = new BankMenu(user);
             menu.run();
         }
         else {
@@ -91,12 +91,10 @@ public class Main implements Runnable{
             
             if (user instanceof NormalUser) {
                 NormalUser newUser = (NormalUser) user;
-    
                 return newUser;
             }
             else if (user instanceof BusinessUser) {
                 BusinessUser newUser = (BusinessUser) user;
-                
                 return newUser;
             }
             else {
