@@ -120,7 +120,7 @@ public class Cheque {
     }
 
     public static String[] PrintHeaders(){
-        String[] headers = {"Cheque ID", "From", "To", "Issuer Transaction Number", "Receiver Transaction Number", "Cheque Number", "Value", "Date", "Status"};
+        String[] headers = {"Cheque ID", "Issuer Account", "Receiver Account", "Issuer Transaction", "Receiver Transaction", "Cheque Number", "Value", "Date", "Status"};
         return headers;
     }
 }

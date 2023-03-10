@@ -1,3 +1,4 @@
+import java.text.ParseException;
 import java.util.Scanner;
 
 import Server.SMS;
@@ -41,7 +42,7 @@ public class Main implements Runnable{
 
     public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
-        commandLine.execute( "Login"); //Change to args if you want do default
+        commandLine.execute(args /*"Login"*/); //Change to args if you want do default
 
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
         CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
@@ -111,8 +112,8 @@ public class Main implements Runnable{
         return user;
     }
 
-    // @CommandLine.Command
-    // public User Registration() {
-
-    // }
+    @CommandLine.Command
+    public void Registration() throws ParseException {
+        ServerUser.registerUser();
+    }
 }

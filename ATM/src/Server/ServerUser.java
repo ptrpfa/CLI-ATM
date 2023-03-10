@@ -14,13 +14,13 @@ import User.User;
 public class ServerUser {
 
     // Method to create user
-    public static void registerUser() throws ParseException{
+    public static void registerUser() throws ParseException {
         int userID;
         String username;
         String passwordSalt;
         String passwordHash;
         String email;
-        String phone;
+        String phone = "";
         String addressOne;
         String addressTwo;
         String addressThree;
@@ -31,6 +31,7 @@ public class ServerUser {
 
         Scanner input = new Scanner(System.in);
         
+        // Set option for user to register as NormalUser or BusinessUser which will set different prompts later
         do{
             System.out.print("Enter user type\n");
             System.out.print("1- Normal user\n");
@@ -40,79 +41,125 @@ public class ServerUser {
 
         input.nextLine();
         
+        // Get user's desired username used for log in
         System.out.print("\nEnter username: ");
         username = input.nextLine();
 
+        // Get user's desired password used for log in
         System.out.print("\nEnter password: ");
         String passwordTemp = input.nextLine();
 
+        // Generate unique random salt to be added to password 
         String salt = AES256.generateSalt();
         passwordSalt = salt;
 
+        // Encrypts user password + salt for better security
         passwordHash = AES256.encrypt(passwordTemp, salt);
 
+        // Get user's email 
         System.out.print("\nEnter email: ");
         email = input.nextLine();
 
-        System.out.print("\nEnter phone: ");
-        phone = input.nextLine();
+        // Loop controller
+        boolean isVerified = false;
 
+        // Sends verification message to user's phone and check for verification status
+        while (!isVerified) {
+            System.out.print("\nEnter phone (+65): ");
+            phone = input.nextLine();
+
+            // Add country code by default as verified number uses +65
+            phone = "+65" + phone;
+
+            // Sends verification message to phone
+            isVerified = SMS.sendSMS(phone, "test message from binder of alexander");
+            
+            // If message goes through, status will return TRUE and break loop
+            if(isVerified) {
+                System.out.println("Phone has been verified!");
+                isVerified = true;
+            }
+            // Else FALSE and resend verification code
+            else {
+                System.out.println("Error verifying phone!");
+            }
+        }
+
+        // Get user's first address
         System.out.print("\nEnter address one: ");
         addressOne = input.nextLine();
 
+        // Get user's second address
         System.out.print("\nEnter address two: ");
         addressTwo = input.nextLine();
 
+        // Get user's third address
         System.out.print("\nEnter address three: ");
         addressThree = input.nextLine();
 
+        // Get user's postal code
         System.out.print("\nEnter postal code: ");
         postalCode = input.nextLine();
 
+        // Generate current date as registration date
         registrationDate = new Date();
 
+        // If user is a NormalUser, prompt these
         if (userType == 1){
             String NRIC;
             String firstName;
             String middleName;
             String lastName;
             String gender = "";
-            Date birthday;
+            Date birthday = null;
 
+            // Get user's NRIC
             System.out.print("\nEnter NRIC: ");
             NRIC = input.nextLine();
             
+            // Get user's first name
             System.out.print("\nEnter first name: ");
             firstName = input.nextLine();
             
+            // Get user's last name
             System.out.print("\nEnter last name: ");
             lastName = input.nextLine();
             
+            // Get user's middle name
             System.out.print("\nEnter middle name (If applicable): ");
             middleName = input.nextLine();
             
+            // Get user's gender using integer options for standardisation
             int genderInt = 0;
             do {
-                System.out.println("Are you a:");
-                System.out.print("1- Male");
+                System.out.println("\nAre you a:");
+                System.out.println("1- Male");
                 System.out.println("2- Female");
-                System.out.println("> ");
+                System.out.print("> ");
                 genderInt = input.nextInt();
             } while (genderInt != 1 & genderInt != 2);
             
             if(genderInt == 1) {
                 gender = "Male";
             }
-            
             else if(genderInt == 2) {
                 gender = "Female";
             }
-            
-            System.out.print("\nEnter DOB (dd-MM-yyyy): ");
-            String birthdayTemp = input.nextLine();
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            birthday = dateFormat.parse(birthdayTemp);
 
+            input.nextLine();
+            
+            try {
+                // Get user's birthday and convert to proper necessary format 
+                System.out.print("\nEnter DOB (dd-MM-yyyy): ");
+                String birthdayTemp = input.nextLine();
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                birthday = dateFormat.parse(birthdayTemp);
+            } 
+            catch (ParseException e) {
+                System.out.println("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
+            }
+
+            // Create NormalUser object which holds user data and sends for user creation process
             NormalUser newUser = new NormalUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                 addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                 NRIC, firstName, middleName, lastName, gender, birthday);
@@ -120,22 +167,28 @@ public class ServerUser {
             createUser(newUser);
         }
 
+        // If user is a BusinessUser, prompt these
         else if (userType == 2) {
             String UEN;
             String businessName;
 
+            // Get company's UEN
             System.out.print("\nEnter UEN: ");
             UEN = input.nextLine();
 
+            // Get company's name
             System.out.print("\nEnter business name: ");
             businessName = input.nextLine();
 
+            // Create BusinessUser object which holds user data and sends for user creation process
             BusinessUser newUser = new BusinessUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                     addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                     UEN, businessName);
             createUser(newUser);
         }
-        System.out.println("Successfully created new user!");
+
+        // Upon successful creation of NormalUser or BusinessUser, print successful message
+        System.out.println("Successfully created new user!\n");
     }
 
     // Method to add new user into DB
@@ -145,13 +198,13 @@ public class ServerUser {
 
         // Try to connect to DB
         try {
-            // Fill up update statements with latest particulars for "User" DB
+            // Fill up update statements with latest particulars for User DB
             String sql1 = "INSERT INTO User (Username, PasswordSalt, PasswordHash, Email, Phone, AddressOne," +
                          "AddressTwo, AddressThree, PostalCode, RegistrationDate, UserType, Active)" + 
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement1 = db.prepareStatement(sql1);
 
-            // Fill up update statements with latest particulars for "User" DB
+            // Fill up update statements with latest particulars for User DB
             statement1.setString(1, user.getUsername());
             statement1.setString(2, user.getPasswordSalt());
             statement1.setString(3, user.getPasswordHash());
@@ -166,28 +219,32 @@ public class ServerUser {
             statement1.setInt(11, user.getUserType());
             statement1.setInt(12, user.getActive());
 
+            // Insert into User DB
             int rowsInserted1 = statement1.executeUpdate();
 
+            // Prints successful insertion
             if (rowsInserted1 > 0) {
                System.out.println("\nA new row in User database was inserted successfully!");
             }
 
+            // Pull auto incremented userID from User DB to insert into NormalUser or BusinessUser DB
             String sqlTemp = String.format("SELECT * FROM User WHERE Username = '%s'", user.getUsername());
             PreparedStatement statementTemp = db.prepareStatement(sqlTemp);
             ResultSet myRsTemp = statementTemp.executeQuery();
-            
             if(myRsTemp.next()) {
                 user.setUserID(myRsTemp.getInt("UserID"));
             }
 
-            // Check if normal user, insert into NormalUser DB
+            // Check if NormalUser, insert into NormalUser DB
             if (user instanceof NormalUser) {
+                // Down-size to child object, NormalUser for child method usage
                 NormalUser newUser = (NormalUser) user;
 
+                // Template to insert into NormalUser DB
                 String sql2 = "INSERT INTO NormalUser (UserID, NRIC, FirstName, MiddleName, LastName, Gender, Birthday) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement statement2 = db.prepareStatement(sql2);
 
-                // Fill up update statements with latest particulars for "NormalUser" DB
+                // Fill up update statements with latest particulars for NormalUser DB
                 statement2.setInt(1, newUser.getUserID());
                 statement2.setString(2, newUser.getNRIC());
                 statement2.setString(3, newUser.getFirstName());
@@ -195,34 +252,53 @@ public class ServerUser {
                 statement2.setString(5, newUser.getLastName());
                 statement2.setString(6, newUser.getGender());
 
-                // Format birthday date as a string in the MySQL date format
-                SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String tempDate = newUser.getBirthday();    
-                String mySQLDate = newDateFormat.format(tempDate);
+                try {
+                    // Format birthday date as a string in the MySQL date format and fill up update statement
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String tempDate = newUser.getBirthday();    
+                    java.util.Date utilDate = dateFormat.parse(tempDate);
 
-                statement2.setString(6, mySQLDate);
+                    // Convert java.util.Date object to java.sql.Date object
+                    Date sqlDate = new Date(utilDate.getTime());
+            
+                    // Format java.sql.Date object to MySQL date format
+                    String mySQLDate = newDateFormat.format(sqlDate);
 
-                int rowsInserted2 = statement2.executeUpdate();
+                    statement2.setString(7, mySQLDate);
 
-                if (rowsInserted2 > 0) {
-                    System.out.println("A new row in NormalUser database was inserted successfully!");
+                    // Insert into NormalUser DB
+                    int rowsInserted2 = statement2.executeUpdate();
+
+                    // Prints successful insertion
+                    if (rowsInserted2 > 0) {
+                        System.out.println("A new row in NormalUser database was inserted successfully!");
+                    }
                 }
+                catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             // Check if business user, insert into BusinessUser DB
             if (user instanceof BusinessUser) {
+                // Down-size to child object, BusinessUser for child method usage
                 BusinessUser newUser = (BusinessUser) user;
 
+                // Template to insert into BusinessUser DB
                 String sql = "INSERT INTO BusinessUser (UserID, UEN, BusinessName) VALUES (?, ?, ?)";
                 PreparedStatement statement2 = db.prepareStatement(sql);
     
-                // Fill up update statements with latest particulars for "BusinessUser" DB
+                // Fill up update statements with latest particulars for BusinessUser DB
                 statement2.setInt(1, newUser.getUserID());
                 statement2.setString(2, newUser.getUEN());
                 statement2.setString(3, newUser.getBusinessName());
 
+                // Insert into BusinessUser DB
                 int rowsInserted2 = statement2.executeUpdate();
 
+                // Prints successful insertion
                 if (rowsInserted2 > 0) {
                     System.out.println("A new row in BusinessUser database was inserted successfully!");
                 }
@@ -754,9 +830,6 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
-    // public static void main(String[] args) throws ParseException {
-    //     ServerUser.registerUser();
-    // }
 }
 
 class WrongPasswordException extends Exception {
