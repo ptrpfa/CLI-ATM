@@ -11,38 +11,96 @@ import Cheque.ChequeTransaction;
 import java.sql.*;
 
 public interface ServerCheque extends SQLConnect {
-    // Get transactions for specific account
-    public static List<Cheque> findUserCheques(ChequeAccount chequeAccount, ChequeTransaction chequeTransaction) {
 
-        ChequeAccount chequeAccount = new ChequeAccount (int ID, int chequeID, accountID.getAccID(), int type) {
-            this.ID = ID;
-            this.chequeID = chequeID;
-            this.accountID = accountID;
-            this.type = type;
-        }
+    // Get list of cheque IDs tied to an account
+    public static List<ChequeAccount> getChequeIDs(int accountID) {
+        List<ChequeAccount> ChequeIDs = new ArrayList<>();
 
-
-        String sql = String.format("SELECT * FROM Cheque WHERE AccountID = %s", account.getAccID());
+        String sql = String.format("SELECT * FROM ChequeAccount WHERE AccountID = %s", accountID);
         Connection db = SQLConnect.getDBConnection();
-        List<Cheque> Cheques = new ArrayList<>();
+
         try {
             PreparedStatement statement = db.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
 
+            rs.next();
+
             while (rs.next()) {
+                // Create ChequeAccount object for every cheque id
+                ChequeAccount chequeID = new ChequeAccount(rs.getInt("ID"),
+                                                           rs.getInt("ChequeID"),
+                                                           rs.getInt("accountID"),
+                                                           rs.getInt("Type"));
+                ChequeIDs.add(chequeID);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.disconnectDB(db);
+        }
+        return ChequeIDs;
+    }
+
+    // Get list of cheque transactions tied to each cheque ID
+    public static List<ChequeTransaction> getChequeTransactions(List<ChequeAccount> chequeAccounts) {
+        List<ChequeTransaction> chequeTransactions = new ArrayList<>();
+
+        Connection db = SQLConnect.getDBConnection();
+        
+        try {
+            for (int i = 0; i < chequeAccounts.size(); i++) {
+                String sql = String.format("SELECT * FROM ChequeTransaction WHERE ChequeID = %s", chequeAccounts.get(i).getChequeID());
+                PreparedStatement statement = db.prepareStatement(sql);
+                ResultSet rs = statement.executeQuery();
+
+                rs.next();
+
+                // Create ChequeTransaction object for every cheque id
+                ChequeTransaction chequeTransaction = new ChequeTransaction(rs.getInt("ID"),
+                                                                            rs.getInt("ChequeID"),
+                                                                            rs.getInt("TransactionID"),
+                                                                            rs.getInt("Type"));
+                chequeTransactions.add(chequeTransaction);
+                }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.disconnectDB(db);
+        }
+        return chequeTransactions;
+    }
+
+    // Get list of cheques for an account
+    public static List<Cheque> findUserCheques(Account account) {
+        // Get ChequeID list based on accountID
+        List<ChequeAccount> chequeIDs = ServerCheque.getChequeIDs(account.getAccID());
+        
+        // Get ChequeTransaction list based on ChequeIDs list
+        List<ChequeTransaction> chequeTransactions = ServerCheque.getChequeTransactions(chequeIDs);
+
+        List<Cheque> cheques = new ArrayList<>();
+
+        Connection db = SQLConnect.getDBConnection();
+        try {
+            for (int i = 0; i < chequeIDs.size(); i++) {
+                String sql = String.format("SELECT * FROM Cheque WHERE ChequeID = %s", chequeIDs.get(i).getChequeID());
+                PreparedStatement statement = db.prepareStatement(sql);
+                ResultSet rs = statement.executeQuery();
+
+                rs.next();
 
                 // Create the Cheque object
-                Cheque Cheque = new Cheque(rs.getInt("ChequeID"),
-                        rs.getInt("IssuerAccount"),
-                        rs.getInt("RecipientAccount"),
-                        rs.getInt("IssuingTransaction"),
-                        rs.getInt("ReceivingTransaction"),
-                        rs.getString("ChequeNo"),
-                        rs.getDouble("Value"),
-                        rs.getDate("Date"),
-                        rs.getInt("Status"));
+                Cheque cheque = new Cheque(rs.getInt("ChequeID"),   
+                                           rs.getInt("IssuerAccount"),
+                                           rs.getInt("RecipientAccount"),
+                                           rs.getInt("IssuingTransaction"),
+                                           rs.getInt("ReceivingTransaction"),
+                                           rs.getString("ChequeNo"),
+                                           rs.getDouble("Value"),
+                                           rs.getDate("Date"),
+                                           rs.getInt("Status"));
 
-                Cheques.add(Cheque);
+                cheques.add(cheque);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -50,13 +108,13 @@ public interface ServerCheque extends SQLConnect {
             SQLConnect.disconnectDB(db);
         }
 
-        // Reverse list to view from latest transaction first
-        for (int k = 0, j = Cheques.size() - 1; k < j; k++)
+        // Reverse list to view from latest cheques first
+        for (int k = 0, j = cheques.size() - 1; k < j; k++)
         {
-            Cheques.add(k, Cheques.remove(j));
+            cheques.add(k, cheques.remove(j));
         }
 
-        return Cheques;
+        return cheques;
     }
 }
 

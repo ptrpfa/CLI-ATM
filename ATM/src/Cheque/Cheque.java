@@ -109,6 +109,13 @@ public class Cheque {
         
     }
 
+    public String[] PrintValues(){   
+        String[] values = { Integer.toString(chequeID), Integer.toString(issuerAccount), Integer.toString(recipientAccount), 
+                            Integer.toString(issuingTransaction), Integer.toString(receivingTransaction), chequeNumber, 
+                            Double.toString(value), "TEST", Integer.toString(status)};
+        return values;
+    }
+
     public static String[] PrintHeaders(){
         String[] headers = {"Cheque ID", "FROM", "TO", "FROM Transaction Number", "TO Transaction Number", "Cheque No", "Value", "Date", "Status"};
         return headers;

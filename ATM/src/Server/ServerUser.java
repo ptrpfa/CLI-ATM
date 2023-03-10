@@ -13,7 +13,7 @@ import User.User;
 
 public class ServerUser {
 
-    // Method to create user (METHOD WIP)
+    // Method to create user
     public static void registerUser() throws ParseException{
         int userID;
         String username;
@@ -169,7 +169,7 @@ public class ServerUser {
             int rowsInserted1 = statement1.executeUpdate();
 
             if (rowsInserted1 > 0) {
-               System.out.println("A new row in User database was inserted successfully!");
+               System.out.println("\nA new row in User database was inserted successfully!");
             }
 
             String sqlTemp = String.format("SELECT * FROM User WHERE Username = '%s'", user.getUsername());

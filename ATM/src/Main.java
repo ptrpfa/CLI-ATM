@@ -65,7 +65,7 @@ public class Main implements Runnable{
     }
 
     @CommandLine.Command
-    public User Login(){
+    public User Login() {
         String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
 
         for (String line : banner) {
@@ -111,5 +111,8 @@ public class Main implements Runnable{
         return user;
     }
 
+    // @CommandLine.Command
+    // public User Registration() {
 
+    // }
 }
