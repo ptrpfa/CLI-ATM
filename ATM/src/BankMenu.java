@@ -14,20 +14,34 @@ import Transaction.TransactionDetails;
 import Cheque.Cheque;
 
 public class BankMenu implements ServerAccount, ServerTransactions {
+    
+    // Object attributes
     private List<Account> accounts = null;
     private User user;
     private Scanner scanner;
 
+    // Constructor
+    BankMenu(User user) {
+        this.accounts = ServerAccount.findUserAccounts(user.getUserID());
+        this.user = user;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    /* Miscellaneous Functions */
+    // Main menu options' mapping
     private enum Option {
+        EXIT(0),
         EDIT_USER_DETAILS(1),
         CREATE_NEW_ACCOUNT(2),
-        DELETE_AN_ACCOUNT(3),
+        DEACTIVATE_AN_ACCOUNT(3),
         DEPOSIT(4),
         WITHDRAW(5),
         TRANSFER_FUNDS(6),
         VIEW_TRANSACTIONS(7),
-        VIEW_CHEQUES(8),
-        EXIT(9);
+        VIEW_CHEQUES(8);
 
         private final int value;
 
@@ -40,11 +54,12 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         }
     }
 
+    // User sub-menu options' mapping
     private enum userOptions {
+        EXIT(0),
         RESET_PASSWORD(1),
         UPDATE_ACCOUNT(2),
-        DEACTIVATE_ACCOUNT(3),
-        EXIT(4);
+        DEACTIVATE_ACCOUNT(3);
 
         private final int value;
 
@@ -57,36 +72,29 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         }
     };
 
-    BankMenu(User user) {
-        this.accounts = ServerAccount.findUserAccounts(user.getUserID());
-        this.user = user;
-    }
-
-    public List<Account> getAccounts() {
-        return accounts;
-    }
-
     // Main Controller
     public void run() {
         int option = 1;
         scanner = new Scanner(System.in);
         do {
+            // Set menu list according to whether the logged in user has a Bank account 
             String[] optionsCommand = accounts.isEmpty() ? new String[] {
                     "1- Edit User Details",
                     "2- Create New Account",
-                    "3- Exit"
+                    "0- Exit"
             }: new String[] {
                             "1- Edit User Details",
                             "2- Create New Account",
-                            "3- Delete An Account",
+                            "3- Deactivate An Account",
                             "4- Deposit",
                             "5- Withdraw",
                             "6- Transfer Funds",
                             "7- View Transactions",
                             "8- View Cheques",
-                            "9- Exit"
+                            "0- Exit"
             };
 
+            // Print user's active accounts
             if(!accounts.isEmpty()){
                 // Print Available Accounts
                 System.out.println("Active Accounts..");
@@ -94,7 +102,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             }else{
                 System.out.println("No Active Accounts...");
             }
-    
+            
+            // Run menu
             try {
                 printMenu(optionsCommand);
                 System.out.println("What would would want to do? (Key in the Command Number)");
@@ -104,27 +113,30 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 System.out.print("\n");
                 scanner.nextLine();
 
-                switch (Option.values()[option - 1]) {
+                switch (Option.values()[option]) {
+                    case EXIT:
+                        // Clean up
+                        scanner.close();
+                        break;
                     case EDIT_USER_DETAILS:
                         EditUser();
                         break;
                     case CREATE_NEW_ACCOUNT:
                         CreateAccount();
                         break;
-
                     default:
                         if (accounts.isEmpty()) {
                             System.out.println(
-                                    "Please enter an integer value between 1 and " + Option.values().length + "\n");
+                                    "Please enter an integer value between 0 and " + Option.values().length + "\n");
                             scanner.nextLine();
                             break;
                         } else { // Option 3 to Exit choosen
                             int accountOption = chooseAccount();
                             if (accountOption != -1) {
                                 Account account = accounts.get(accountOption - 1);
-                                switch (Option.values()[option - 1]) {
-                                    case DELETE_AN_ACCOUNT:
-                                        DeleteAccount(account);
+                                switch (Option.values()[option]) {
+                                    case DEACTIVATE_AN_ACCOUNT:
+                                        DeactivateAccount(account);
                                         break;
                                     case DEPOSIT:
                                         Deposit(account);
@@ -142,7 +154,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                                         ViewCheques(account);
                                         break;
                                     default:
-                                        System.out.println("Please enter an integer value between 1 and "
+                                        System.out.println("Please enter an integer value between 0 and "
                                                 + Option.values().length + "\n");
                                         scanner.nextLine();
                                         break;
@@ -150,10 +162,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                             }
                             break; // User chose to go back Main Menu from Choose Account or Error
                         }
-                    case EXIT:
-                        // Clean up
-                        scanner.close();
-                        break;
                 }
             } catch (InputMismatchException | WrongNumberException e) {
                 System.out.println("Invalid input. Please enter an integer value.\n");
@@ -161,7 +169,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 scanner.nextLine();
                 continue;
             }
-        } while (Option.values()[option - 1] != Option.EXIT);
+        } while (Option.values()[option] != Option.EXIT);
     }
 
     // Option 1
@@ -190,7 +198,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 System.out.print("\n");
                 scanner.nextLine();
 
-                switch (userOptions.values()[userOption - 1]) {
+                switch (userOptions.values()[userOption]) {
                     case RESET_PASSWORD:
                         ServerUser.resetUserPassword(user);
                         break;
@@ -205,7 +213,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         break; // return to maun
                     default:
                         System.out.println(
-                                "Please enter an integer value between 1 and " + userOptions.values().length + "\n");
+                                "Please enter an integer value between 0 and " + userOptions.values().length + "\n");
                         break;
                 }
             } catch (EmptyTableException e) {
@@ -270,8 +278,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     }
 
     // Option 3
-    private void DeleteAccount(Account acc) {
-        boolean result = ServerAccount.DeleteAccount(acc.getUserID(), acc.getAccID());
+    private void DeactivateAccount(Account acc) {
+        boolean result = ServerAccount.DeactivateAccount(acc.getUserID(), acc.getAccID());
         if (!result) {
             System.out.println("Error...");
         } else {
@@ -563,13 +571,13 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private <T> T promptForInput(String prompt, Class<T> type) {
 
         System.out.println(prompt);
-        System.out.println("Press '-1' to go back to the previous menu.");
+        System.out.println("Press '0' to go back to the previous menu.");
 
         T input = null;
         do {
             System.out.print("> ");
             String userInput = scanner.nextLine();
-            if (userInput.equals("-1")) {
+            if (userInput.equals("0")) {
                 System.out.print("\n");
                 throw new GoBackException("Return Control");
             } else if (!userInput.isEmpty()) {

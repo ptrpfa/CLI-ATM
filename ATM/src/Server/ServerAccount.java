@@ -226,7 +226,7 @@ public interface ServerAccount extends SQLConnect{
         return false;
     }
 
-    public static boolean DeleteAccount(int userID, int accID){
+    public static boolean DeactivateAccount(int userID, int accID){
         Connection db = SQLConnect.getDBConnection();
 
         try{

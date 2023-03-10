@@ -7,12 +7,12 @@ import java.util.*;
 // Centralised class for reading and returning configuration settings
 public class Settings {
 
-    // Specify configurations file
+    // Specify configurations file (production)
     public static final String FILEPATH = "ATM";
-    // public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
+    public static final String CONFIGURATION_FILE = String.format("%s/settings.config", FILEPATH);
 
-    // // Just comment this out when using the cloud database
-    public static final String CONFIGURATION_FILE = String.format("%s/settingsLocal.config", FILEPATH);
+    // Local settings
+    // public static final String CONFIGURATION_FILE = String.format("%s/settingsLocal.config", FILEPATH);
     // public static final String CONFIGURATION_FILE = String.format("%s/local_settings.config", FILEPATH);
 
     // Function to read database settings from the configuration file

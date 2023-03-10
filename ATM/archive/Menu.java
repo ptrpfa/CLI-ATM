@@ -76,7 +76,7 @@ class Menu implements ServerAccount, ServerTransactions {
                     case 3:
                         accountOption = chooseAccount();
                         if(accountOption != -1){
-                            DeleteAccount(accounts.get(accountOption-1));
+                            DeactivateAccount(accounts.get(accountOption-1));
                         }
                         break;
                         
@@ -256,7 +256,7 @@ class Menu implements ServerAccount, ServerTransactions {
     }
 
     //Option 3
-    private void DeleteAccount(Account acc){
+    private void DeactivateAccount(Account acc){
         boolean result = service.closeAccount(acc.getUserID(), acc.getAccID());
         if(!result){
             System.out.println("Error...");
