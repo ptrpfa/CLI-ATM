@@ -1,7 +1,7 @@
 package Server;
 
-import java.security.SecureRandom;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -14,8 +14,7 @@ import User.User;
 public class ServerUser {
 
     // Method to create user (METHOD WIP)
-    public void registerUser() {
-        Scanner input = new Scanner(System.in).useDelimiter(",\\s*");
+    public static void registerUser() throws ParseException{
         int userID;
         String username;
         String passwordSalt;
@@ -29,36 +28,45 @@ public class ServerUser {
         Date registrationDate;
         int userType = 0;
         boolean active = true;
+
+        Scanner input = new Scanner(System.in);
         
         do{
             System.out.print("Enter user type\n");
-            System.out.print("1- Business user");
-            System.out.print("2- Normal user\nEnter user type: ");
-            System.out.print("> ");
+            System.out.print("1- Normal user\n");
+            System.out.print("2- Business user\nEnter user type: ");
             userType = input.nextInt();
         } while (userType != 1 & userType != 2);
 
-        System.out.print("Enter username: ");
+        input.nextLine();
+        
+        System.out.print("\nEnter username: ");
         username = input.nextLine();
 
-        System.out.print("Enter password: ");
+        System.out.print("\nEnter password: ");
         String passwordTemp = input.nextLine();
+
         String salt = AES256.generateSalt();
         passwordSalt = salt;
+
         passwordHash = AES256.encrypt(passwordTemp, salt);
 
-        System.out.print("Enter email: ");
+        System.out.print("\nEnter email: ");
         email = input.nextLine();
 
-        System.out.print("Enter phone: ");
+        System.out.print("\nEnter phone: ");
         phone = input.nextLine();
 
-        System.out.print("Enter addresses separated by commas (eg: Address 1, Address 2, Address 3): ");
-        addressOne = input.next();
-        addressTwo = input.next();
-        addressThree = input.next();
+        System.out.print("\nEnter address one: ");
+        addressOne = input.nextLine();
 
-        System.out.println("Enter postal code: ");
+        System.out.print("\nEnter address two: ");
+        addressTwo = input.nextLine();
+
+        System.out.print("\nEnter address three: ");
+        addressThree = input.nextLine();
+
+        System.out.print("\nEnter postal code: ");
         postalCode = input.nextLine();
 
         registrationDate = new Date();
@@ -71,16 +79,16 @@ public class ServerUser {
             String gender = "";
             Date birthday;
 
-            System.out.print("Enter NRIC: ");
+            System.out.print("\nEnter NRIC: ");
             NRIC = input.nextLine();
             
-            System.out.print("Enter first name: ");
+            System.out.print("\nEnter first name: ");
             firstName = input.nextLine();
             
-            System.out.print("Enter last name: ");
+            System.out.print("\nEnter last name: ");
             lastName = input.nextLine();
             
-            System.out.print("Enter middle name (If applicable): ");
+            System.out.print("\nEnter middle name (If applicable): ");
             middleName = input.nextLine();
             
             int genderInt = 0;
@@ -100,9 +108,10 @@ public class ServerUser {
                 gender = "Female";
             }
             
-            System.out.print("Enter DOB (dd/MM/yyyy): ");
+            System.out.print("\nEnter DOB (dd-MM-yyyy): ");
             String birthdayTemp = input.nextLine();
-            // Convert birthday to ddMMyyyy formay for SQL
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            birthday = dateFormat.parse(birthdayTemp);
 
             NormalUser newUser = new NormalUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                 addressTwo, addressThree, postalCode, registrationDate, userType, active, 
@@ -115,16 +124,18 @@ public class ServerUser {
             String UEN;
             String businessName;
 
-            System.out.print("Enter UEN: ");
+            System.out.print("\nEnter UEN: ");
             UEN = input.nextLine();
 
-            System.out.print("Enter business name");
+            System.out.print("\nEnter business name: ");
             businessName = input.nextLine();
 
             BusinessUser newUser = new BusinessUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
                                                     addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                     UEN, businessName);
+            createUser(newUser);
         }
+        System.out.println("Successfully created new user!");
     }
 
     // Method to add new user into DB
@@ -134,46 +145,65 @@ public class ServerUser {
 
         // Try to connect to DB
         try {
-            // Fill up update statements with latest particulars for "NormalUser" DB
-            String sql1 = "INSERT INTO User (UserID, PasswordSalt, PasswordHash, Email, Phone, AddressOne," +
+            // Fill up update statements with latest particulars for "User" DB
+            String sql1 = "INSERT INTO User (Username, PasswordSalt, PasswordHash, Email, Phone, AddressOne," +
                          "AddressTwo, AddressThree, PostalCode, RegistrationDate, UserType, Active)" + 
-                         "VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement1 = db.prepareStatement(sql1);
 
-            // Fill up update statements with latest particulars for "NormalUser" DB1            statement1.setString(1, user.getPasswordSalt());
-            statement1.setString(1, user.getPasswordHash());
-            statement1.setString(2, user.getEmail());
-            statement1.setString(3, user.getPhone());
-            statement1.setString(4, user.getAddresses(1));
-            statement1.setString(5, user.getAddresses(2));
-            statement1.setString(6, user.getAddresses(3));
-            statement1.setString(7, user.getPostalCode());
-            statement1.setDate(8, user.getRegistrationDate());
-            statement1.setInt(9, user.getUserType());
-            statement1.setInt(10, user.getActive());
+            // Fill up update statements with latest particulars for "User" DB
+            statement1.setString(1, user.getUsername());
+            statement1.setString(2, user.getPasswordSalt());
+            statement1.setString(3, user.getPasswordHash());
+            statement1.setString(4, user.getEmail());
+            statement1.setString(5, user.getPhone());
+            statement1.setString(6, user.getAddresses(1));
+            statement1.setString(7, user.getAddresses(2));
+            statement1.setString(8, user.getAddresses(3));
+            statement1.setString(9, user.getPostalCode());
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            statement1.setTimestamp(10, timestamp);
+            statement1.setInt(11, user.getUserType());
+            statement1.setInt(12, user.getActive());
 
+            int rowsInserted1 = statement1.executeUpdate();
+
+            if (rowsInserted1 > 0) {
+               System.out.println("A new row in User database was inserted successfully!");
+            }
+
+            String sqlTemp = String.format("SELECT * FROM User WHERE Username = '%s'", user.getUsername());
+            PreparedStatement statementTemp = db.prepareStatement(sqlTemp);
+            ResultSet myRsTemp = statementTemp.executeQuery();
+            
+            if(myRsTemp.next()) {
+                user.setUserID(myRsTemp.getInt("UserID"));
+            }
 
             // Check if normal user, insert into NormalUser DB
             if (user instanceof NormalUser) {
                 NormalUser newUser = (NormalUser) user;
 
-                String sql2 = "INSERT INTO NormalUser (NRIC, FirstName, MiddleName, LastName, Gender, Birthday) VALUES (?, ?, ?, ?, ?, ?)";
+                String sql2 = "INSERT INTO NormalUser (UserID, NRIC, FirstName, MiddleName, LastName, Gender, Birthday) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement statement2 = db.prepareStatement(sql2);
 
                 // Fill up update statements with latest particulars for "NormalUser" DB
-                statement2.setString(1, newUser.getNRIC());
-                statement2.setString(2, newUser.getFirstName());
-                statement2.setString(3, newUser.getMiddleName());
-                statement2.setString(4, newUser.getLastName());
-                statement2.setString(5, newUser.getGender());
-                statement2.setDate(6, newUser.getBirthday());
+                statement2.setInt(1, newUser.getUserID());
+                statement2.setString(2, newUser.getNRIC());
+                statement2.setString(3, newUser.getFirstName());
+                statement2.setString(4, newUser.getMiddleName());
+                statement2.setString(5, newUser.getLastName());
+                statement2.setString(6, newUser.getGender());
 
-                int rowsInserted1 = statement1.executeUpdate();
+                // Format birthday date as a string in the MySQL date format
+                SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String tempDate = newUser.getBirthday();    
+                String mySQLDate = newDateFormat.format(tempDate);
+
+                statement2.setString(6, mySQLDate);
+
                 int rowsInserted2 = statement2.executeUpdate();
 
-                if (rowsInserted1 > 0) {
-                   System.out.println("A new row in User database was inserted successfully!");
-                }
                 if (rowsInserted2 > 0) {
                     System.out.println("A new row in NormalUser database was inserted successfully!");
                 }
@@ -183,19 +213,16 @@ public class ServerUser {
             if (user instanceof BusinessUser) {
                 BusinessUser newUser = (BusinessUser) user;
 
-                String sql = "INSERT INTO BusinessUser (UEN, BusinessName )VALUES (?, ?)";
+                String sql = "INSERT INTO BusinessUser (UserID, UEN, BusinessName) VALUES (?, ?, ?)";
                 PreparedStatement statement2 = db.prepareStatement(sql);
     
                 // Fill up update statements with latest particulars for "BusinessUser" DB
-                statement2.setString(1, newUser.getUEN());
-                statement2.setString(2, newUser.getBusinessName());
+                statement2.setInt(1, newUser.getUserID());
+                statement2.setString(2, newUser.getUEN());
+                statement2.setString(3, newUser.getBusinessName());
 
-                int rowsInserted1 = statement1.executeUpdate();
                 int rowsInserted2 = statement2.executeUpdate();
 
-                if (rowsInserted1 > 0) {
-                    System.out.println("A new row in User database was inserted successfully!");
-                }
                 if (rowsInserted2 > 0) {
                     System.out.println("A new row in BusinessUser database was inserted successfully!");
                 }
@@ -727,16 +754,8 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
-    public static Date convertToSqlDate(String inputDate) throws ParseException {
-        SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
-        java.util.Date utilDate = inputFormat.parse(inputDate);
-        return new Date(utilDate.getTime());
-    }
-
     public static void main(String[] args) throws ParseException {
-        String inputDate = "31-12-2022";
-        Date sqlDate = convertToSqlDate(inputDate);
-        System.out.println("SQL Date: " + sqlDate);
+        ServerUser.registerUser();
     }
 }
 
