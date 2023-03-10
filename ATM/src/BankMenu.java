@@ -81,7 +81,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             String[] optionsCommand = accounts.isEmpty() ? new String[] {
                     "1- Edit User Details",
                     "2- Create New Account",
-                    "0- Exit"
+                    "\nPress '0' to Log Out."
             }: new String[] {
                             "1- Edit User Details",
                             "2- Create New Account",
@@ -91,7 +91,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                             "6- Transfer Funds",
                             "7- View Transactions",
                             "8- View Cheques",
-                            "0- Exit"
+                            "\nPress '0' to Log Out."
             };
 
             // Print user's active accounts
@@ -106,7 +106,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             // Run menu
             try {
                 printMenu(optionsCommand);
-                System.out.println("What would would want to do? (Key in the Command Number)");
+                System.out.println("What do you want to do?");
                 System.out.print("> ");
                 option = scanner.nextInt();
                 checkOption(option, Option.values().length);
@@ -164,7 +164,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         }
                 }
             } catch (InputMismatchException | WrongNumberException e) {
-                System.out.println("Invalid input. Please enter an integer value.\n");
+                System.out.println(e.getMessage()); 
                 option = 1;
                 scanner.nextLine();
                 continue;
@@ -178,7 +178,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 "1- Reset Password",
                 "2- Update User Account",
                 "3- Deactivate User Account",
-                "0- Return to menu"
+                "\nPress '0' to go back to the previous menu."
         };
         int userOption = -1;
 
@@ -191,10 +191,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 printTable(User.PrintHeaders(), userList);
 
                 printMenu(userOptionsCommand);
-                System.out.println("What would would want to do? (Key in the Command Number)");
+                System.out.println("What do you want to do?");
                 System.out.print("> ");
                 userOption = scanner.nextInt();
-                checkOption(userOption, userOptions.values().length);
+                checkOption(userOption, userOptions.values().length-1);
                 System.out.print("\n");
                 scanner.nextLine();
 
@@ -212,15 +212,14 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     case EXIT:
                         break; // return to maun
                     default:
-                        System.out.println(
-                                "Please enter an integer value between 0 and " + userOptions.values().length + "\n");
+                        // System.out.println("Please enter an integer value between 0 and " + userOptions.values().length + "\n");
                         break;
                 }
             } catch (EmptyTableException e) {
                 System.out.println(e.getMessage());
                 break;
             } catch (InputMismatchException | WrongNumberException e) {
-                System.out.println("Invalid input. Please enter an integer value.\n");
+                System.out.println(e.getMessage());
                 userOption = 1;
             }
 
@@ -435,12 +434,13 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
                     // Display menu and check for valid input of 1 - 3
                     System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
-                    System.out.print("\n\n1- Back");
+                    System.out.print("\n1- Back");
                     System.out.print("\n2- Next");
-                    System.out.println("\n3- Return to menu");
+                    System.out.println("\n\nPress '0' to go back to the previous menu.");
+                    System.out.println("What do you want to do?");
                     System.out.print("> ");
                     int pageOption = scanner.nextInt();
-                    checkOption(pageOption, 3);
+                    checkOption(pageOption, 2);
 
                     // Checks if user tries to go below min or beyond max number of pages
                     // Increase/Decrease page counter and page displays
@@ -456,7 +456,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         pageFirstElement = pageFirstElement + 10;
                     }
                     // Exit transaction viewing
-                    else if (pageOption == 3) {
+                    else if (pageOption == 0) {
                         view = false;
                     }
                 } catch (WrongNumberException e) {
@@ -513,12 +513,13 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     
                     // Display menu and check for valid input of 1 - 3
                     System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
-                    System.out.print("\n\n1- Back");
+                    System.out.print("\n1- Back");
                     System.out.print("\n2- Next");
-                    System.out.println("\n3- Return to menu");
+                    System.out.println("\n\nPress '0' to go back to the previous menu.");
+                    System.out.println("What do you want to do?");
                     System.out.print("> ");
                     int pageOption = scanner.nextInt();
-                    checkOption(pageOption, 3);
+                    checkOption(pageOption, 2);
                     
                     // Checks if user tries to go below min or beyond max number of pages
                     // Increase/Decrease page counter and page displays
@@ -534,7 +535,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         pageFirstElement = pageFirstElement + 10;
                     }
                     // Exit transaction viewing
-                    else if (pageOption == 3) {
+                    else if (pageOption == 0) {
                         view = false;
                     }
                 } catch (WrongNumberException e) {
@@ -712,7 +713,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
     public static void checkOption(int number, int max) throws WrongNumberException {
         if (number > max || number < 0) {
-            throw new WrongNumberException("\nWrong choice lah bang");
+            throw new WrongNumberException("\nInvalid input. Enter 0 to " + max + ".\n");
         }
     }
 

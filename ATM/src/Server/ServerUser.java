@@ -485,38 +485,44 @@ public class ServerUser {
         int max = 7;
         String newUpdate;
 
-        while(updateChoice < 0 || updateChoice > max) {
-            System.out.println("\nWhich user detail would you like to update..\n");
-            System.out.println("1- Username");
-            System.out.println("2- Email");
-            System.out.println("3- Phone");
-            System.out.println("4- Address One");
-            System.out.println("5- Address Two");
-            System.out.println("6- Address Three");
-            System.out.println("7- Postal Code");
+        do {
+            try {
+                System.out.println("\nWhich user detail would you like to update..\n");
+                System.out.println("1- Username");
+                System.out.println("2- Email");
+                System.out.println("3- Phone");
+                System.out.println("4- Address One");
+                System.out.println("5- Address Two");
+                System.out.println("6- Address Three");
+                System.out.println("7- Postal Code");
 
-            if (user instanceof NormalUser) {
-                max = 12;
-                System.out.println("8- NRIC");
-                System.out.println("9- First Name");
-                System.out.println("10- Middle Name");
-                System.out.println("11- Last Name");
-                System.out.println("12- Gender");
-                System.out.println("0- Return to menu");
-            }
+                if (user instanceof NormalUser) {
+                    max = 12;
+                    System.out.println("8- NRIC");
+                    System.out.println("9- First Name");
+                    System.out.println("10- Middle Name");
+                    System.out.println("11- Last Name");
+                    System.out.println("12- Gender");
+                    System.out.println("\nPress '0' to go back to the previous menu.");
+                }
 
-            if (user instanceof BusinessUser) {
-                max = 9;
-                System.out.println("8- UEN");
-                System.out.println("9- Business Name");
-                System.out.println("0- Return to menu");
+                if (user instanceof BusinessUser) {
+                    max = 9;
+                    System.out.println("8- UEN");
+                    System.out.println("9- Business Name");
+                    System.out.println("\nPress '0' to go back to the previous menu.");
+                }
+                
+                System.out.println("What do you want to do?");
+                System.out.print("> ");
+                updateChoice = input.nextInt();
+                checkOption(updateChoice, max);
+                input.nextLine();
+            } 
+            catch (WrongException e){
+                System.out.println(e.getMessage());
             }
-            
-            System.out.println("\nWhat do you want to do?");
-            System.out.print("> ");
-            updateChoice = input.nextInt();
-            input.nextLine();
-        }
+        } while (updateChoice < 0 || updateChoice > max);
 
         switch(updateChoice) {
             case 0: 
@@ -633,6 +639,7 @@ public class ServerUser {
 
                 break;
         }
+        System.out.print("\n");
     }
 
     // Method to reset user password
@@ -661,7 +668,7 @@ public class ServerUser {
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
 
                 // Check old password with DB password. If match continue, else throw exception
-                PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
+                checkPassword(oldPassword, DBPassword, passwordTries);
 
                 // Get new password input
                 System.out.print("\nEnter new password: ");
@@ -704,7 +711,7 @@ public class ServerUser {
                 // Check for any SQL connection errors
                 e.printStackTrace();
             }
-            catch (WrongPasswordException e){
+            catch (WrongException e){
                 // Check for password mismatch
                 System.out.println(e.getMessage());
             }
@@ -749,7 +756,7 @@ public class ServerUser {
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
 
                 // Check old password with DB password. If match continue, else throw exception
-                PassChecker.checkPassword(oldPassword, DBPassword, passwordTries);
+                checkPassword(oldPassword, DBPassword, passwordTries);
             
                 // Template to select "User" DB for updating data
                 String sql2 = String.format("UPDATE User SET Active = ? WHERE UserID = %s", user.getUserID());
@@ -809,7 +816,7 @@ public class ServerUser {
                     passwordTries = 0;
                 }
             }
-            catch (WrongPasswordException e) {
+            catch (WrongException e) {
                 // Check for any input errors
                 System.out.println(e.getMessage());
             }
@@ -830,23 +837,21 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
-}
-
-class WrongPasswordException extends Exception {
-    public WrongPasswordException(String errorMessage) {
-        super(errorMessage);
-    }
-}
-
-class PassChecker {
-    public static void checkPassword(String oldPass, String newPass, int tries) throws WrongPasswordException {
-        if (!oldPass.equals(newPass)) {
-            throw new WrongPasswordException("Incorrect password! " + tries + " tries left.");
+    private static class WrongException extends Exception {
+        public WrongException(String errorMessage) {
+            super(errorMessage);
         }
     }
-    public static void checkOption(int number, int max) throws WrongPasswordException {
-        if (number > max) {
-            throw new WrongPasswordException("Wrong Input. Try again..\n");
+    
+    public static void checkPassword(String oldPass, String newPass, int tries) throws WrongException {
+        if (!oldPass.equals(newPass)) {
+            throw new WrongException("Incorrect password! " + tries + " tries left.");
+        }
+    }
+
+    public static void checkOption(int number, int max) throws WrongException {
+        if (number > max || number < 0) {
+            throw new WrongException("\nInvalid input. Enter 0 to " + max + ".");
         }
     }
 }
