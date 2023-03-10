@@ -178,7 +178,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 "1- Reset Password",
                 "2- Update User Account",
                 "3- Deactivate User Account",
-                "4- Return to menu"
+                "0- Return to menu"
         };
         int userOption = -1;
 
@@ -224,7 +224,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 userOption = 1;
             }
 
-        } while (userOptions.values()[userOption - 1] != userOptions.EXIT);
+        } while (userOptions.values()[userOption] != userOptions.EXIT);
         System.out.print("\n");
     }
 

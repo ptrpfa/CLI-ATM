@@ -405,11 +405,11 @@ public class ServerUser {
     // Method to display update options and get new information
     public static void getNewUpdates(User user) {
         Scanner input = new Scanner(System.in);
-        int updateChoice = 0;
+        int updateChoice = -1;
         int max = 7;
         String newUpdate;
 
-        while(updateChoice < 1 || updateChoice > max) {
+        while(updateChoice < 0 || updateChoice > max) {
             System.out.println("\nWhich user detail would you like to update..\n");
             System.out.println("1- Username");
             System.out.println("2- Email");
@@ -420,20 +420,20 @@ public class ServerUser {
             System.out.println("7- Postal Code");
 
             if (user instanceof NormalUser) {
-                max = 13;
+                max = 12;
                 System.out.println("8- NRIC");
                 System.out.println("9- First Name");
                 System.out.println("10- Middle Name");
                 System.out.println("11- Last Name");
                 System.out.println("12- Gender");
-                System.out.println("13- Return to menu");
+                System.out.println("0- Return to menu");
             }
 
             if (user instanceof BusinessUser) {
-                max = 10;
+                max = 9;
                 System.out.println("8- UEN");
                 System.out.println("9- Business Name");
-                System.out.println("10- Return to menu");
+                System.out.println("0- Return to menu");
             }
             
             System.out.println("\nWhat do you want to do?");
@@ -443,6 +443,8 @@ public class ServerUser {
         }
 
         switch(updateChoice) {
+            case 0: 
+                break;
             case 1:
                 System.out.println("Current username: " + user.getUsername());
                 System.out.print("Enter new username: ");
@@ -553,8 +555,6 @@ public class ServerUser {
                 newUpdate = input.next();
                 tempUser3.setGender(newUpdate);
 
-                break;
-            case 13:
                 break;
         }
     }
@@ -754,9 +754,9 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
-    public static void main(String[] args) throws ParseException {
-        ServerUser.registerUser();
-    }
+    // public static void main(String[] args) throws ParseException {
+    //     ServerUser.registerUser();
+    // }
 }
 
 class WrongPasswordException extends Exception {

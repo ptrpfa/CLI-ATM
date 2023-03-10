@@ -23,8 +23,6 @@ public interface ServerCheque extends SQLConnect {
             PreparedStatement statement = db.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
 
-            rs.next();
-
             while (rs.next()) {
                 // Create ChequeAccount object for every cheque id
                 ChequeAccount chequeID = new ChequeAccount(rs.getInt("ID"),
@@ -87,20 +85,20 @@ public interface ServerCheque extends SQLConnect {
                 PreparedStatement statement = db.prepareStatement(sql);
                 ResultSet rs = statement.executeQuery();
 
-                rs.next();
+                if(rs.next()) {
+                    // Create the Cheque object
+                    Cheque cheque = new Cheque(rs.getInt("ChequeID"),   
+                                            rs.getInt("IssuerAccount"),
+                                            rs.getInt("RecipientAccount"),
+                                            rs.getInt("IssuingTransaction"),
+                                            rs.getInt("ReceivingTransaction"),
+                                            rs.getString("ChequeNo"),
+                                            rs.getDouble("Value"),
+                                            rs.getDate("Date"),
+                                            rs.getInt("Status"));
 
-                // Create the Cheque object
-                Cheque cheque = new Cheque(rs.getInt("ChequeID"),   
-                                           rs.getInt("IssuerAccount"),
-                                           rs.getInt("RecipientAccount"),
-                                           rs.getInt("IssuingTransaction"),
-                                           rs.getInt("ReceivingTransaction"),
-                                           rs.getString("ChequeNo"),
-                                           rs.getDouble("Value"),
-                                           rs.getDate("Date"),
-                                           rs.getInt("Status"));
-
-                cheques.add(cheque);
+                    cheques.add(cheque);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,62 +114,13 @@ public interface ServerCheque extends SQLConnect {
 
         return cheques;
     }
+
+    // public static void main(String[] args) {
+    //     /* Pretend this is work class where user does a transaction */
+    //     List<Cheque> cheques = ServerCheque.findUserCheques(3);
+
+    //     for(int i = 0; i < cheques.size(); i++) {
+    //         System.out.println(cheques.get(i).getChequeID());
+    //     }
+    // }
 }
-
-
-
-
-
-
-
-//     //Create Cheque
-//     public static void createNewTransaction(Cheque Cheque) {
-//         String sql = String.format("INSERT INTO cheque (Cheque, IssuerAccount, RecipientAccount, ValueDatetime, Debit, Credit, Balance, Status, Remarks) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)");
-//         String countQuery = "SELECT count(*) FROM Transaction";
-        
-//         Connection db = SQLConnect.getDBConnection();
-//         try {
-//             // Template for 2 statements. 1 for Insertion, 1 for Reading Queries
-//             PreparedStatement statement = db.prepareStatement(sql);
-//             PreparedStatement countStatement = db.prepareStatement(countQuery);
-//             ResultSet countRS = countStatement.executeQuery();
-
-//             countRS.next();
-//             int transactionNo = countRS.getInt(1);
-
-//             // Fill up update statements with latest particulars for "Transaction" DB
-//             statement.setInt(1, transaction.getAccID());
-//             statement.setString(2, Integer.toString(transactionNo));
-//             statement.setDate(3, transaction.getValueDatetime());
-//             statement.setDouble(4, transaction.getDebit());
-//             statement.setDouble(5, transaction.getCredit());
-//             statement.setDouble(6, transaction.getBalance());
-//             statement.setInt(7, transaction.getStatus());
-//             statement.setString(8, transaction.getRemarks());
-
-//             // Insert into latest row of DB
-//             int rowsInserted = statement.executeUpdate();
-//             if (rowsInserted > 0) {
-//                 System.out.println("A new user was inserted successfully!");
-//             }
-//         } catch (SQLException e) {
-//             e.printStackTrace();
-//         } finally {
-//             SQLConnect.disconnectDB(db);
-//         }
-//     }
-
-// //     public static void main(String[] args) {
-// //         /* Pretend this is work class where user does a transaction */
-// //         // Create new transaction, store in transaction object
-// //         // Send transaction object to method that adds to DB
-// //         TransactionDetails transaction;
-// //         Scanner input = new Scanner(System.in);
-
-// //         System.out.println("Enter amount to deposit (debit): ");
-// //         double amount = input.nextDouble();
-
-// //         createNewTransaction(transaction);
-// //     }
-// // }
-    
