@@ -249,7 +249,7 @@ public class ServerUser {
         // Try to connect to DB
         try {
             // Template to select "User" DB with inputted username
-            String sql = "SELECT * FROM User WHERE username = ?";
+            String sql = "SELECT * FROM User WHERE Username = ?";
             PreparedStatement statement1 = db.prepareStatement(sql);
             statement1.setString(1, username);
             ResultSet myRs1 = statement1.executeQuery();
