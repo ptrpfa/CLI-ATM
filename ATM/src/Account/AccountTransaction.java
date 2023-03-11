@@ -24,9 +24,13 @@ public class AccountTransaction implements ServerAccount{
     public void Withdraw(Account account, double amount){
         double availableBalance = account.getAvailableBalance();
         double totalBalance = account.getTotalBalance();
+        double currentLimit = ServerAccount.getRemainingWithdrawLimit(account.getAccID(), account.getWithdrawLimit());
         if(amount > availableBalance){
             //Cannot withdraw more than the account balance
             throw new TransactionError("*****Insufficient Funds*****\n\n*****Withdrawal Terminated!*****");
+        } else if (amount > currentLimit) {
+            // Cannot withdraw more than limit set
+            throw new TransactionError("*****Amount Exceeds Transfer Limit*****\n\n*****Withdrawal Terminated!*****");
         }
         //Checks all true
         boolean result = ServerAccount.AccountWithdrawal(account.getUserID(), account.getAccID(), availableBalance, totalBalance, amount);

@@ -41,7 +41,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         WITHDRAW(5),
         TRANSFER_FUNDS(6),
         VIEW_TRANSACTIONS(7),
-        VIEW_CHEQUES(8);
+        VIEW_CHEQUES(8),
+        UPDATE_WITHDRAWAL_LIMIT(9),
+        UPDATE_TRANSFER_LIMIT(10);
 
         private final int value;
 
@@ -91,6 +93,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                             "6- Transfer Funds",
                             "7- View Transactions",
                             "8- View Cheques",
+                            "9- Update Withdrawal Limit",
+                            "10- Update Transfer Limit",
                             "\nPress '0' to Log Out."
             };
 
@@ -153,6 +157,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                                     case VIEW_CHEQUES:
                                         ViewCheques(account);
                                         break;
+                                    case UPDATE_WITHDRAWAL_LIMIT:
+                                        UpdateWithdrawalLimit(account);
+                                        break;
+                                    // case UPDATE_TRANSFER_LIMIT:
+                                    //     UpdateTransferLimit(account);
                                     default:
                                         System.out.println("Please enter an integer value between 0 and "
                                                 + Option.values().length + "\n");
@@ -557,6 +566,38 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         }
         // End of while loop
         System.out.print("\n");
+    }
+
+    // Option 9
+    private void UpdateWithdrawalLimit(Account acc) {
+        // Sentinel variable
+        boolean isValidInput = false;
+        while (!isValidInput) {
+            try {
+                double newLimit = promptForInput(String.format("Enter a new withdrawal limit (current limit is $%s): ", acc.getWithdrawLimit()), Double.class);
+                if(newLimit == acc.getWithdrawLimit()) {
+                    System.out.println("New limit is the same as the current limit!\n");
+                    continue;
+                }
+                else {
+                    validateAmount(newLimit);
+                    System.out.println("Updating withdrawal limit...\n");
+                    acc.setWithdrawLimit(newLimit);
+                    isValidInput = ServerAccount.updateWithdrawalLimit(acc.getAccID(), newLimit);
+                    if(!isValidInput) {
+                        System.out.println("Error...");
+                    } else {
+                        System.out.println("Withdrawal Limit updated successfully!\n");
+                    }
+
+                }
+            } catch (WrongNumberException e) {
+                System.out.println(e.getMessage());
+            } catch (GoBackException e) {
+                return;
+            }
+        }
+    
     }
 
     /*
