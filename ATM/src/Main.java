@@ -1,28 +1,26 @@
 import java.text.ParseException;
 import java.util.Scanner;
-
-import Server.SMS;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Help.Ansi;
 import Server.ServerUser;
 import User.BusinessUser;
 import User.NormalUser;
 import User.User;
-//import Server.ServerUser;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Help.Ansi;
 // import picocli.jansi.graalvm.AnsiConsole;
 
 //Common Header Banner
 @Command(name = "bank-teller", header = {
-    "@|green .____    .__         ____  __.      .__  __________.__|@",
-    "@|green |    |   |__|__ __  |    |/ _|____  |__| \\______   \\__| ____    ____  |@",
-    "@|green |    |   |  |  |  \\ |      < \\__  \\ |  |  |     ___/  |/    \\  / ___\\ |@",
-    "@|green |    |___|  |  |  / |    |  \\ / __ \\|  |  |    |   |  |   |  \\/ /_/  >|@",
-    "@|green |_______ \\__|____/  |____|__ (____  /__|  |____|   |__|___|  /\\___  / |@",
-    "@|green         \\/                  \\/    \\/                       \\//_____/  |@"
+    "@|green \n██████╗  █████╗ ███╗   ██╗██╗  ██╗     █████╗ ████████╗███╗   ███╗ |@",
+    "@|green ██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝    ██╔══██╗╚══██╔══╝████╗ ████║ |@",
+    "@|green ██████╔╝███████║██╔██╗ ██║█████╔╝     ███████║   ██║   ██╔████╔██║ |@",
+    "@|green ██╔══██╗██╔══██║██║╚██╗██║██╔═██╗     ██╔══██║   ██║   ██║╚██╔╝██║ |@",
+    "@|green ██████╔╝██║  ██║██║ ╚████║██║  ██╗    ██║  ██║   ██║   ██║ ╚═╝ ██║ |@",
+    "@|green ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝    ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝ |@"
+
 },
-    description = "@|blue 你的黑钱 Project\n |@",
+    description = "@|blue OOP ATM Project\n |@",
     mixinStandardHelpOptions = true,
     version = "bank-teller 1.0",
     optionListHeading = "Options are:%n",
@@ -40,6 +38,7 @@ public class Main implements Runnable{
         //AnsiConsole.systemUninstall();
     }
 
+    // Program entrypoint
     public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
         commandLine.execute("Login"); //Change to args if you want do default
@@ -66,7 +65,7 @@ public class Main implements Runnable{
     }
 
     @CommandLine.Command
-    public User Login() {
+    public User Login() { // Login option
         String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
 
         for (String line : banner) {
@@ -80,19 +79,17 @@ public class Main implements Runnable{
         //Console console = System.console();
         //do while loop to check login, condition user is null
         int counter = 2;
-        System.out.printf("欢迎来到大刘银行!\n");
+        System.out.println("\nPlease login to access our bank services 🏦\n");
         User user = null; 
 
         do{
-            System.out.println("Enter username:");
+            System.out.print("Enter username: ");
             String username = scanner.nextLine();
-            System.out.println("Enter password:");
+            System.out.print("Enter password: ");
             String password = scanner.nextLine();
         
             user = serverUser.checkUser(username, password); 
             if(user != null){
-                //OTP
-                //SMS.sendSMS("+6585933198", "hello");
                 if (user instanceof NormalUser) {
                     NormalUser newUser = (NormalUser) user;
                     return newUser;
@@ -113,7 +110,7 @@ public class Main implements Runnable{
     }
 
     @CommandLine.Command
-    public void Registration() throws ParseException {
+    public void Registration() throws ParseException { // User Registration option
         ServerUser.registerUser();
     }
 }
