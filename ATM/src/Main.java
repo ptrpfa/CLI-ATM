@@ -42,7 +42,7 @@ public class Main implements Runnable{
 
     public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
-        commandLine.execute(args /*"Login"*/); //Change to args if you want do default
+        commandLine.execute("Login"); //Change to args if you want do default
 
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
         CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
