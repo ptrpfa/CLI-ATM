@@ -607,6 +607,8 @@ public class ServerUser {
                     BusinessUser tempUser = (BusinessUser) user;
                     System.out.println("Current business name: " + tempUser.getBusinessName());
                     System.out.print("Enter new business name: ");
+                    newUpdate = input.next();
+                    tempUser.setBusinessName(newUpdate);
                 }
 
                 break;

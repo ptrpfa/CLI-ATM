@@ -54,7 +54,7 @@ public interface ServerAccount extends SQLConnect{
         int accNo = 0;
 
         String insertsql = "INSERT INTO Account VALUES(NULL,?,?,?,?,0,?,?,1000,1000,?,1)";
-        String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-' AND UserID =" + userid; //set userid var
+        String getAccNoSQL = "SELECT MAX(SUBSTR(AccountNo,5, 9)) FROM Account WHERE LEFT(AccountNo, 4) = '407-';";
         Connection db = SQLConnect.getDBConnection();
         
         PreparedStatement ps;

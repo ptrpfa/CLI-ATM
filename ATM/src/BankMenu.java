@@ -229,15 +229,14 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
     // Option 2
     private void CreateAccount() {
-
         int userid = user.getUserID();
         String accName = null, accDescString = null;
         double amount = 0;
         boolean isValidInput = false;
 
         try {
-            accName = promptForInput("Key in the Account Name ", String.class);
-            accDescString = promptForInput("Account Descriptions", String.class);
+            accName = promptForInput("Enter the Account Name", String.class);
+            accDescString = promptForInput("Account Description", String.class);
             while (!isValidInput) {
                 try {
                     amount = promptForInput("Initial Deposit", Double.class);
