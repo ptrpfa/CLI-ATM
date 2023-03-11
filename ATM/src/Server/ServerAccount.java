@@ -346,4 +346,21 @@ public interface ServerAccount extends SQLConnect{
         return false;
     }
 
+    public static boolean updateTransferLimit(int accID, double newLimit){
+        Connection db = SQLConnect.getDBConnection();
+        try{
+            String sql = "UPDATE Account SET TransferLimit=? WHERE AccountID=?";
+            PreparedStatement updateStmt = db.prepareStatement(sql);
+            updateStmt.setDouble(1, newLimit);
+            updateStmt.setInt(2, accID);
+            int row = updateStmt.executeUpdate(); 
+            if(row > 0 ){
+                return true;
+            }
+        }catch(SQLException e){
+            System.out.println("Error occurred: " + e.getMessage());
+        }
+        return false;
+    }
+
 }
