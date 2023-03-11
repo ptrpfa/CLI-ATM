@@ -176,7 +176,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private void EditUser() {
         String[] userOptionsCommand = {
                 "1- Reset Password",
-                "2- Update User Account",
+                "2- Update User Details",
                 "3- Deactivate User Account",
                 "\nPress '0' to go back to the previous menu."
         };

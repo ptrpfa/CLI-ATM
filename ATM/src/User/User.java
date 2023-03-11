@@ -187,6 +187,12 @@ public class User {
         }
     }
 
+    public void setPasswordCensored(String passwordSalt, String passwordHash) {
+        this.passwordSalt = passwordSalt;
+        this.passwordHash = passwordHash;
+        censoredPass = censoredPass();
+    }
+
     public String censoredPass() {        
         String decryptedPass = AES256.decrypt(passwordHash, passwordSalt);
         int half = decryptedPass.length() / 2;

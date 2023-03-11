@@ -699,6 +699,7 @@ public class ServerUser {
                         // Prints successful message and breaks out of loop and method
                         System.out.println("\nPassword resetted successfully!\n");
                         passwordTries = -1;
+                        user.setPasswordCensored(myRs1.getString("PasswordSalt"), newPassword1);
                         break;
                     }
                     
