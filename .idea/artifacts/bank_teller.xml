@@ -1,6 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="bank-teller">
-    <output-path>$PROJECT_DIR$/out/artifacts/bank_teller</output-path>
-    <root id="archive" name="bank-teller.jar" />
-  </artifact>
-</component>

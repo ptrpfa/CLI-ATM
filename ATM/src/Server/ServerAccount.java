@@ -102,6 +102,7 @@ public interface ServerAccount extends SQLConnect{
 
         return acc;
     }
+
     public static boolean AccountDeposit(int userID, int accID, double availableBalance, double totalBalance, double amount){
 
         Connection db = SQLConnect.getDBConnection();
@@ -290,4 +291,5 @@ public interface ServerAccount extends SQLConnect{
         }
         return false;
     }
+    
 }

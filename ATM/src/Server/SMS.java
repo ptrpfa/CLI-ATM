@@ -7,7 +7,6 @@ import com.twilio.type.PhoneNumber;
 import com.twilio.exception.AuthenticationException;
 import com.twilio.exception.ApiException;
 
-
 public class SMS {
 
     // Function to send an SMS message to a specified number (Twilio trial account limited to sending SMS to verified phone numbers)

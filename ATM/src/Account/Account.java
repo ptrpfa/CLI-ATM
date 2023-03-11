@@ -2,6 +2,7 @@ package Account;
 import java.util.Date;
 
 public class Account {
+    // Instance attributes
     private int accID;
     private int userID;
     private String accNo;
@@ -16,6 +17,7 @@ public class Account {
     private boolean accActive;
     private AccountTransaction transaction;
 
+    // Constructor
     public Account(int accID, int userID, String accNo, String accName, String description, double holdingBalance, double availableBalance, double totalBalance, double transferLimit, double withdrawLimit, Date openingDate, boolean accActive) {
         this.accID = accID;
         this.userID = userID;
@@ -32,7 +34,7 @@ public class Account {
         this.transaction = new AccountTransaction();
     }
 
-    //Connect to the db and set the var too
+    /* Get & Set methods */
     protected void setAccID(int accID){this.accID= accID;}
 
     public void setAccNo(String accNo) {this.accNo = accNo;}
@@ -115,7 +117,7 @@ public class Account {
         return accActive;
     }
     
-    //Printing Methods
+    /*  Printing Methods */
     public String[] PrintValues(){   
         String[] values = {accNo, accName, Double.toString(availableBalance)};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
@@ -127,7 +129,7 @@ public class Account {
         return headers;
     }
 
-    //Transcations
+    /* Transaction Methods */
     public void deposit(double amount) {
         this.transaction.Deposit(this, amount);
     }
