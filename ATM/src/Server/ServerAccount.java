@@ -122,7 +122,7 @@ public interface ServerAccount extends SQLConnect{
             }
             /*Create New Transaction*/
             //Get Last TransactNo
-            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM Transaction WHERE  AccountID = " + accID;
+            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM Transaction;";
             updateStmt = db.prepareStatement(getTransactNoSQL);
             ResultSet rs = updateStmt.executeQuery();
             int transactionNo = 0;
@@ -145,7 +145,7 @@ public interface ServerAccount extends SQLConnect{
             //Format TransactionNo
             String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
             //Insert into Transaction Table
-            sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,?,0,?,1,NULL)");
+            sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,?,0,?,1,\"ATM-Deposit\")");
             updateStmt = db.prepareStatement(sql);
             updateStmt.setInt(1, accID);
             updateStmt.setString(2, transacString);
@@ -207,7 +207,7 @@ public interface ServerAccount extends SQLConnect{
             //Format TransactionNo
             String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
             //Insert into Transaction Table
-            sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,0,?,?,1,NULL)");
+            sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,0,?,?,1,\"ATM-Withdrawal\")");
             updateStmt = db.prepareStatement(sql);
             updateStmt.setInt(1, accID);
             updateStmt.setString(2, transacString);
@@ -285,6 +285,8 @@ public interface ServerAccount extends SQLConnect{
             }
 
             //Create Transaction Details, check above methods
+            // Set remarks of Transaction for transfers to: \"ATM-Transfer\" to allow support of transfer limit
+            ;;;
             return true;
         }catch(SQLException e){
             System.out.println("Error occurred: " + e.getMessage());
@@ -292,4 +294,39 @@ public interface ServerAccount extends SQLConnect{
         return false;
     }
     
+    public static double getRemainingWithdrawLimit(int accID, double dbLimit) {
+
+        // Initialise remaining limit
+        double limit = 0;
+
+        // SQL to get the sum of all withdrawals (to add checks in remarks too)
+        String sql = "SELECT Temp.CurrentDay, Temp.Sum FROM (SELECT DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\") AS 'CurrentDay', SUM(Credit) AS 'Sum' FROM `Transaction` WHERE AccountID = ? AND Remarks LIKE \"%ATM-Withdrawal%\" GROUP BY DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\")) AS Temp WHERE Temp.CurrentDay = DATE_FORMAT(CURDATE() , \"%d/%m/%Y\");";
+        
+        // Establish a connection with the database
+        Connection db = SQLConnect.getDBConnection();
+        try {
+            PreparedStatement statement = db.prepareStatement(sql);
+            statement.setString(1, String.valueOf(accID));
+            ResultSet rs= statement.executeQuery();  
+            // Update current limit
+            if (!rs.isBeforeFirst() ) {    
+                limit = dbLimit;
+            } 
+            else {
+                // Get sum of all withdrawals within the day
+                rs.next();
+                limit = dbLimit - rs.getDouble("Sum");
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.disconnectDB(db);
+        }
+        
+        // Return limit
+        return limit;
+        
+    }
+
 }

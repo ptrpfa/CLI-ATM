@@ -317,28 +317,34 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private void Withdraw(Account acc) {
         double amount = 0;
         boolean isValidInput = false;
-
-        while (!isValidInput) {
-            try {
-                amount = promptForInput("Enter Withdraw Amount", Double.class);
-                validateAmount(amount);
-                // Send to withdraw
-                System.out.println("Withdrawing...\n");
-                acc.withdraw(amount);
-
-                Thread.sleep(1000);
-                System.out.println("Withdrew amount $" + amount + " in " + acc.getAccName() + "\n");
-
-                isValidInput = true;
-            } catch (WrongNumberException | TransactionError e) {
-                System.out.println(e.getMessage());
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-                break;
-            } catch (GoBackException e) {
-                return;
+        double currentLimit = ServerAccount.getRemainingWithdrawLimit(acc.getAccID(), acc.getWithdrawLimit());
+        System.out.println("Current remaining withdrawal limit is: $" + currentLimit);
+        if(currentLimit > 0) {
+            while (!isValidInput) {
+                try {
+                    amount = promptForInput("Enter Withdraw Amount", Double.class);
+                    validateAmount(amount);
+                    // Send to withdraw
+                    System.out.println("Withdrawing...\n");
+                    acc.withdraw(amount);
+    
+                    Thread.sleep(1000);
+                    System.out.println("Withdrew amount $" + amount + " in " + acc.getAccName() + "\n");
+    
+                    isValidInput = true;
+                } catch (WrongNumberException | TransactionError e) {
+                    System.out.println(e.getMessage());
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                    break;
+                } catch (GoBackException e) {
+                    return;
+                }
+    
             }
-
+        } 
+        else {
+            System.out.println("\nYou have reached your daily withdrawal limit! Please try again another day or update your limit first.");
         }
     }
 
