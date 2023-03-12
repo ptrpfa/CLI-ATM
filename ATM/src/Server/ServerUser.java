@@ -10,6 +10,7 @@ import java.util.Date;
 import User.BusinessUser;
 import User.NormalUser;
 import User.User;
+import picocli.CommandLine;
 
 public class ServerUser {
 
@@ -33,15 +34,16 @@ public class ServerUser {
         
         // Set option for user to register as NormalUser or BusinessUser which will set different prompts later
         do{
-            System.out.print("Enter user type\n");
-            System.out.print("1- Normal user\n");
-            System.out.print("2- Business user\nEnter user type: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 What user type are you?\n|@"));
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|39 1- Normal user\n|@"));
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|39 2- Business user\n|@"));
+            System.out.println("Enter user type: ");
             userType = input.nextInt();
         } while (userType != 1 & userType != 2);
-
         input.nextLine();
         
         // Get user's desired username used for log in
+        
         System.out.print("\nEnter username: ");
         username = input.nextLine();
 
@@ -76,12 +78,12 @@ public class ServerUser {
             
             // If message goes through, status will return TRUE and break loop
             if(isVerified) {
-                System.out.println("Phone has been verified!");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Phone has been verified!|@"));
                 isVerified = true;
             }
             // Else FALSE and resend verification code
             else {
-                System.out.println("Error verifying phone!");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error verifying phone!"));
             }
         }
 
@@ -132,9 +134,9 @@ public class ServerUser {
             // Get user's gender using integer options for standardisation
             int genderInt = 0;
             do {
-                System.out.println("\nAre you a:");
-                System.out.println("1- Male");
-                System.out.println("2- Female");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nAre you a:|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Male|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Female|@"));
                 System.out.print("> ");
                 genderInt = input.nextInt();
             } while (genderInt != 1 & genderInt != 2);
@@ -158,7 +160,7 @@ public class ServerUser {
                     input.nextLine();
                 } 
                 catch (ParseException e) {
-                    System.out.println("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Invalid date format. Please enter the date in the format dd-MM-yyyy.|@"));
                 }
             }
 
@@ -228,7 +230,7 @@ public class ServerUser {
 
             // Prints successful insertion
             if (rowsInserted1 > 0) {
-               System.out.println("\nA new row in User database was inserted successfully!");
+               System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nA new row in User database was inserted successfully!|@"));
             }
 
             // Pull auto incremented userID from User DB to insert into NormalUser or BusinessUser DB
@@ -276,7 +278,7 @@ public class ServerUser {
 
                     // Prints successful insertion
                     if (rowsInserted2 > 0) {
-                        System.out.println("A new row in NormalUser database was inserted successfully!");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 A new row in NormalUser database was inserted successfully!|@"));
                     }
                 }
                 catch (ParseException e) {
@@ -304,7 +306,7 @@ public class ServerUser {
 
                 // Prints successful insertion
                 if (rowsInserted2 > 0) {
-                    System.out.println("A new row in BusinessUser database was inserted successfully!");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 A new row in BusinessUser database was inserted successfully!|@"));
                 }
             }
         }
@@ -338,7 +340,7 @@ public class ServerUser {
             if(myRs1.next()){
                 // Check whether user is deactivated, disallow login if disabled
                 if(myRs1.getInt("Active") == 0) {
-                    System.out.println("\nYour account is inactive. Please contact the bank administrator.");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nYour account is inactive. Please contact the bank administrator.|@"));
                     System.exit(1);
                 }
                 String tempPassword = AES256.encrypt(password, myRs1.getString("PasswordSalt"));
@@ -491,33 +493,33 @@ public class ServerUser {
 
         do {
             try {
-                System.out.println("\nWhich user detail would you like to update..\n");
-                System.out.println("1- Username");
-                System.out.println("2- Email");
-                System.out.println("3- Phone");
-                System.out.println("4- Address One");
-                System.out.println("5- Address Two");
-                System.out.println("6- Address Three");
-                System.out.println("7- Postal Code");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWhich user detail would you like to update..\n|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Username|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Email|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 3- Phone|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 4- Address One|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 5- Address Two|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 6- Address Three|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 7- Postal Code|@"));
 
                 if (user instanceof NormalUser) {
                     max = 12;
-                    System.out.println("8- NRIC");
-                    System.out.println("9- First Name");
-                    System.out.println("10- Middle Name");
-                    System.out.println("11- Last Name");
-                    System.out.println("12- Gender");
-                    System.out.println("\nPress '0' to go back to the previous menu.");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- NRIC|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- First Name|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 10- Middle Name|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 11- Last Name|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 12- Gender|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
                 }
 
                 if (user instanceof BusinessUser) {
                     max = 9;
-                    System.out.println("8- UEN");
-                    System.out.println("9- Business Name");
-                    System.out.println("\nPress '0' to go back to the previous menu.");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- UEN|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- Business Name|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
                 }
                 
-                System.out.println("What do you want to do?");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                 System.out.print("> ");
                 updateChoice = input.nextInt();
                 checkOption(updateChoice, max);
@@ -532,49 +534,49 @@ public class ServerUser {
             case 0: 
                 break;
             case 1:
-                System.out.println("Current username: " + user.getUsername());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current username: " + user.getUsername() + "|@"));
                 System.out.print("Enter new username: ");
                 newUpdate = input.nextLine();
                 user.setUsername(newUpdate);
                 
                 break;
             case 2:
-                System.out.println("Current email: " + user.getEmail());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current email: " + user.getEmail() + "|@"));
                 System.out.print("Enter new email: ");
                 newUpdate = input.nextLine();
                 user.setEmail(newUpdate);
                 
                 break;
             case 3:
-                System.out.println("Current phone: " + user.getPhone());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current phone: " + user.getPhone() + "|@"));
                 System.out.print("Enter new phone: ");
                 newUpdate = input.nextLine();
                 user.setPhone(newUpdate);
                 
                 break;
             case 4:
-                System.out.println("Current address one: " + user.getAddresses(1));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address one: " + user.getAddresses(1) + "|@"));
                 System.out.print("Enter new address one: ");
                 newUpdate = input.nextLine();
                 user.setAddress(newUpdate, user.getAddresses(2), user.getAddresses(3), user.getPostalCode());
                 
                 break;
             case 5:
-                System.out.println("Current address two: " + user.getAddresses(2));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address two: " + user.getAddresses(2) + "|@"));
                 System.out.print("Enter new address two: ");
                 newUpdate = input.next();
                 user.setAddress(user.getAddresses(1), newUpdate, user.getAddresses(3), user.getPostalCode());
                 
                 break;
             case 6:
-                System.out.println("Current address three: " + user.getAddresses(3));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address three: " + user.getAddresses(3) + "|@"));
                 System.out.print("Enter new address three: ");
                 newUpdate = input.next();
                 user.setAddress(user.getAddresses(1), user.getAddresses(2), newUpdate, user.getPostalCode());
                 
                 break;
             case 7:
-                System.out.println("Current postal code: " + user.getPostalCode());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current postal code: " + user.getPostalCode() + "|@"));
                 System.out.print("Enter new postal code: ");
                 newUpdate = input.next();
                 user.setAddress(user.getAddresses(1), user.getAddresses(2), user.getAddresses(3), newUpdate);
@@ -584,14 +586,14 @@ public class ServerUser {
                 if (user instanceof NormalUser) {
                     NormalUser tempUser = (NormalUser) user;
 
-                    System.out.println("Current NRIC: " + tempUser.getNRIC());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current NRIC: " + tempUser.getNRIC() + "|@"));
                     System.out.print("Enter new NRIC: ");
                     newUpdate = input.next();
                     tempUser.setNRIC(newUpdate);
                 }
                 if (user instanceof BusinessUser) {
                     BusinessUser tempUser = (BusinessUser) user;
-                    System.out.println("Current UEN: " + tempUser.getUEN());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current UEN: " + tempUser.getUEN() + "|@"));
                     System.out.print("Enter new UEN: ");
                     newUpdate = input.next();
                     tempUser.setUEN(newUpdate);
@@ -602,14 +604,14 @@ public class ServerUser {
                 if (user instanceof NormalUser) {
                     NormalUser tempUser = (NormalUser) user;
 
-                    System.out.println("Current first name: " + tempUser.getFirstName());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current first name: " + tempUser.getFirstName() + "|@"));
                     System.out.print("Enter new first name: ");
                     newUpdate = input.next();
                     tempUser.setAllNames(newUpdate, tempUser.getMiddleName(), tempUser.getLastName());
                 }
                 if (user instanceof BusinessUser) {
                     BusinessUser tempUser = (BusinessUser) user;
-                    System.out.println("Current business name: " + tempUser.getBusinessName());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current business name: " + tempUser.getBusinessName() + "|@"));
                     System.out.print("Enter new business name: ");
                     newUpdate = input.next();
                     tempUser.setBusinessName(newUpdate);
@@ -620,7 +622,7 @@ public class ServerUser {
                 if (user instanceof NormalUser) {
                     NormalUser tempUser = (NormalUser) user;
 
-                    System.out.println("Current middle name: " + tempUser.getFirstName());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current middle name: " + tempUser.getFirstName() + "|@"));
                     System.out.print("Enter new middle name: ");
                     newUpdate = input.next();
                     tempUser.setAllNames(newUpdate, newUpdate, tempUser.getLastName());
@@ -629,7 +631,7 @@ public class ServerUser {
             case 11:
                 NormalUser tempUser2 = (NormalUser) user;
 
-                System.out.println("Current last name: " + tempUser2.getLastName());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current last name: " + tempUser2.getLastName() + "|@"));
                 System.out.print("Enter new last name: ");
                 newUpdate = input.next();
                 tempUser2.setAllNames(tempUser2.getFirstName(), tempUser2.getMiddleName(), newUpdate);
@@ -638,8 +640,8 @@ public class ServerUser {
             case 12:
                 NormalUser tempUser3 = (NormalUser) user;
 
-                System.out.println("Current gender: " + tempUser3.getGender());
-                System.out.print("Enter new gender: ");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current gender: " + tempUser3.getGender() + "|@"));
+                System.out.println("Enter new gender: ");
                 newUpdate = input.next();
                 tempUser3.setGender(newUpdate);
 
@@ -701,13 +703,13 @@ public class ServerUser {
                         statement.executeUpdate();
 
                         // Prints successful message and breaks out of loop and method
-                        System.out.println("\nPassword resetted successfully!\n");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nPassword resetted successfully!\n|@"));
                         passwordTries = -1;
                         user.setPasswordCensored(myRs1.getString("PasswordSalt"), newPassword1);
                         break;
                     }
                     
-                    System.out.print("Passwords did not match! Please try again. " + (3-i) + " tries left.\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Passwords did not match! Please try again. " + (3-i) + " tries left.\n|@"));
                  
                     if(i == 3){
                         passwordTries = 0;
@@ -729,7 +731,7 @@ public class ServerUser {
             // If confirm new password fails 3 times, print message and break from loop
             if(passwordTries == 0) {
                 passwordTries = -1;
-                System.out.print("\nPassword reset request aborted.\n\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nPassword reset request aborted.\n\n|@"));
             }
             passwordTries--;
         } while (passwordTries >= 0);
@@ -772,29 +774,29 @@ public class ServerUser {
                 // Display menu and checks for valid input of 1 - 2
                 System.out.print("\n");
                 while(deactivationOption1 != 1 && deactivationOption1 != 2) {
-                    System.out.print("Activation of user account can only be done on administrator side.");
-                    System.out.print("\nAre you sure you want to deactivate your user account? ");
-                    System.out.print("\n1- Yes");
-                    System.out.print("\n2- No");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Activation of user account can only be done on administrator side.|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nAre you sure you want to deactivate your user account?|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 \n1- Yes|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 \n2- No|@"));
                     System.out.print("\n> ");
                     deactivationOption1 = input.nextInt();
 
                     if(deactivationOption1 != 1 && deactivationOption1 != 2) {
-                        System.out.println("Wrong input. Try again..\n");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong input. Try again..\n|@"));
                     }
                 }
                 
                 // If user wants to deactivate user account and checks for valid input of 1 - 2
                 if(deactivationOption1 == 1) {
                     while(deactivationOption2 != 1 && deactivationOption2 != 2) {
-                        System.out.print("\nConfirm deactivation? ");
-                        System.out.print("\n1- Yes");
-                        System.out.print("\n2- No");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nConfirm deactivation? |@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 \n1- Yes|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 \n2- No|@"));
                         System.out.print("\n> ");
                         deactivationOption2 = input.nextInt();
 
                         if(deactivationOption2 != 1 && deactivationOption2 != 2) {
-                            System.out.println("Wrong input. Try again..\n");
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Wrong input. Try again..\n|@"));
                         }
                     }
 
@@ -804,8 +806,8 @@ public class ServerUser {
 
                         // Perform database updates and exit session
                         statement.executeUpdate();
-                        System.out.print("\nUser account has been deactivated.");
-                        System.out.print("\nNow logging out...");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUser account has been deactivated.|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nNow logging out...|@"));
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -837,7 +839,7 @@ public class ServerUser {
             }
             // If password tries fails 3 times or user decides not to deactivate user account
             if(passwordTries == 0){
-                System.out.println("\nUser account deactivation request aborted.\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nUser account deactivation request aborted.\n|@"));
                 passwordTries = -1;
             }
             passwordTries--;

@@ -82,21 +82,21 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         do {
             // Set menu list according to whether the logged in user has a Bank account 
             String[] optionsCommand = accounts.isEmpty() ? new String[] {
-                    "1- Edit User Details",
-                    "2- Create New Account",
-                    "\nPress '0' to Log Out."
+                    "@|39 1- Edit User Details|@",
+                    "@|39 2- Create New Account|@",
+                    "@|51 \nPress '0' to Log Out.|@"
             }: new String[] {
-                            "1- Edit User Details",
-                            "2- Create New Account",
-                            "3- Deactivate An Account",
-                            "4- Deposit",
-                            "5- Withdraw",
-                            "6- Transfer Funds",
-                            "7- View Transactions",
-                            "8- View Cheques",
-                            "9- Update Withdrawal Limit",
-                            "10- Update Transfer Limit",
-                            "\nPress '0' to Log Out."
+                            "@|39 1- Edit User Details|@",
+                            "@|39 2- Create New Account|@",
+                            "@|39 3- Deactivate An Account|@",
+                            "@|39 4- Deposit|@",
+                            "@|39 5- Withdraw|@",
+                            "@|39 6- Transfer Funds|@",
+                            "@|39 7- View Transactions|@",
+                            "@|39 8- View Cheques|@",
+                            "@|39 9- Update Withdrawal Limit|@",
+                            "@|39 10- Update Transfer Limit|@",
+                            "@|51 \nPress '0' to Log Out.|@"
             };
 
             // Print user's active accounts
@@ -111,7 +111,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             // Run menu
             try {
                 printMenu(optionsCommand);
-                System.out.println("What do you want to do?");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                 System.out.print("> ");
                 option = scanner.nextInt();
                 checkOption(option, Option.values().length);
@@ -186,10 +186,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     // Option 1
     private void EditUser() {
         String[] userOptionsCommand = {
-                "1- Reset Password",
-                "2- Update User Details",
-                "3- Deactivate User Account",
-                "\nPress '0' to go back to the previous menu."
+                "@|39 1- Reset Password|@",
+                "@|39 2- Update User Details|@",
+                "@|39 3- Deactivate User Account|@",
+                "@|51 \nPress '0' to go back to the previous menu.|@"
         };
         int userOption = -1;
 
@@ -202,7 +202,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 printTable(User.PrintHeaders(), userList);
 
                 printMenu(userOptionsCommand);
-                System.out.println("What do you want to do?");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
+
                 System.out.print("> ");
                 userOption = scanner.nextInt();
                 checkOption(userOption, userOptions.values().length-1);
@@ -246,7 +247,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         boolean isValidInput = false;
 
         try {
-            accName = promptForInput("Enter the Account Name", String.class);
+            accName = promptForInput("@|51 Enter the Account Name|@", String.class);
             accDescString = promptForInput("Account Description", String.class);
             while (!isValidInput) {
                 try {
@@ -305,12 +306,12 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
         while (!isValidInput) {
             try {
-                amount = promptForInput("Enter Deposit Amount", Double.class);
+                amount = promptForInput("@|51 Enter Deposit Amount|@", Double.class);
                 validateAmount(amount);
-                System.out.println("Depositing...\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Depositing...\n|@"));
                 acc.deposit(amount);
                 Thread.sleep(1000);
-                System.out.println("Depositied amount $" + amount + " in " + acc.getAccName() + "\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Depositied amount $" + amount + " in " + acc.getAccName() + "\n|@"));
                 isValidInput = true;
             } catch (WrongNumberException | TransactionError e) {
                 // Throw by validateAmount()
@@ -329,18 +330,18 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         double amount = 0;
         boolean isValidInput = false;
         double currentLimit = ServerAccount.getRemainingWithdrawLimit(acc.getAccID(), acc.getWithdrawLimit());
-        System.out.println("Current remaining withdrawal limit is: $" + currentLimit);
+        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Current remaining withdrawal limit is: $" + currentLimit + "|@"));
         if(currentLimit > 0) {
             while (!isValidInput) {
                 try {
-                    amount = promptForInput("Enter Withdraw Amount", Double.class);
+                    amount = promptForInput("@|51 Enter Withdraw Amount|@", Double.class);
                     validateAmount(amount);
                     // Send to withdraw
-                    System.out.println("Withdrawing...\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Withdrawing...\n|@"));
                     acc.withdraw(amount);
     
                     Thread.sleep(1000);
-                    System.out.println("Withdrew amount $" + amount + " in " + acc.getAccName() + "\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|196 Withdrew amount $" + amount + " in " + acc.getAccName() + " account\n|@"));
     
                     isValidInput = true;
                 } catch (WrongNumberException | TransactionError e) {
@@ -449,11 +450,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     printTable(TransactionDetails.PrintHeaders(), tempList);
 
                     // Display menu and check for valid input of 1 - 3
-                    System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
-                    System.out.print("\n1- Back");
-                    System.out.print("\n2- Next");
-                    System.out.println("\n\nPress '0' to go back to the previous menu.");
-                    System.out.println("What do you want to do?");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Back|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                     System.out.print("> ");
                     int pageOption = scanner.nextInt();
                     checkOption(pageOption, 2);
@@ -528,11 +529,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     printTable(Cheque.PrintHeaders(), tempList);
                     
                     // Display menu and check for valid input of 1 - 3
-                    System.out.print("\t\t\t\t\t\tPage: " + pageCount + " / " + pages2);
-                    System.out.print("\n1- Back");
-                    System.out.print("\n2- Next");
-                    System.out.println("\n\nPress '0' to go back to the previous menu.");
-                    System.out.println("What do you want to do?");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Back|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                     System.out.print("> ");
                     int pageOption = scanner.nextInt();
                     checkOption(pageOption, 2);
@@ -576,20 +577,20 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         boolean isValidInput = false;
         while (!isValidInput) {
             try {
-                double newLimit = promptForInput(String.format("Enter a new withdrawal limit (current limit is $%s): ", acc.getWithdrawLimit()), Double.class);
+                double newLimit = promptForInput(String.format("|@51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()), Double.class);
                 if(newLimit == acc.getWithdrawLimit()) {
-                    System.out.println("New limit is the same as the current limit!\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 New limit is the same as the current limit!\n|@"));
                     continue;
                 }
                 else {
                     validateAmount(newLimit);
-                    System.out.println("Updating withdrawal limit...\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Updating withdrawal limit...\n|@"));
                     acc.setWithdrawLimit(newLimit);
                     isValidInput = ServerAccount.updateWithdrawalLimit(acc.getAccID(), newLimit);
                     if(!isValidInput) {
-                        System.out.println("Error...");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error...|@"));
                     } else {
-                        System.out.println("Withdrawal Limit updated successfully!\n");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Withdrawal Limit updated successfully!\n|@"));
                     }
 
                 }
@@ -608,20 +609,20 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         boolean isValidInput = false;
         while (!isValidInput) {
             try {
-                double newLimit = promptForInput(String.format("Enter a new transfer limit (current limit is $%s): ", acc.getTransferLimit()), Double.class);
+                double newLimit = promptForInput(String.format("@|51 Enter a new transfer limit (current limit is $%s): |@", acc.getTransferLimit()), Double.class);
                 if(newLimit == acc.getTransferLimit()) {
-                    System.out.println("New limit is the same as the current limit!\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 New limit is the same as the current limit!\n|@"));
                     continue;
                 }
                 else {
                     validateAmount(newLimit);
-                    System.out.println("Updating transfer limit...\n");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Updating transfer limit...\n|@"));
                     acc.setTransferLimit(newLimit);
                     isValidInput = ServerAccount.updateTransferLimit(acc.getAccID(), newLimit);
                     if(!isValidInput) {
-                        System.out.println("Error...");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error...|@"));
                     } else {
-                        System.out.println("Transfer Limit updated successfully!\n");
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Transfer Limit updated successfully!\n|@"));
                     }
 
                 }
@@ -642,7 +643,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         do {
             try {
                 printTable(Account.PrintHeaders(), accounts);
-                accountOption = promptForInput("Please choose Account...", Integer.class);
+                accountOption = promptForInput("@|51 Please choose Account...|@", Integer.class);
                 checkOption(accountOption, accounts.size());
             } catch (WrongNumberException e) {
                 System.out.println(e.getMessage());
@@ -659,7 +660,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
      */
     private void printMenu(String[] options) {
         for (String option : options) {
-            System.out.println(CommandLine.Help.Ansi.ON.string("@|blue " + option + "|@"));
+            System.out.println(CommandLine.Help.Ansi.ON.string(option));
         }
     }
 
@@ -668,8 +669,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
      */
     private <T> T promptForInput(String prompt, Class<T> type) {
 
-        System.out.println(prompt);
-        System.out.println("Press '0' to go back to the previous menu.");
+        System.out.println(CommandLine.Help.Ansi.ON.string(prompt));
+        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
 
         T input = null;
         do {
