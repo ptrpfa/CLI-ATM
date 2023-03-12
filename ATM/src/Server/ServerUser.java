@@ -7,6 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
+import com.twilio.converter.Promoter;
+import com.twilio.rest.serverless.v1.service.environment.Variable;
+
 import User.BusinessUser;
 import User.NormalUser;
 import User.User;
@@ -419,7 +422,7 @@ public class ServerUser {
     }
     
     // Method to update DBs with latest information
-    public static void updateUser(User user) {
+    public static boolean updateUser(User user) {
         Connection db = SQLConnect.getDBConnection();
         
         // Try to connect to DB
@@ -476,177 +479,440 @@ public class ServerUser {
         }
         catch (SQLException e) {
             // Check for any SQL connection errors
-            e.printStackTrace();
+            // e.printStackTrace();
+            return false;
         }
         finally {
             // Close DB connection
             SQLConnect.disconnectDB(db);
         }
+        return true;
     }
 
     // Method to display update options and get new information
     public static void getNewUpdates(User user) {
         Scanner input = new Scanner(System.in);
+        boolean isContinue = true;
         int updateChoice = -1;
         int max = 7;
-        String newUpdate;
+        String newUpdate = "";
+        String oldValue;
 
-        do {
-            try {
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWhich user detail would you like to update..\n|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Username|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Email|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 3- Phone|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 4- Address One|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 5- Address Two|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 6- Address Three|@"));
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|39 7- Postal Code|@"));
+        do{
+            do {
+                try {
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Which user detail would you like to update..\n|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Username|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Email|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 3- Phone|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 4- Address One|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 5- Address Two|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 6- Address Three|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 7- Postal Code|@"));
 
-                if (user instanceof NormalUser) {
-                    max = 12;
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- NRIC|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- First Name|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 10- Middle Name|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 11- Last Name|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 12- Gender|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
+                    if (user instanceof NormalUser) {
+                        max = 12;
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- NRIC|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- First Name|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 10- Middle Name|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 11- Last Name|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 12- Gender|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
+                    }
+
+                    if (user instanceof BusinessUser) {
+                        max = 9;
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- UEN|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- Business Name|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
+                    }
+                    
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
+                    System.out.print("> ");
+                    updateChoice = input.nextInt();
+                    checkOption(updateChoice, max);
+                    input.nextLine();
+                } 
+                catch (WrongException e){
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 }
+            } while (updateChoice < 0 || updateChoice > max);
 
-                if (user instanceof BusinessUser) {
-                    max = 9;
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 8- UEN|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 9- Business Name|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
+            System.out.println("\n");
+            boolean isUpdated = false;
+
+            label: do {
+                switch(updateChoice) {
+                    case 0: 
+                        isContinue = false;
+                        isUpdated = true;
+                        break;
+                    case 1:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current username: " + user.getUsername() + "|@"));
+                            System.out.print("Enter new username: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getUsername();
+                            
+                            checkString(oldValue, newUpdate, "username");
+                            user.setUsername(newUpdate);
+
+                            if(!updateUser(user)) {
+                                user.setUsername(oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUsername already taken!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 2:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current email: " + user.getEmail() + "|@"));
+                            System.out.print("Enter new email: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getEmail();
+
+                            checkString(oldValue, newUpdate, "email");
+                            user.setEmail(newUpdate);
+
+                            if(!updateUser(user)) {
+                                user.setEmail(oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nEmail already taken!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+                        
+                        break;
+                    case 3:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current phone: " + user.getPhone() + "|@"));
+                            System.out.print("Enter new phone: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getPhone();
+
+                            checkString(oldValue, newUpdate, "phone number");
+                            user.setPhone(newUpdate);
+
+                            if(!updateUser(user)) {
+                                user.setPhone(oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nPhone number already taken!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 4:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address one: " + user.getAddresses(1) + "|@"));
+                            System.out.print("Enter new address one: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getAddresses(1);
+
+                            checkString(oldValue, newUpdate, "address one");
+                            newUpdate = capitalize(newUpdate);
+                            user.setAddress(newUpdate, user.getAddresses(2), user.getAddresses(3), user.getPostalCode());
+
+                            if(!updateUser(user)) {
+                                user.setAddress(oldValue, user.getAddresses(2), user.getAddresses(3), user.getPostalCode());
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 5:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address two: " + user.getAddresses(2) + "|@"));
+                            System.out.print("Enter new address two: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getAddresses(2);
+
+                            checkString(oldValue, newUpdate, "address two");
+                            newUpdate = capitalize(newUpdate);
+                            user.setAddress(user.getAddresses(1), newUpdate, user.getAddresses(3), user.getPostalCode());
+
+                            if(!updateUser(user)) {
+                                user.setAddress(user.getAddresses(1), oldValue, user.getAddresses(3), user.getPostalCode());
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+                        
+                        break;
+                    case 6:
+                        try {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address three: " + user.getAddresses(3) + "|@"));
+                            System.out.print("Enter new address three: ");
+                            newUpdate = input.nextLine();
+                            oldValue = user.getAddresses(3);
+
+                            checkString(oldValue, newUpdate, "address three");
+                            newUpdate = capitalize(newUpdate);
+                            user.setAddress(user.getAddresses(1), user.getAddresses(2), newUpdate, user.getPostalCode());
+
+                            if(!updateUser(user)) {
+                                user.setAddress(user.getAddresses(1), user.getAddresses(2), oldValue, user.getPostalCode());
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+                        
+                        break;
+                    case 7:
+                        try{
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current postal code: " + user.getPostalCode() + "|@"));
+                            System.out.print("Enter new postal code: ");
+                            newUpdate = input.next();
+                            oldValue = user.getPostalCode();
+
+                            checkString(oldValue, newUpdate, "postal code");
+                            user.setAddress(user.getAddresses(1), user.getAddresses(2), user.getAddresses(3), newUpdate);
+                            
+                            if(!updateUser(user)) {
+                                user.setAddress(user.getAddresses(1), user.getAddresses(2), user.getAddresses(3), oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 8:
+                        try{
+                            if (user instanceof NormalUser) {
+                                NormalUser tempUser = (NormalUser) user;
+
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current NRIC: " + tempUser.getNRIC() + "|@"));
+                                System.out.print("Enter new NRIC: ");
+                                newUpdate = input.next();
+                                oldValue = tempUser.getNRIC();
+
+                                checkString(oldValue, newUpdate, "NRIC");
+                                tempUser.setNRIC(newUpdate);
+
+                                if(!updateUser(tempUser)) {
+                                    tempUser.setNRIC(oldValue);
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                                }
+                                else {
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                    isUpdated = true;
+                                }
+                            }
+                            if (user instanceof BusinessUser) {
+                                BusinessUser tempUser = (BusinessUser) user;
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current UEN: " + tempUser.getUEN() + "|@"));
+                                System.out.print("Enter new UEN: ");
+                                newUpdate = input.next();
+                                oldValue = tempUser.getUEN();
+
+                                checkString(oldValue, newUpdate, "UEN");
+                                tempUser.setUEN(newUpdate);
+
+                                if(!updateUser(tempUser)) {
+                                    tempUser.setUEN(oldValue);
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                                }
+                                else {
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                    isUpdated = true;
+                                }
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 9:
+                        try{
+                            if (user instanceof NormalUser) {
+                                NormalUser tempUser = (NormalUser) user;
+
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current first name: " + tempUser.getFirstName() + "|@"));
+                                System.out.print("Enter new first name: ");
+                                newUpdate = input.next();
+                                oldValue = tempUser.getFirstName();
+
+                                checkString(oldValue, newUpdate, "first name");
+                                tempUser.setAllNames(newUpdate, tempUser.getMiddleName(), tempUser.getLastName());
+
+                                if(!updateUser(tempUser)) {
+                                    tempUser.setAllNames(oldValue, tempUser.getMiddleName(), tempUser.getLastName());
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                                }
+                                else {
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                    isUpdated = true;
+                                }
+                            }
+                            if (user instanceof BusinessUser) {
+                                BusinessUser tempUser = (BusinessUser) user;
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current business name: " + tempUser.getBusinessName() + "|@"));
+                                System.out.print("Enter new business name: ");
+                                newUpdate = input.next();
+                                oldValue = tempUser.getBusinessName();
+
+                                checkString(oldValue, newUpdate, "business name");
+                                tempUser.setBusinessName(newUpdate);
+
+                                if(!updateUser(tempUser)) {
+                                    tempUser.setBusinessName(oldValue);
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                                }
+                                else {
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                    isUpdated = true;
+                                }
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 10:
+                        try{
+                            NormalUser tempUser = (NormalUser) user;
+
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current middle name: " + tempUser.getMiddleName() + "|@"));
+                            System.out.print("Enter new middle name: ");
+                            newUpdate = input.next();
+                            oldValue = tempUser.getMiddleName();
+
+                            checkString(oldValue, newUpdate, "middle name");
+                            newUpdate = capitalize(newUpdate);
+                            tempUser.setAllNames(tempUser.getFirstName(), newUpdate, tempUser.getLastName());
+
+                            if(!updateUser(tempUser)) {
+                                tempUser.setAllNames(tempUser.getFirstName(), oldValue, tempUser.getLastName());
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 11:
+                        try{
+                            NormalUser tempUser2 = (NormalUser) user;
+
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current last name: " + tempUser2.getLastName() + "|@"));
+                            System.out.print("Enter new last name: ");
+                            newUpdate = input.next();
+                            oldValue = tempUser2.getLastName();
+
+                            checkString(oldValue, newUpdate, "last name");
+                            newUpdate = capitalize(newUpdate);
+                            tempUser2.setAllNames(tempUser2.getFirstName(), tempUser2.getMiddleName(), newUpdate);
+
+                            if(!updateUser(tempUser2)) {
+                                tempUser2.setAllNames(tempUser2.getFirstName(), tempUser2.getMiddleName(), oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+
+                        break;
+                    case 12:
+                        try{
+                            NormalUser tempUser3 = (NormalUser) user;
+
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current gender: " + tempUser3.getGender() + "|@"));
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Select new gender|@"));
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Male|@"));
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Female|@"));
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPress '0' to go back to the previous menu.|@"));
+                            System.out.print("> ");
+                            int tempUpdate = input.nextInt();
+                            oldValue = tempUser3.getGender();
+
+                            checkOption(tempUpdate, 2);
+
+                            if(tempUpdate == 0) {
+                                System.out.println("");
+                                break label;
+                            }
+                            else if(tempUpdate == 1) {
+                                newUpdate = "Male";
+                            }
+                            else {
+                                newUpdate = "Female";
+                            }
+
+                            checkString(oldValue, newUpdate, "gender");
+                            tempUser3.setGender(newUpdate);
+
+                            if(!updateUser(tempUser3)) {
+                                tempUser3.setAllNames(tempUser3.getFirstName(), tempUser3.getMiddleName(), oldValue);
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request failed!\n|@"));
+                            }
+                            else {
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
+                                isUpdated = true;
+                            }
+                        }
+                        catch (WrongException e) {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
+                        }
+                        
+                        break;
                 }
-                
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
-                System.out.print("> ");
-                updateChoice = input.nextInt();
-                checkOption(updateChoice, max);
-                input.nextLine();
-            } 
-            catch (WrongException e){
-                System.out.println(e.getMessage());
-            }
-        } while (updateChoice < 0 || updateChoice > max);
+            } while (!isUpdated);
+        } while (isContinue);
 
-        switch(updateChoice) {
-            case 0: 
-                break;
-            case 1:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current username: " + user.getUsername() + "|@"));
-                System.out.print("Enter new username: ");
-                newUpdate = input.nextLine();
-                user.setUsername(newUpdate);
-                
-                break;
-            case 2:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current email: " + user.getEmail() + "|@"));
-                System.out.print("Enter new email: ");
-                newUpdate = input.nextLine();
-                user.setEmail(newUpdate);
-                
-                break;
-            case 3:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current phone: " + user.getPhone() + "|@"));
-                System.out.print("Enter new phone: ");
-                newUpdate = input.nextLine();
-                user.setPhone(newUpdate);
-                
-                break;
-            case 4:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address one: " + user.getAddresses(1) + "|@"));
-                System.out.print("Enter new address one: ");
-                newUpdate = input.nextLine();
-                user.setAddress(newUpdate, user.getAddresses(2), user.getAddresses(3), user.getPostalCode());
-                
-                break;
-            case 5:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address two: " + user.getAddresses(2) + "|@"));
-                System.out.print("Enter new address two: ");
-                newUpdate = input.next();
-                user.setAddress(user.getAddresses(1), newUpdate, user.getAddresses(3), user.getPostalCode());
-                
-                break;
-            case 6:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current address three: " + user.getAddresses(3) + "|@"));
-                System.out.print("Enter new address three: ");
-                newUpdate = input.next();
-                user.setAddress(user.getAddresses(1), user.getAddresses(2), newUpdate, user.getPostalCode());
-                
-                break;
-            case 7:
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current postal code: " + user.getPostalCode() + "|@"));
-                System.out.print("Enter new postal code: ");
-                newUpdate = input.next();
-                user.setAddress(user.getAddresses(1), user.getAddresses(2), user.getAddresses(3), newUpdate);
-                
-                break;
-            case 8:
-                if (user instanceof NormalUser) {
-                    NormalUser tempUser = (NormalUser) user;
-
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current NRIC: " + tempUser.getNRIC() + "|@"));
-                    System.out.print("Enter new NRIC: ");
-                    newUpdate = input.next();
-                    tempUser.setNRIC(newUpdate);
-                }
-                if (user instanceof BusinessUser) {
-                    BusinessUser tempUser = (BusinessUser) user;
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current UEN: " + tempUser.getUEN() + "|@"));
-                    System.out.print("Enter new UEN: ");
-                    newUpdate = input.next();
-                    tempUser.setUEN(newUpdate);
-                }
-
-                break;
-            case 9:
-                if (user instanceof NormalUser) {
-                    NormalUser tempUser = (NormalUser) user;
-
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current first name: " + tempUser.getFirstName() + "|@"));
-                    System.out.print("Enter new first name: ");
-                    newUpdate = input.next();
-                    tempUser.setAllNames(newUpdate, tempUser.getMiddleName(), tempUser.getLastName());
-                }
-                if (user instanceof BusinessUser) {
-                    BusinessUser tempUser = (BusinessUser) user;
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current business name: " + tempUser.getBusinessName() + "|@"));
-                    System.out.print("Enter new business name: ");
-                    newUpdate = input.next();
-                    tempUser.setBusinessName(newUpdate);
-                }
-
-                break;
-            case 10:
-                if (user instanceof NormalUser) {
-                    NormalUser tempUser = (NormalUser) user;
-
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current middle name: " + tempUser.getFirstName() + "|@"));
-                    System.out.print("Enter new middle name: ");
-                    newUpdate = input.next();
-                    tempUser.setAllNames(newUpdate, newUpdate, tempUser.getLastName());
-                }
-                break;
-            case 11:
-                NormalUser tempUser2 = (NormalUser) user;
-
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current last name: " + tempUser2.getLastName() + "|@"));
-                System.out.print("Enter new last name: ");
-                newUpdate = input.next();
-                tempUser2.setAllNames(tempUser2.getFirstName(), tempUser2.getMiddleName(), newUpdate);
-
-                break;
-            case 12:
-                NormalUser tempUser3 = (NormalUser) user;
-
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Current gender: " + tempUser3.getGender() + "|@"));
-                System.out.println("Enter new gender: ");
-                newUpdate = input.next();
-                tempUser3.setGender(newUpdate);
-
-                break;
-        }
         System.out.print("\n");
     }
 
@@ -846,21 +1112,41 @@ public class ServerUser {
         } while (passwordTries >= 0);
     }
 
+    /* Start of user defined exception */
     private static class WrongException extends Exception {
         public WrongException(String errorMessage) {
             super(errorMessage);
         }
     }
-    
-    public static void checkPassword(String oldPass, String newPass, int tries) throws WrongException {
-        if (!oldPass.equals(newPass)) {
-            throw new WrongException("Incorrect password! " + tries + " tries left.");
+
+    private static void checkPassword(String oldPass, String newPass, int tries) throws WrongException {
+        if(!oldPass.equals(newPass)) {
+            throw new WrongException("\nIncorrect password! " + tries + " tries left.\n");
         }
     }
 
-    public static void checkOption(int number, int max) throws WrongException {
-        if (number > max || number < 0) {
-            throw new WrongException("\nInvalid input. Enter 0 to " + max + ".");
+    private static void checkOption(int number, int max) throws WrongException {
+        if(number > max || number < 0) {
+            throw new WrongException("\nInvalid input. Enter 0 to " + max + ".\n");
         }
+    }
+
+    private static void checkString(String oldString, String newString, String variable) throws WrongException {
+        if(newString.isEmpty() || newString.trim().isEmpty()) {
+            throw new WrongException("\nField cannot be empty!\n");
+        }
+        if(oldString.equals(newString)) {
+            throw new WrongException("\nNew " + variable + " cannot be same as old " + variable + "!\n");
+        }
+    }
+    /* End of exception */
+
+    // Method to capitalized first character of a string
+    public static String capitalize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input; // Return the input as-is if it's null or empty
+        }
+        // Uppercase the first character and concatenate the rest of the string
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 }

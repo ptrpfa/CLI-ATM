@@ -216,7 +216,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         break;
                     case UPDATE_ACCOUNT:
                         ServerUser.getNewUpdates(user);
-                        ServerUser.updateUser(user);
                         break;
                     case DEACTIVATE_ACCOUNT:
                         ServerUser.deactivateUser(user);
