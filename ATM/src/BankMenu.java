@@ -102,10 +102,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             // Print user's active accounts
             if(!accounts.isEmpty()){
                 // Print Available Accounts
-                System.out.println("Active Accounts..");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Active Accounts..|@"));
                 printTable(Account.PrintHeaders(), accounts);
             }else{
-                System.out.println("No Active Accounts...");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 No Active Accounts...|@"));
             }
             
             // Run menu
@@ -422,7 +422,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         // Print user's cheques only if available
         if(!transactions.isEmpty()) {
             // Print Available Accounts
-            System.out.println("Account Transactions..");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Account Transactions..|@"));
             // Loop controllers and counter
             boolean view = true;
             int pageCount = 1;
@@ -452,7 +452,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     // Display menu and check for valid input of 1 - 3
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Back|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next\n|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                     System.out.print("> ");
@@ -486,7 +486,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             }
         }
         else {
-            System.out.println("No transactions to view...");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 No transactions to view...|@"));
         }
         // End of while loop
         System.out.print("\n");
@@ -500,7 +500,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         // Print user's cheques only if available
         if(!cheques.isEmpty()) {
             // Print Available Accounts
-            System.out.println("Cheque Transactions..");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Cheque Transactions..|@"));
             
             // Loop controllers and counter
             boolean view = true;
@@ -531,7 +531,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     // Display menu and check for valid input of 1 - 3
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Back|@"));
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next\n|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                     System.out.print("> ");
@@ -565,7 +565,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             }
         } 
         else {
-            System.out.println("No cheques to view...");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 No cheques to view...|@"));
         }
         // End of while loop
         System.out.print("\n");

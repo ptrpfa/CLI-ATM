@@ -49,7 +49,7 @@ public class Main implements Runnable{
             CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
             User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
             if(user != null) {
-                System.out.println("\nWelcome " + user.getUsername() + "\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWelcome " + user.getUsername() + ",\n|@"));
                 //Run the Menu
                 BankMenu menu = new BankMenu(user);
                 menu.run();
@@ -82,7 +82,7 @@ public class Main implements Runnable{
         //Console console = System.console();
         //do while loop to check login, condition user is null
         int counter = 2;
-        System.out.println("\nPlease login to access our bank services 🏦\n");
+        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPlease login to access our bank services 🏦\n|@"));
         User user = null; 
 
         do{
@@ -102,7 +102,7 @@ public class Main implements Runnable{
                     return newUser;
                 }
             }else { //No User
-                System.out.println("Invalid login. " + counter + " tries left.\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Invalid login. " + counter + " tries left.\n|@"));
             }
             //return user
             counter--;
