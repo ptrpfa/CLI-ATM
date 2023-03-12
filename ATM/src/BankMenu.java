@@ -355,7 +355,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             }
         } 
         else {
-            System.out.println("\nYou have reached your daily withdrawal limit! Please try again another day or update your limit first.");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nYou have reached your daily withdrawal limit! Please try again another day or update your limit first.|@"));
         }
     }
 
@@ -576,7 +576,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         boolean isValidInput = false;
         while (!isValidInput) {
             try {
-                double newLimit = promptForInput(String.format("|@51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()), Double.class);
+                double newLimit = promptForInput(String.format("@|51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()), Double.class);
                 if(newLimit == acc.getWithdrawLimit()) {
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|208 New limit is the same as the current limit!\n|@"));
                     continue;

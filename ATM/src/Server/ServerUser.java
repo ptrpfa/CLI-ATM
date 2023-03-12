@@ -7,9 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
-import com.twilio.converter.Promoter;
-import com.twilio.rest.serverless.v1.service.environment.Variable;
-
 import User.BusinessUser;
 import User.NormalUser;
 import User.User;
