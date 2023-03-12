@@ -15,7 +15,7 @@ public class ServerUser {
 
     // Method to create user
     public static void registerUser() throws ParseException {
-        int userID;
+   
         String username;
         String passwordSalt;
         String passwordHash;
@@ -147,16 +147,19 @@ public class ServerUser {
             }
 
             input.nextLine();
-            
-            try {
-                // Get user's birthday and convert to proper necessary format 
-                System.out.print("\nEnter DOB (dd-MM-yyyy): ");
-                String birthdayTemp = input.nextLine();
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                birthday = dateFormat.parse(birthdayTemp);
-            } 
-            catch (ParseException e) {
-                System.out.println("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
+
+            while(birthday == null){
+                try {
+                    // Get user's birthday and convert to proper necessary format 
+                    System.out.print("\nEnter DOB (dd-MM-yyyy): ");
+                    String birthdayTemp = input.nextLine();
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    birthday = dateFormat.parse(birthdayTemp);
+                    input.nextLine();
+                } 
+                catch (ParseException e) {
+                    System.out.println("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
+                }
             }
 
             // Create NormalUser object which holds user data and sends for user creation process
@@ -187,8 +190,9 @@ public class ServerUser {
             createUser(newUser);
         }
 
-        // Upon successful creation of NormalUser or BusinessUser, print successful message
-        System.out.println("Successfully created new user!\n");
+        //Clean up
+        input.close();
+
     }
 
     // Method to add new user into DB

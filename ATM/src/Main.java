@@ -41,26 +41,29 @@ public class Main implements Runnable{
     // Program entrypoint
     public static void main(String[] args) throws InterruptedException {
         final CommandLine commandLine = new CommandLine( new Main() );
-        commandLine.execute("Login"); //Change to args if you want do default
+        commandLine.execute(args); //Change to args if you want do default
 
         CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
-        CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
-        User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
-        if(user != null) {
-            System.out.println("\nWelcome " + user.getUsername() + "\n");
-            //Run the Menu
-            BankMenu menu = new BankMenu(user);
-            menu.run();
-        }
-        else {
-            System.out.println("The bank will now self destruct in 3");
-            Thread.sleep(1000);
-            System.out.print("2\n");
-            Thread.sleep(1000);
-            System.out.print("1\n");
-            Thread.sleep(1000);
-            System.out.print("Boom");
-            System.exit(-1);
+        CommandLine.ParseResult subcommand = parseResult.subcommand();
+        if(subcommand !=null && subcommand.commandSpec().name() == "Login"){
+            CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
+            User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
+            if(user != null) {
+                System.out.println("\nWelcome " + user.getUsername() + "\n");
+                //Run the Menu
+                BankMenu menu = new BankMenu(user);
+                menu.run();
+            }
+            else {
+                System.out.println("The bank will now self destruct in 3");
+                Thread.sleep(1000);
+                System.out.print("2\n");
+                Thread.sleep(1000);
+                System.out.print("1\n");
+                Thread.sleep(1000);
+                System.out.print("Boom");
+                System.exit(-1);
+            }
         }
     }
 
@@ -112,5 +115,7 @@ public class Main implements Runnable{
     @CommandLine.Command
     public void Registration() throws ParseException { // User Registration option
         ServerUser.registerUser();
+        System.out.println("Success creation of user. Please Login below!\n");
+        Login();
     }
 }

@@ -6,6 +6,7 @@ import java.util.Scanner;
 import Account.Account;
 import Account.AccountTransaction.TransactionError;
 import User.User;
+import picocli.CommandLine;
 import Server.ServerAccount;
 import Server.ServerCheque;
 import Server.ServerTransactions;
@@ -658,7 +659,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
      */
     private void printMenu(String[] options) {
         for (String option : options) {
-            System.out.println(option);
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|blue " + option + "|@"));
         }
     }
 
