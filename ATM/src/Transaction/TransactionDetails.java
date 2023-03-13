@@ -121,17 +121,25 @@ public class TransactionDetails {
     //Printing Methods
     public String[] PrintValues(){   
         String datetime = Datetime.toString();
-        String formattedNumber;
+        String formattedNumber = "";
+        String debitString = "";
+        String creditString = "";
 
         if(debit == 0) {
-            formattedNumber = String.format("%05.2f", debit);
+            debitString = String.format("%05.2f", debit);
         }
         else {
             formattedNumber = String.format("%.2f", debit);
+            debitString = "@|46 " + formattedNumber + "|@";
         }
 
-        String debitString = "@|46 " + formattedNumber + "|@";
-        String creditString = "@|196 " + formattedNumber + "|@";
+        if(credit == 0) {
+            creditString = String.format("%05.2f", credit);
+        }
+        else {
+            formattedNumber = String.format("%.2f", credit);
+            creditString = "@|196 " + formattedNumber + "|@";
+        }
 
         String[] values = {transno, datetime, debitString, creditString, Double.toString(balance), Integer.toString(status),Remarks};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
