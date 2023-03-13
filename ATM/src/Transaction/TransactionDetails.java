@@ -1,6 +1,8 @@
 package Transaction;
 import java.sql.Date;
 
+import picocli.CommandLine;
+
 public class TransactionDetails {
     private int transID;
     private int accID;
@@ -119,7 +121,19 @@ public class TransactionDetails {
     //Printing Methods
     public String[] PrintValues(){   
         String datetime = Datetime.toString();
-        String[] values = {transno, datetime, Double.toString(debit),Double.toString(credit),Double.toString(balance),Integer.toString(status),Remarks};
+        String formattedNumber;
+
+        if(debit == 0) {
+            formattedNumber = String.format("%05.2f", debit);
+        }
+        else {
+            formattedNumber = String.format("%.2f", debit);
+        }
+
+        String debitString = "@|46 " + formattedNumber + "|@";
+        String creditString = "@|196 " + formattedNumber + "|@";
+
+        String[] values = {transno, datetime, debitString, creditString, Double.toString(balance), Integer.toString(status),Remarks};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
         return values;
     }

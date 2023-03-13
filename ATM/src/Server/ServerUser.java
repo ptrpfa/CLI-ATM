@@ -1102,7 +1102,7 @@ public class ServerUser {
             }
             // If password tries fails 3 times or user decides not to deactivate user account
             if(passwordTries == 0){
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nUser account deactivation request aborted.\n|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUser account deactivation request aborted.\n|@"));
                 passwordTries = -1;
             }
             passwordTries--;

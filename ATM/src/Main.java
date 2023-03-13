@@ -39,7 +39,8 @@ public class Main implements Runnable{
     }
 
     // Program entrypoint
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {        
+        System.setProperty("picocli.ansi", "false");
         final CommandLine commandLine = new CommandLine( new Main() );
         commandLine.execute(args); //Change to args if you want do default
 

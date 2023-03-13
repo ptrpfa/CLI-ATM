@@ -7,6 +7,7 @@ import Account.Account;
 import Account.AccountTransaction.TransactionError;
 import User.User;
 import picocli.CommandLine;
+import picocli.CommandLine.Help.Ansi;
 import Server.ServerAccount;
 import Server.ServerCheque;
 import Server.ServerTransactions;
@@ -307,10 +308,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             try {
                 amount = promptForInput("@|51 Enter Deposit Amount|@", Double.class);
                 validateAmount(amount);
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Depositing...\n|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Depositing...\n|@"));
                 acc.deposit(amount);
                 Thread.sleep(1000);
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Depositied amount $" + amount + " in " + acc.getAccName() + "\n|@"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Depositied amount $" + amount + " in " + acc.getAccName() + "\n|@"));
                 isValidInput = true;
             } catch (WrongNumberException | TransactionError e) {
                 // Throw by validateAmount()
@@ -336,11 +337,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     amount = promptForInput("@|51 Enter Withdraw Amount|@", Double.class);
                     validateAmount(amount);
                     // Send to withdraw
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Withdrawing...\n|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Withdrawing...\n|@"));
                     acc.withdraw(amount);
     
                     Thread.sleep(1000);
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|196 Withdrew amount $" + amount + " in " + acc.getAccName() + " account\n|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Withdrew amount $" + amount + " in " + acc.getAccName() + " account\n|@"));
     
                     isValidInput = true;
                 } catch (WrongNumberException | TransactionError e) {
@@ -724,16 +725,20 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 values[i] = ((User) item).PrintValues();
             }
         }
-        
+
         String line;
         // Determine the maximum width of each column
         int[] colWidths = new int[headers.length];
+        int[] tempColWidths = new int[headers.length];
         int attrLength = 0;
         for (int i = 0; i < headers.length; i++) {
             colWidths[i] = headers[i].length();
+            tempColWidths[i] = headers[i].length();
+
             for (int j = 0; j < values.length; j++) {
                 attrLength = values[j][i].length();
                 colWidths[i] = Math.max(colWidths[i], attrLength);
+                tempColWidths[i] = Math.max(colWidths[i], attrLength);
             }
         }
 
@@ -741,16 +746,23 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         line = String.format("\n| %-3s", "No");
         System.out.print(line);
         for (int i = 0; i < headers.length; i++) {
-            line = String.format("| %-" + colWidths[i] + "s ", headers[i]);
-            System.out.print(line);
+
+            if(headers[i].equals("Debit")) {
+                tempColWidths[i] = tempColWidths[i] - 7;
+            }
+            if(headers[i].equals("Credit")) {
+                tempColWidths[i] = tempColWidths[i] - 8;
+            }
+            line = String.format("| %-" + tempColWidths[i] + "s ", headers[i]);
+            System.out.print(CommandLine.Help.Ansi.ON.string(line));
         }
         System.out.print("|\n");
 
         // Print the horizontal line below the header
         System.out.print("+----");
         for (int i = 0; i < headers.length; i++) {
-            line = String.format("+-%-" + colWidths[i] + "s-", "-").replace(' ', '-');
-            System.out.print(line);
+            line = String.format("+-%-" + tempColWidths[i] + "s-", "-").replace(' ', '-');
+            System.out.print(CommandLine.Help.Ansi.ON.string(line));
         }
         System.out.print("+\n");
 
@@ -760,7 +772,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             System.out.print(line);
             for (int j = 0; j < headers.length; j++) {
                 line = String.format("| %-" + colWidths[j] + "s ", values[i][j]);
-                System.out.print(line);
+                System.out.print(CommandLine.Help.Ansi.ON.string(line));
             }
             System.out.print("|\n");
         }
