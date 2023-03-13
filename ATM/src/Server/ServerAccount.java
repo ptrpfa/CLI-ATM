@@ -184,7 +184,7 @@ public interface ServerAccount extends SQLConnect{
 
             /*Create New Transaction*/
             //Get Last TransactNo
-            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction` WHERE  AccountID =" + accID;
+            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction`";
             updateStmt = db.prepareStatement(getTransactNoSQL);
             ResultSet rs = updateStmt.executeQuery();
             int transactionNo = 0;
