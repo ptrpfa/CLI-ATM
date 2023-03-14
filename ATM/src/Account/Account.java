@@ -119,13 +119,19 @@ public class Account {
     
     /*  Printing Methods */
     public String[] PrintValues(){   
-        String[] values = {accNo, accName, Double.toString(availableBalance)};
+        String formattedNumber = "";
+        String balanceString = "";
+
+        formattedNumber = String.format("%05.2f", availableBalance);
+        balanceString = formattedNumber;
+
+        String[] values = {accNo, accName, description, balanceString};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
         return values;
     }
     
     public static String[] PrintHeaders(){
-        String[] headers = {"Account No", "Account Name", "Available Balance"};
+        String[] headers = {"Account No", "Account Name", "Account Description" , "Available Balance"};
         return headers;
     }
 

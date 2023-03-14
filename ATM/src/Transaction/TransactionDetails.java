@@ -124,24 +124,28 @@ public class TransactionDetails {
         String formattedNumber = "";
         String debitString = "";
         String creditString = "";
+        String balanceString = "";
 
         if(debit == 0) {
-            debitString = String.format("%05.2f", debit);
+            formattedNumber = String.format("%05.2f", debit);
+            debitString = "@|249 " + formattedNumber + "|@";
         }
         else {
-            formattedNumber = String.format("%.2f", debit);
-            debitString = "@|46 " + formattedNumber + "|@";
+            formattedNumber = String.format("%05.2f", debit);
+            debitString = "@|118 " + formattedNumber + "|@";
         }
 
         if(credit == 0) {
-            creditString = String.format("%05.2f", credit);
+            formattedNumber = String.format("%05.2f", credit);
+            creditString = "@|249 " + formattedNumber + " |@";       
         }
         else {
-            formattedNumber = String.format("%.2f", credit);
+            formattedNumber = String.format("%05.2f", credit);
             creditString = "@|196 " + formattedNumber + "|@";
         }
+        balanceString = String.format("%.2f", balance);
 
-        String[] values = {transno, datetime, debitString, creditString, Double.toString(balance), Integer.toString(status),Remarks};
+        String[] values = {transno, datetime, debitString, creditString, balanceString, Integer.toString(status), Remarks};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
         return values;
     }

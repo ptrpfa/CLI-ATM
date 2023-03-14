@@ -733,12 +733,18 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         int attrLength = 0;
         for (int i = 0; i < headers.length; i++) {
             colWidths[i] = headers[i].length();
-            tempColWidths[i] = headers[i].length();
 
             for (int j = 0; j < values.length; j++) {
                 attrLength = values[j][i].length();
                 colWidths[i] = Math.max(colWidths[i], attrLength);
-                tempColWidths[i] = Math.max(colWidths[i], attrLength);
+                tempColWidths[i] = colWidths[i];
+            }
+
+            if(headers[i].equals("Debit")) {
+                colWidths[i] = colWidths[i] - 8;
+            }
+            if(headers[i].equals("Credit")) {
+                colWidths[i] = colWidths[i] - 8;
             }
         }
 
@@ -746,14 +752,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         line = String.format("\n| %-3s", "No");
         System.out.print(line);
         for (int i = 0; i < headers.length; i++) {
-
-            if(headers[i].equals("Debit")) {
-                tempColWidths[i] = tempColWidths[i] - 7;
-            }
-            if(headers[i].equals("Credit")) {
-                tempColWidths[i] = tempColWidths[i] - 8;
-            }
-            line = String.format("| %-" + tempColWidths[i] + "s ", headers[i]);
+            line = String.format("| %-" + colWidths[i] + "s ", headers[i]);
             System.out.print(CommandLine.Help.Ansi.ON.string(line));
         }
         System.out.print("|\n");
@@ -761,7 +760,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         // Print the horizontal line below the header
         System.out.print("+----");
         for (int i = 0; i < headers.length; i++) {
-            line = String.format("+-%-" + tempColWidths[i] + "s-", "-").replace(' ', '-');
+            line = String.format("+-%-" + colWidths[i] + "s-", "-").replace(' ', '-');
             System.out.print(CommandLine.Help.Ansi.ON.string(line));
         }
         System.out.print("+\n");
@@ -771,7 +770,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             line = String.format("| %-2d ", i + 1);
             System.out.print(line);
             for (int j = 0; j < headers.length; j++) {
-                line = String.format("| %-" + colWidths[j] + "s ", values[i][j]);
+                line = String.format("| %-" + tempColWidths[j] + "s ", values[i][j]);
                 System.out.print(CommandLine.Help.Ansi.ON.string(line));
             }
             System.out.print("|\n");
