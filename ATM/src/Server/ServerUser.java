@@ -64,27 +64,36 @@ public class ServerUser {
 
         // Loop controller
         boolean isVerified = false;
+        boolean smsSent = false;
+        String otp = SMS.generateOTP(6);
+        String input_otp = null;
+
+        System.out.print("\nEnter phone (+65): ");
+        phone = input.nextLine();
+        phone = "+65" + phone; // Add country code by default as verified number uses +65
+
+        // Sends verification message to phone
+        smsSent = SMS.sendSMS(phone, "Your Bank OTP is: " + otp);
+        if(smsSent) {
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 A One-Time Passcode has been sent to your phone number.|@"));
+        }
 
         // Sends verification message to user's phone and check for verification status
         while (!isVerified) {
-            System.out.print("\nEnter phone (+65): ");
-            phone = input.nextLine();
 
-            // Add country code by default as verified number uses +65
-            phone = "+65" + phone;
-
-            // Sends verification message to phone
-            isVerified = SMS.sendSMS(phone, "test message from binder of alexander");
             
-            // If message goes through, status will return TRUE and break loop
-            if(isVerified) {
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Phone has been verified!|@"));
+
+            System.out.printf("Enter your OTP (%s): ", otp);
+            input_otp = input.nextLine();
+
+            if(otp.equals(input_otp)) {
                 isVerified = true;
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Phone has been verified!|@"));
             }
-            // Else FALSE and resend verification code
             else {
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error verifying phone!"));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again."));
             }
+
         }
 
         // Get user's first address
