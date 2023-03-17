@@ -746,6 +746,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             if(headers[i].equals("Credit")) {
                 colWidths[i] = colWidths[i] - 8;
             }
+            if(headers[i].equals("Status")) {
+                colWidths[i] = colWidths[i] - 8;
+            }
         }
 
         // Print the table header

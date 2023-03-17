@@ -125,7 +125,9 @@ public class TransactionDetails {
         String debitString = "";
         String creditString = "";
         String balanceString = "";
+        String statusString = "";
 
+        // Transaction type formatting
         if(debit == 0) {
             formattedNumber = String.format("%05.2f", debit);
             debitString = "@|249 " + formattedNumber + "|@";
@@ -145,7 +147,18 @@ public class TransactionDetails {
         }
         balanceString = String.format("%.2f", balance);
 
-        String[] values = {transno, datetime, debitString, creditString, balanceString, Integer.toString(status), Remarks};
+        // Transaction status formatting
+        if(status < 0) {
+            statusString = "@|196 Failed |@";
+        }
+        else if(status == 1) {
+            statusString = "@|118 Success |@";
+        }
+        else{
+            statusString = "@|220 Pending |@";
+        }
+
+        String[] values = {transno, datetime, debitString, creditString, balanceString, statusString, Remarks};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
         return values;
     }
