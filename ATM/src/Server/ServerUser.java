@@ -81,8 +81,6 @@ public class ServerUser {
         // Sends verification message to user's phone and check for verification status
         while (!isVerified) {
 
-            
-
             System.out.printf("Enter your OTP (%s): ", otp);
             input_otp = input.nextLine();
 
@@ -616,6 +614,33 @@ public class ServerUser {
                                 System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nPhone number already taken!\n|@"));
                             }
                             else {
+                                // Loop controller
+                                boolean isVerified = false;
+                                boolean smsSent = false;
+                                String otp = SMS.generateOTP(6);
+                                String input_otp = null;
+
+                                // Sends verification message to phone
+                                smsSent = SMS.sendSMS(newUpdate, "Your Bank OTP is: " + otp);
+                                if(smsSent) {
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 A One-Time Passcode has been sent to your phone number for verification.|@"));
+                                }
+
+                                // Sends verification message to user's phone and check for verification status
+                                while (!isVerified) {
+
+                                    System.out.printf("Enter your OTP (%s): ", otp);
+                                    input_otp = input.nextLine();
+
+                                    if(otp.equals(input_otp)) {
+                                        isVerified = true;
+                                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Phone has been verified!|@"));
+                                    }
+                                    else {
+                                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again.|@"));
+                                    }
+
+                                }
                                 System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nUpdate request successful!\n|@"));
                                 isUpdated = true;
                             }
