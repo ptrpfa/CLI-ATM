@@ -91,7 +91,7 @@ public class ServerUser {
                 System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Phone has been verified!|@"));
             }
             else {
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again."));
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again.|@"));
             }
 
         }

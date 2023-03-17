@@ -12,6 +12,7 @@ import Server.ServerAccount;
 import Server.ServerCheque;
 import Server.ServerTransactions;
 import Server.ServerUser;
+import Server.SMS;
 import Transaction.TransactionDetails;
 import Cheque.Cheque;
 
@@ -575,6 +576,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private void UpdateWithdrawalLimit(Account acc) {
         // Sentinel variable
         boolean isValidInput = false;
+        // Scanner
+        Scanner input = new Scanner(System.in);
         while (!isValidInput) {
             try {
                 double newLimit = promptForInput(String.format("@|51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()), Double.class);
@@ -583,6 +586,33 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     continue;
                 }
                 else {
+                    // Send an OTP to user's registered phone no first
+                    boolean isVerified = false;
+                    boolean smsSent = false;
+                    String otp = SMS.generateOTP(6);
+                    String input_otp = null;
+
+                    // Sends verification message to phone
+                    System.out.println("\nPlease confirm this request before proceeding.");
+                    smsSent = SMS.sendSMS(user.getPhone(), "An attempt to update your withdrawal limit has been made. Please contact the bank if you did not make this request.\nYour Bank OTP is: " + otp);
+                    if(smsSent) {
+                        System.out.println(CommandLine.Help.Ansi.ON.string(String.format("@|208 A One-Time Passcode has been sent to your registered phone number (%s).|@", user.getPhone())));
+                    }
+
+                    // Sends verification message to user's phone and check for verification status
+                    while (!isVerified) {
+                        System.out.printf("Enter your OTP (%s): ", otp);
+                        input_otp = input.nextLine();
+                        if(otp.equals(input_otp)) {
+                            isVerified = true;
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Proceeding with your update request...|@"));
+                        }
+                        else {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again. |@"));
+                        }
+                    }
+
+                    // Validate amount
                     validateAmount(newLimit);
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Updating withdrawal limit...\n|@"));
                     acc.setWithdrawLimit(newLimit);
@@ -590,7 +620,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     if(!isValidInput) {
                         System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error...|@"));
                     } else {
-                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Withdrawal Limit updated successfully!\n|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|118 Your withdrawal limit has been updated successfully!\n|@"));
                     }
 
                 }
@@ -607,6 +637,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private void UpdateTransferLimit(Account acc) {
         // Sentinel variable
         boolean isValidInput = false;
+        // Scanner
+        Scanner input = new Scanner(System.in);
         while (!isValidInput) {
             try {
                 double newLimit = promptForInput(String.format("@|51 Enter a new transfer limit (current limit is $%s): |@", acc.getTransferLimit()), Double.class);
@@ -615,6 +647,32 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     continue;
                 }
                 else {
+                    // Send an OTP to user's registered phone no first
+                    boolean isVerified = false;
+                    boolean smsSent = false;
+                    String otp = SMS.generateOTP(6);
+                    String input_otp = null;
+
+                    // Sends verification message to phone
+                    System.out.println("\nPlease confirm this request before proceeding.");
+                    smsSent = SMS.sendSMS(user.getPhone(), "An attempt to update your transfer limit has been made. Please contact the bank if you did not make this request.\nYour Bank OTP is: " + otp);
+                    if(smsSent) {
+                        System.out.println(CommandLine.Help.Ansi.ON.string(String.format("@|208 A One-Time Passcode has been sent to your registered phone number (%s).|@", user.getPhone())));
+                    }
+
+                    // Sends verification message to user's phone and check for verification status
+                    while (!isVerified) {
+                        System.out.printf("Enter your OTP (%s): ", otp);
+                        input_otp = input.nextLine();
+                        if(otp.equals(input_otp)) {
+                            isVerified = true;
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Proceeding with your update request...|@"));
+                        }
+                        else {
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong OTP entered! Please try again. |@"));
+                        }
+                    }
+
                     validateAmount(newLimit);
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Updating transfer limit...\n|@"));
                     acc.setTransferLimit(newLimit);
@@ -622,7 +680,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     if(!isValidInput) {
                         System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Error...|@"));
                     } else {
-                        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Transfer Limit updated successfully!\n|@"));
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|118 Your transfer limit has been updated successfully!\n|@"));
                     }
 
                 }
