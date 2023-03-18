@@ -59,6 +59,7 @@ public class Main implements Runnable{
         if (!parseResult.hasSubcommand()) {
             new Main().run();
         }else{
+            commandLine.execute(args);
             CommandLine.ParseResult subcommand = parseResult.subcommand();
             if(subcommand != null && (subcommand.commandSpec().name().equals("Login") || Arrays.asList(subcommand.commandSpec().aliases()).contains("login"))) {
                 CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
