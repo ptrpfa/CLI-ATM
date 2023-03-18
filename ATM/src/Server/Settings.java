@@ -56,7 +56,7 @@ public class Settings {
     public static String[] getTwilioAPIKeys() {
 
         // Initialise array
-        String keys[] = new String[3];
+        String keys[] = new String[4];
 
         // Create a FileInputSteam object to read configuration settings file
         FileInputStream settingsFile = null;
@@ -77,6 +77,7 @@ public class Settings {
             keys[0] = propSettings.getProperty("ACCOUNT_SID");
             keys[1] = propSettings.getProperty("AUTH_TOKEN");
             keys[2] = propSettings.getProperty("PHONE_NO");
+            keys[3] = propSettings.getProperty("OUTGOING_NO_1");
         } 
         catch(Exception e){
             e.printStackTrace();
