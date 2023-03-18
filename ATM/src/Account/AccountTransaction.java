@@ -51,18 +51,18 @@ public class AccountTransaction implements ServerAccount{
     }
 
     public void transferFunds(Account IssuingAccount, Account ReceivingAccount, double amount){
-        double xferLimit = IssuingAccount.getTransferLimit();
         double accBalance = IssuingAccount.getAvailableBalance();
         double totalBalance = IssuingAccount.getTotalBalance();
+        double currentLimit = ServerAccount.getRemainingTransferLimit(IssuingAccount.getAccID(), IssuingAccount.getTransferLimit());
         // Check if accounts are the same
         if(IssuingAccount.getAccID() == ReceivingAccount.getAccID()) {
             throw new TransactionError("*****Cannot transfer to the same account!*****\n\n*****Transaction Terminated!*****\n");
         }
         if(amount > accBalance){
-            //Cannot withdraw more than the account balance
+            //Cannot transfer more than the account balance
             throw new TransactionError("*****Insufficient Funds*****\n\n*****Transaction Terminated!*****\n");
-        }else if(amount > xferLimit){
-            //Cannot withdraw more than transfer limit
+        }else if(amount > currentLimit){
+            //Cannot transfer more than outgoing transfer limit
             throw new TransactionError("*****Amount Exceeds Transfer Limit*****\n\n*****Transfer Terminated!*****\n");
         }
         //DB query to change the availableBalance

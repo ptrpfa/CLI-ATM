@@ -367,52 +367,59 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             "1- Transfer funds between own Accounts",
             "2- Transfer funds to another Account"
         };
-
         boolean isValidInput = false;
-        while (!isValidInput) {
-            printMenu(transferCommand);
-            System.out.println();
-            try{
-                int transactionOption = promptForInput("Which Transaction Operation?", Integer.class);
-                //Check if transOption is within the size of the transferCommand
-                checkOption(transactionOption, transferCommand.length);
-                switch(transactionOption){
-                    case 1://Transfer to Own Account
-                        System.out.println("Select the Receiving Account...");
-                        int accountOption = chooseAccount();
-                        Account RecivingAccount = accounts.get(accountOption - 1);
-                        double transferAmount = 0;
-                        while (transferAmount == 0) { //Loop till transfer amount correct
-                            try {
-                                //Get Transfer Amount
-                                transferAmount = promptForInput("Transfer Amount:", Double.class);
-                                if(transferAmount == 0){
-                                    System.out.println("Unable to proceed with amount keyed. Try again");
-                                }else{
-                                    validateAmount(transferAmount);
-                                    //Send to AccountTransaction Method
-                                    IssuingAccount.transferFunds(RecivingAccount, transferAmount);
+        double currentLimit = ServerAccount.getRemainingTransferLimit(IssuingAccount.getAccID(), IssuingAccount.getTransferLimit());
+        System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Current remaining transfer limit is: $" + currentLimit + "|@"));
+        if(currentLimit > 0) {
+            while (!isValidInput) {
+                printMenu(transferCommand);
+                System.out.println();
+                try{
+                    int transactionOption = promptForInput("Which Transaction Operation?", Integer.class);
+                    //Check if transOption is within the size of the transferCommand
+                    checkOption(transactionOption, transferCommand.length);
+                    switch(transactionOption){
+                        case 1://Transfer to Own Account
+                            System.out.println("Select the Receiving Account...");
+                            int accountOption = chooseAccount();
+                            Account RecivingAccount = accounts.get(accountOption - 1);
+                            double transferAmount = 0;
+                            while (transferAmount == 0) { //Loop till transfer amount correct
+                                try {
+                                    //Get Transfer Amount
+                                    transferAmount = promptForInput("Transfer Amount:", Double.class);
+                                    if(transferAmount == 0){
+                                        System.out.println("Unable to proceed with amount keyed. Try again");
+                                    }else{
+                                        validateAmount(transferAmount);
+                                        //Send to AccountTransaction Method
+                                        IssuingAccount.transferFunds(RecivingAccount, transferAmount);
+                                    }
+                                }catch(WrongNumberException e){
+                                    System.out.println(e.getMessage());
+                                }catch(GoBackException e){
+                                    break;
                                 }
-                            }catch(WrongNumberException e){
-                                System.out.println(e.getMessage());
-                            }catch(GoBackException e){
-                                break;
                             }
-                        }
-                        break;
-                    case 2://Transfer to others accuount
-                        break;
-                    default:
-                        System.out.println("Wrong Input. Try Again.");
-                        break;
+                            break;
+                        case 2://Transfer to others accuount
+                            break;
+                        default:
+                            System.out.println("Wrong Input. Try Again.");
+                            break;
+                    }
+                    isValidInput = true;
+                }catch(WrongNumberException | TransactionError e){
+                    System.out.println(e.getMessage());
+                }catch(GoBackException e){
+                    return;
                 }
-                isValidInput = true;
-            }catch(WrongNumberException | TransactionError e){
-                System.out.println(e.getMessage());
-            }catch(GoBackException e){
-                return;
             }
         }
+        else {
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nYou have reached your daily transfer limit! Please try again another day or update your limit first.|@"));
+        }
+
     }
 
     // Option 7
