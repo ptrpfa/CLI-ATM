@@ -378,7 +378,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 checkOption(transactionOption, transferCommand.length);
                 switch(transactionOption){
                     case 1://Transfer to Own Account
-                        System.out.println("Select the Recieving Account...");
+                        System.out.println("Select the Receiving Account...");
                         int accountOption = chooseAccount();
                         Account RecivingAccount = accounts.get(accountOption - 1);
                         double transferAmount = 0;
@@ -407,7 +407,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         break;
                 }
                 isValidInput = true;
-            }catch(WrongNumberException e){
+            }catch(WrongNumberException | TransactionError e){
                 System.out.println(e.getMessage());
             }catch(GoBackException e){
                 return;

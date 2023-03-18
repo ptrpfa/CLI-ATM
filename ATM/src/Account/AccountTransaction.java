@@ -1,6 +1,7 @@
 package Account;
 
 import Server.ServerAccount;
+import picocli.CommandLine;
 
 public class AccountTransaction implements ServerAccount{
 
@@ -16,6 +17,7 @@ public class AccountTransaction implements ServerAccount{
             totalBalance += amount;
             account.setAvailableBalance(availableBalance);
             account.setTotalBalance(totalBalance);
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Successful Deposit!|@"));
         }else{
             throw new TransactionError("Error in system...");
         }
@@ -30,7 +32,7 @@ public class AccountTransaction implements ServerAccount{
             throw new TransactionError("*****Insufficient Funds*****\n\n*****Withdrawal Terminated!*****");
         } else if (amount > currentLimit) {
             // Cannot withdraw more than limit set
-            throw new TransactionError("*****Amount Exceeds Transfer Limit*****\n\n*****Withdrawal Terminated!*****");
+            throw new TransactionError("*****Amount Exceeds Withdrawal Limit*****\n\n*****Withdrawal Terminated!*****");
         }
         //Checks all true
         boolean result = ServerAccount.AccountWithdrawal(account.getUserID(), account.getAccID(), availableBalance, totalBalance, amount);
@@ -41,32 +43,38 @@ public class AccountTransaction implements ServerAccount{
             totalBalance -= amount;
             account.setAvailableBalance(availableBalance);
             account.setTotalBalance(totalBalance);
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Successful Withdrawal!|@"));
         }else{
             throw new TransactionError("Error in system...");
         }
     
     }
 
-    public void transferFunds(Account IssuingAccount, Account RecievingAccount, double amount){
+    public void transferFunds(Account IssuingAccount, Account ReceivingAccount, double amount){
         double xferLimit = IssuingAccount.getTransferLimit();
         double accBalance = IssuingAccount.getAvailableBalance();
         double totalBalance = IssuingAccount.getTotalBalance();
+        // Check if accounts are the same
+        if(IssuingAccount.getAccID() == ReceivingAccount.getAccID()) {
+            throw new TransactionError("*****Cannot transfer to the same account!*****\n\n*****Transaction Terminated!*****\n");
+        }
         if(amount > accBalance){
             //Cannot withdraw more than the account balance
-            throw new TransactionError("*****不够钱，你转这么多kan！*****\n*****Transaction Terminated!*****");
+            throw new TransactionError("*****Insufficient Funds*****\n\n*****Transaction Terminated!*****\n");
         }else if(amount > xferLimit){
-            //Cannot withdraw more than WithdrawLimit
-            throw new TransactionError("*****不够钱转账！*****\n*****Transaction Terminated!*****");
+            //Cannot withdraw more than transfer limit
+            throw new TransactionError("*****Amount Exceeds Transfer Limit*****\n\n*****Transfer Terminated!*****\n");
         }
         //DB query to change the availableBalance
-        boolean result = ServerAccount.TransferFunds(IssuingAccount, RecievingAccount, amount);
+        boolean result = ServerAccount.TransferFunds(IssuingAccount, ReceivingAccount, amount);
         if(result){ //Transfer Successful
             IssuingAccount.setAvailableBalance(accBalance-amount);
             IssuingAccount.setTotalBalance(totalBalance-amount);
-            accBalance = RecievingAccount.getAvailableBalance();
-            totalBalance = RecievingAccount.getTotalBalance();
-            RecievingAccount.setAvailableBalance(accBalance+amount);
-            RecievingAccount.setTotalBalance(accBalance+amount);
+            accBalance = ReceivingAccount.getAvailableBalance();
+            totalBalance = ReceivingAccount.getTotalBalance();
+            ReceivingAccount.setAvailableBalance(accBalance+amount);
+            ReceivingAccount.setTotalBalance(accBalance+amount);
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Successful internal fund transfer!|@"));
         }else{ //Transfer Failed    
             throw new TransactionError("Transaction at Server failed");
         } 

@@ -251,11 +251,78 @@ public interface ServerAccount extends SQLConnect{
         Connection db = SQLConnect.getDBConnection();
 
         try{
+
+            // Create 2 transactions for internal transfer of funds (1: Outgoing transaction, 2: Incoming transaction)
+            /* Outgoing Transaction */
+            // Get transaction number
+            String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction`";
+            PreparedStatement updateStmt = db.prepareStatement(getTransactNoSQL);
+            ResultSet rs = updateStmt.executeQuery();
+            int transactionNo = 0;
+            if(rs.next()){
+                if(rs.getString(1) != null){
+                    transactionNo = Integer.parseInt(rs.getString(1)) + 1;
+                }
+            }
+
+            //Get Current TimeStamp
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date currentDate = new Date();
+            String transactDate = dateFormat.format(currentDate);
+            // Get Transaction Month in MM 
+            SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+            String month = monthFormat.format(currentDate);
+            // Get Transaction Year in YYYY '2023'
+            SimpleDateFormat yearFormat = new SimpleDateFormat("YYYY");
+            String year = yearFormat.format(currentDate);
+            //Format TransactionNo
+            String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
+
+            // Insert into Transaction Table
+            String sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,0,?,?,1,?)");
+            updateStmt = db.prepareStatement(sql);
+            updateStmt.setInt(1, IssuingAccount.getAccID());                                                          // AccountID
+            updateStmt.setString(2, transacString);                                                                   // TransactionNo
+            updateStmt.setTimestamp(3, Timestamp.valueOf(transactDate));                                              // Datetime
+            updateStmt.setTimestamp(4, Timestamp.valueOf(transactDate));                                              // ValueDatetime
+            updateStmt.setDouble(5, amount);                                                                          // Credit
+            updateStmt.setDouble(6, IssuingAccount.getAvailableBalance() - amount);                                   // Balance
+            updateStmt.setString(7, String.format("ATM-Transfer (To: %s)", ReceivingAccount.getAccNo()));      // Remarks
+            int row = updateStmt.executeUpdate(); 
+            // Check status of database insertion
+            if(row < 0 ){
+                return false;
+            }
+
+            /* Incoming Transaction */
+            // Get transaction number
+            transactionNo += 1;
+
+            // Format TransactionNo
+            transacString = String.format("%08d-%s-%s", transactionNo, month, year);
+
+            // Insert into Transaction Table
+            sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,?,0,?,1,?)");
+            updateStmt = db.prepareStatement(sql);
+            updateStmt.setInt(1, ReceivingAccount.getAccID());                                                        // AccountID
+            updateStmt.setString(2, transacString);                                                                   // TransactionNo
+            updateStmt.setTimestamp(3, Timestamp.valueOf(transactDate));                                              // Datetime
+            updateStmt.setTimestamp(4, Timestamp.valueOf(transactDate));                                              // ValueDatetime
+            updateStmt.setDouble(5, amount);                                                                          // Debit
+            updateStmt.setDouble(6, ReceivingAccount.getAvailableBalance() + amount);                                 // Balance
+            updateStmt.setString(7, String.format("ATM-Transfer (From: %s)", IssuingAccount.getAccNo()));      // Remarks
+            row = updateStmt.executeUpdate(); 
+            // Check status of database insertion
+            if(row < 0 ){
+                return false;
+            }
+
+            /* Update Issuing and Receiving Accounts */
             String issuingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Issuing
             String recievingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Recieving
             
             //Prepare the issuingAccount Details
-            PreparedStatement updateStmt = db.prepareStatement(issuingSQL);
+            updateStmt = db.prepareStatement(issuingSQL);
             double availableBalance = IssuingAccount.getAvailableBalance();
             double totalBalance = IssuingAccount.getTotalBalance();
 
@@ -263,7 +330,7 @@ public interface ServerAccount extends SQLConnect{
             updateStmt.setDouble(2, (totalBalance - amount));
             updateStmt.setInt(3,IssuingAccount.getUserID());
             updateStmt.setInt(4, IssuingAccount.getAccID());
-            int row = updateStmt.executeUpdate(); 
+            row = updateStmt.executeUpdate(); 
 
             if(row < 0 ){ //< 0, never update
                 return false;
@@ -284,14 +351,11 @@ public interface ServerAccount extends SQLConnect{
                 return false;
             }
 
-            //Create Transaction Details, check above methods
-            // Set remarks of Transaction for transfers to: \"ATM-Transfer\" to allow support of transfer limit
-            ;;;
-            return true;
         }catch(SQLException e){
             System.out.println("Error occurred: " + e.getMessage());
         }
-        return false;
+        // Return true once all processing have successfully been executed
+        return true;
     }
     
     public static double getRemainingWithdrawLimit(int accID, double dbLimit) {
