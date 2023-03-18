@@ -11,11 +11,11 @@ public class BusinessUser extends User{
     }
 
     // Constructor taking data from DB including NULLs
-    public BusinessUser(int userID, String username, String passwordSalt, String passwordHash, String email, String phone, String addressOne, 
+    public BusinessUser(int userID, String username, String email, String phone, String addressOne, 
                         String addressTwo, String addressThree, String postalCode, Date registrationDate, int userType, boolean active, 
                         String UEN, String businessName) {
 
-        super(userID, username, passwordSalt, passwordHash, email, phone, addressOne, addressTwo, addressThree, postalCode, registrationDate, userType, active);
+        super(userID, username, email, phone, addressOne, addressTwo, addressThree, postalCode, registrationDate, userType, active);
         this.UEN = UEN;
         this.businessName = businessName;
     }

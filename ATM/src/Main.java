@@ -1,7 +1,8 @@
 
+import java.io.Console;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Scanner;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
@@ -30,8 +31,6 @@ import User.User;
 )
 //End Command Header
 public class Main implements Runnable{
-    
-    public final static Scanner scanner = new Scanner(System.in);
 
     @Override
     public void run() {
@@ -67,7 +66,7 @@ public class Main implements Runnable{
                 if(user != null) {
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWelcome " + user.getUsername() + ",\n|@"));
                     //Run the Menu
-                    BankMenu menu = new BankMenu(scanner, user);
+                    BankMenu menu = new BankMenu(user);
                     menu.run();
                 }
                 else {
@@ -85,7 +84,7 @@ public class Main implements Runnable{
 
     }
 
-    @CommandLine.Command(name = "Login", aliases = {"login", "init"})
+    @CommandLine.Command(name = "Login", aliases = {"login", "init"}, description = "@|yellow Logs in User to the system. |@")
     public User Login() { // Login option
         String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
 
@@ -96,17 +95,17 @@ public class Main implements Runnable{
         }
 
         ServerUser serverUser = new ServerUser();
-        //Console console = System.console();
+        
         //do while loop to check login, condition user is null
         int counter = 2;
         System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nPlease login to access our bank services 🏦\n|@"));
         User user = null; 
-
+        Console console = System.console();
+    
         do{
-            System.out.print("Enter username: ");
-            String username = scanner.nextLine();
-            System.out.print("Enter password: ");
-            String password = scanner.nextLine();
+            String username = console.readLine("Enter username: ");
+            char[] passwordChars = console.readPassword("Enter password (Hidden for Security): ");
+            String password = new String(passwordChars);
         
             user = serverUser.checkUser(username, password); 
             if(user != null){
@@ -128,7 +127,7 @@ public class Main implements Runnable{
         return user;
     }
 
-    @CommandLine.Command(name = "Registration", aliases = {"register", "new", "signup"})
+    @CommandLine.Command(name = "Registration", aliases = {"register", "new", "signup"}, description = "@|yellow Register new User to the system. |@")
     public void Registration() throws ParseException { // User Registration option
         ServerUser.registerUser();
         System.out.println("Success creation of user. Please Login below!\n");

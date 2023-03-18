@@ -21,13 +21,12 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     // Object attributes
     private List<Account> accounts = null;
     private User user;
-    private Scanner scanner;
+    public final static Scanner scanner = new Scanner(System.in);
 
     // Constructor
-    BankMenu(Scanner scanner, User user) {
+    BankMenu(User user) {
         this.accounts = ServerAccount.findUserAccounts(user.getUserID());
         this.user = user;
-        this.scanner = scanner;
     }
 
     public List<Account> getAccounts() {
@@ -191,7 +190,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 "@|39 1- Reset Password|@",
                 "@|39 2- Update User Details|@",
                 "@|39 3- Deactivate User Account|@",
-                "@|51 \nPress '0' to go back to the previous menu.|@"
         };
         int userOption = -1;
 
@@ -204,17 +202,15 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 printTable(User.PrintHeaders(), userList);
 
                 printMenu(userOptionsCommand);
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
-
-                System.out.print("> ");
-                userOption = scanner.nextInt();
+                System.out.print("\n");
+                userOption = promptForInput("@|51 What do you want to do?|@", Integer.class);
                 checkOption(userOption, userOptions.values().length-1);
                 System.out.print("\n");
                 scanner.nextLine();
 
                 switch (userOptions.values()[userOption]) {
                     case RESET_PASSWORD:
-                        ServerUser.resetUserPassword(scanner, user);
+                        ServerUser.resetUserPassword(user);
                         break;
                     case UPDATE_ACCOUNT:
                         ServerUser.getNewUpdates(scanner, user);
@@ -234,6 +230,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             } catch (InputMismatchException | WrongNumberException e) {
                 System.out.println(e.getMessage());
                 userOption = 1;
+            } catch(GoBackException e){
+                break;
             }
 
         } while (userOptions.values()[userOption] != userOptions.EXIT);
@@ -577,8 +575,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private void UpdateWithdrawalLimit(Account acc) {
         // Sentinel variable
         boolean isValidInput = false;
-        // Scanner
-        Scanner input = new Scanner(System.in);
         while (!isValidInput) {
             try {
                 double newLimit = promptForInput(String.format("@|51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()), Double.class);
@@ -603,7 +599,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     // Sends verification message to user's phone and check for verification status
                     while (!isVerified) {
                         System.out.printf("Enter your OTP (%s): ", otp);
-                        input_otp = input.nextLine();
+                        input_otp = scanner.nextLine();
                         if(otp.equals(input_otp)) {
                             isVerified = true;
                             System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Proceeding with your update request...|@"));
@@ -732,9 +728,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Press '0' to go back to the previous menu.|@"));
 
         T input = null;
+        
         do {
             System.out.print("> ");
-            String userInput = scanner.nextLine();
+            String userInput = scanner.next();
             if (userInput.equals("0")) {
                 System.out.print("\n");
                 throw new GoBackException("Return Control");
@@ -752,7 +749,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 }
             }
         } while (input == null);
-        System.out.print("\n");
         return input;
     }
 

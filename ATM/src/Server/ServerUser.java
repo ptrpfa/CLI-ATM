@@ -1,5 +1,6 @@
 package Server;
 
+import java.io.Console;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -31,6 +32,7 @@ public class ServerUser {
         boolean active = true;
 
         Scanner input = new Scanner(System.in);
+        Console console = System.console();
         
         // Set option for user to register as NormalUser or BusinessUser which will set different prompts later
         do{
@@ -48,15 +50,15 @@ public class ServerUser {
         username = input.nextLine();
 
         // Get user's desired password used for log in
-        System.out.print("\nEnter password: ");
-        String passwordTemp = input.nextLine();
+        char[] passwordChars = console.readPassword("\nEnter password (Hidden for Security): ");
+        String passwordTemp = new String(passwordChars);
+    
 
         // Generate unique random salt to be added to password 
-        String salt = AES256.generateSalt();
-        passwordSalt = salt;
+        passwordSalt = AES256.generateSalt();
 
         // Encrypts user password + salt for better security
-        passwordHash = AES256.encrypt(passwordTemp, salt);
+        passwordHash = AES256.encrypt(passwordTemp, passwordSalt);
 
         // Get user's email 
         System.out.print("\nEnter email: ");
@@ -172,11 +174,11 @@ public class ServerUser {
             }
 
             // Create NormalUser object which holds user data and sends for user creation process
-            NormalUser newUser = new NormalUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
+            NormalUser newUser = new NormalUser(0, username, email, phone, addressOne, 
                                                 addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                 NRIC, firstName, middleName, lastName, gender, birthday);
 
-            createUser(newUser);
+            createUser(newUser, passwordSalt, passwordHash);
         }
 
         // If user is a BusinessUser, prompt these
@@ -193,10 +195,10 @@ public class ServerUser {
             businessName = input.nextLine();
 
             // Create BusinessUser object which holds user data and sends for user creation process
-            BusinessUser newUser = new BusinessUser(0, username, passwordSalt, passwordHash, email, phone, addressOne, 
+            BusinessUser newUser = new BusinessUser(0, username, email, phone, addressOne, 
                                                     addressTwo, addressThree, postalCode, registrationDate, userType, active, 
                                                     UEN, businessName);
-            createUser(newUser);
+            createUser(newUser, passwordSalt, passwordHash);
         }
 
         //Clean up
@@ -205,7 +207,7 @@ public class ServerUser {
     }
 
     // Method to add new user into DB
-    public static void createUser(User user) {
+    public static void createUser(User user, String passwordSalt, String passwordHash) {
         // Initialise connection to DB
         Connection db = SQLConnect.getDBConnection();
 
@@ -219,8 +221,8 @@ public class ServerUser {
 
             // Fill up update statements with latest particulars for User DB
             statement1.setString(1, user.getUsername());
-            statement1.setString(2, user.getPasswordSalt());
-            statement1.setString(3, user.getPasswordHash());
+            statement1.setString(2, passwordSalt);
+            statement1.setString(3, passwordHash);
             statement1.setString(4, user.getEmail());
             statement1.setString(5, user.getPhone());
             statement1.setString(6, user.getAddresses(1));
@@ -360,15 +362,13 @@ public class ServerUser {
                     // ID and type reserved to differentiate and create Normal or Business user
                     int userID = myRs1.getInt("UserID");
                     int userType = myRs1.getInt("UserType");
-                    
+
                     // If user is NormalUser, get extra attributes that NormalUser has
                     if (userType == 1) {
 
                         // Read from NormalUser DB and load user with saved particulars
                         user = new NormalUser(userID,
                                             myRs1.getString("Username"),
-                                            myRs1.getString("PasswordSalt"),
-                                            myRs1.getString("PasswordHash"),
                                             myRs1.getString("Email"),
                                             myRs1.getString("Phone"),
                                             myRs1.getString("AddressOne"),
@@ -385,6 +385,7 @@ public class ServerUser {
                                             myRs1.getString("Gender"),
                                             myRs1.getDate("Birthday")
                                             );
+                                            user.setCensorPass(myRs1.getString("PasswordSalt"), tempPassword);
                         return user;
                     }
                     // If user is BusinessUser
@@ -392,8 +393,6 @@ public class ServerUser {
                         // Read from "BusinessUser" DB and load user with saved particulars
                         user = new BusinessUser(userID,
                                                 myRs1.getString("Username"),
-                                                myRs1.getString("PasswordSalt"),
-                                                myRs1.getString("PasswordHash"),
                                                 myRs1.getString("Email"),
                                                 myRs1.getString("Phone"),
                                                 myRs1.getString("AddressOne"),
@@ -406,6 +405,7 @@ public class ServerUser {
                                                 myRs1.getString("UEN"),
                                                 myRs1.getString("BusinessName")
                                                 );
+                                                user.setCensorPass(myRs1.getString("PasswordSalt"), tempPassword);
                         return user;
                     }
                 }
@@ -945,10 +945,11 @@ public class ServerUser {
     }
 
     // Method to reset user password
-    public static void resetUserPassword(Scanner input, User user) {
+    public static void resetUserPassword(User user) {
         // Loop counter where user only allowed 3 tries
         int passwordTries = 2;
-        
+        Console console = System.console();
+
         do {
             Connection db = SQLConnect.getDBConnection();
             // Try to connect to DB
@@ -961,9 +962,9 @@ public class ServerUser {
                 myRs1.next();
 
                 // Get old password input for security feature
-                System.out.print("\nRequest to reset password\n");
-                System.out.print("Enter old password: ");
-                String oldPassword = input.nextLine();
+                System.out.println("Request to reset password\n");
+                char[] passwordChars = console.readPassword("Enter old password (Hidden for Security): ");
+                String oldPassword = new String(passwordChars);
 
                 // Get old password from DB
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
@@ -972,8 +973,8 @@ public class ServerUser {
                 checkPassword(oldPassword, DBPassword, passwordTries);
 
                 // Get new password input
-                System.out.print("\nEnter new password: ");
-                String newPassword1 = input.nextLine();
+                passwordChars = console.readPassword("Enter new password (Hidden for Security): ");
+                String newPassword = new String(passwordChars);
 
                 // Secondary loop counter where user have 3 tries to confirm new password
                 for(int i = 1; i < 4; i++) {
@@ -982,15 +983,14 @@ public class ServerUser {
                     PreparedStatement statement = db.prepareStatement(sql2);
 
                     // Get confirmed new password input
-                    System.out.print("\nConfirm new password: ");
-                    String newPassword2 = input.nextLine();
+                    passwordChars = console.readPassword("Confirm new password (Hidden for Security): ");
+                    String confirmPassword = new String(passwordChars);
 
                     // Check new password matches twice. If match continue, else reduce tries by 1
-                    if(newPassword1.equals(newPassword2)){
+                    if(newPassword.equals(confirmPassword)){
                         // Encrpyts new password and set it for updating to DB
-                        newPassword1 = AES256.encrypt(newPassword2, myRs1.getString("PasswordSalt"));
-                        user.setPasswordHash(newPassword1);
-                        statement.setString(1, newPassword1);
+                        newPassword = AES256.encrypt(confirmPassword, myRs1.getString("PasswordSalt"));
+                        statement.setString(1, newPassword);
 
                         // Perform database updates
                         statement.executeUpdate();
@@ -998,7 +998,7 @@ public class ServerUser {
                         // Prints successful message and breaks out of loop and method
                         System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nPassword resetted successfully!\n|@"));
                         passwordTries = -1;
-                        user.setPasswordCensored(myRs1.getString("PasswordSalt"), newPassword1);
+                        user.setCensorPass(myRs1.getString("PasswordSalt"), newPassword);
                         break;
                     }
                     
@@ -1036,6 +1036,7 @@ public class ServerUser {
         int passwordTries = 2;
         int deactivationOption1 = 0;
         int deactivationOption2 = 0;
+        Console console = System.console();
         
         do {
             Connection db = SQLConnect.getDBConnection();
@@ -1050,8 +1051,8 @@ public class ServerUser {
 
                 // Get old password input for security feature
                 System.out.print("\nDeactivation of user account\n");
-                System.out.print("Enter password: ");
-                String oldPassword = input.nextLine();
+                char[] passwordChars = console.readPassword("Enter password (Hidden for Security): ");
+                String oldPassword = new String(passwordChars);
 
                 // Get old password from DB
                 String DBPassword = AES256.decrypt(myRs1.getString("PasswordHash"), myRs1.getString("PasswordSalt"));
