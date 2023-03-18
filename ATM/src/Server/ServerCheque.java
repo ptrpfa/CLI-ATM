@@ -72,9 +72,6 @@ public interface ServerCheque extends SQLConnect {
     public static List<Cheque> findUserCheques(Account account) {
         // Get ChequeID list based on accountID
         List<ChequeAccount> chequeIDs = ServerCheque.getChequeIDs(account.getAccID());
-        
-        // Get ChequeTransaction list based on ChequeIDs list
-        List<ChequeTransaction> chequeTransactions = ServerCheque.getChequeTransactions(chequeIDs);
 
         List<Cheque> cheques = new ArrayList<>();
 

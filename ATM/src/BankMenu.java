@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import Account.Account;
 import Account.AccountTransaction.TransactionError;
 import User.User;
 import picocli.CommandLine;
-import picocli.CommandLine.Help.Ansi;
 import Server.ServerAccount;
 import Server.ServerCheque;
 import Server.ServerTransactions;
@@ -23,9 +23,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     private Scanner scanner;
 
     // Constructor
-    BankMenu(User user) {
+    BankMenu(Scanner scanner, User user) {
         this.accounts = ServerAccount.findUserAccounts(user.getUserID());
         this.user = user;
+        this.scanner = scanner;
     }
 
     public List<Account> getAccounts() {
@@ -53,9 +54,6 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             this.value = value;
         }
 
-        public int getValue() {
-            return value;
-        }
     }
 
     // User sub-menu options' mapping
@@ -70,16 +68,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         userOptions(int value) {
             this.value = value;
         }
-
-        public int getValue() {
-            return value;
-        }
     };
 
     // Main Controller
     public void run() {
         int option = 1;
-        scanner = new Scanner(System.in);
         do {
             // Set menu list according to whether the logged in user has a Bank account 
             String[] optionsCommand = accounts.isEmpty() ? new String[] {
@@ -115,15 +108,16 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 System.out.println(CommandLine.Help.Ansi.ON.string("@|51 What do you want to do?|@"));
                 System.out.print("> ");
                 option = scanner.nextInt();
-                checkOption(option, Option.values().length);
+                checkOption(option, Option.values().length -1);
                 System.out.print("\n");
                 scanner.nextLine();
 
                 switch (Option.values()[option]) {
                     case EXIT:
                         // Clean up
+                        System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Thank you for using LKP ATM!|@"));
                         scanner.close();
-                        break;
+                        System.exit(1);
                     case EDIT_USER_DETAILS:
                         EditUser();
                         break;
@@ -136,7 +130,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                                     "Please enter an integer value between 0 and " + Option.values().length + "\n");
                             scanner.nextLine();
                             break;
-                        } else { // Option 3 to Exit choosen
+                        } else { 
                             int accountOption = chooseAccount();
                             if (accountOption != -1) {
                                 Account account = accounts.get(accountOption - 1);
@@ -166,20 +160,26 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                                         UpdateTransferLimit(account);
                                         break;
                                     default:
-                                        System.out.println("Please enter an integer value between 0 and "
-                                                + Option.values().length + "\n");
-                                        scanner.nextLine();
-                                        break;
+                                        // System.out.println("Please enter an integer value between 0 and "
+                                        //         + Option.values().length + "\n");
+                                        // scanner.nextLine();
+                                        // break;
+                                        throw new WrongNumberException("Please enter an integer value between 0 and "
+                                              + Option.values().length + "\n");
                                 }
                             }
                             break; // User chose to go back Main Menu from Choose Account or Error
                         }
                 }
-            } catch (InputMismatchException | WrongNumberException e) {
+            } catch (WrongNumberException e) {
                 System.out.println(e.getMessage()); 
+            } catch (InputMismatchException i){
+                System.out.println("Invalid input. Please enter an integer.\n");
+            } catch (NoSuchElementException e) {
+                System.out.println("No input available.\n");
+            }finally {
                 option = 1;
                 scanner.nextLine();
-                continue;
             }
         } while (Option.values()[option] != Option.EXIT);
     }
@@ -213,13 +213,13 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
                 switch (userOptions.values()[userOption]) {
                     case RESET_PASSWORD:
-                        ServerUser.resetUserPassword(user);
+                        ServerUser.resetUserPassword(scanner, user);
                         break;
                     case UPDATE_ACCOUNT:
-                        ServerUser.getNewUpdates(user);
+                        ServerUser.getNewUpdates(scanner, user);
                         break;
                     case DEACTIVATE_ACCOUNT:
-                        ServerUser.deactivateUser(user);
+                        ServerUser.deactivateUser(scanner, user);
                         break;
                     case EXIT:
                         break; // return to maun
@@ -569,6 +569,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         }
         // End of while loop
         System.out.print("\n");
+        return;
     }
 
     // Option 9

@@ -1,8 +1,6 @@
 package Transaction;
 import java.sql.Date;
 
-import picocli.CommandLine;
-
 public class TransactionDetails {
     private int transID;
     private int accID;

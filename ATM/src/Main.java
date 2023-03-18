@@ -1,4 +1,6 @@
+
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Scanner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -29,11 +31,13 @@ import User.User;
 //End Command Header
 public class Main implements Runnable{
     
+    public final static Scanner scanner = new Scanner(System.in);
+
     @Override
     public void run() {
         //Prints the default help Page
         //AnsiConsole.systemInstall();
-        CommandLine cmd = new CommandLine(new Main());
+        CommandLine cmd = new CommandLine(this);
         cmd.usage(System.out, Ansi.ON);
         //AnsiConsole.systemUninstall();
     }
@@ -42,33 +46,45 @@ public class Main implements Runnable{
     public static void main(String[] args) throws InterruptedException {        
         System.setProperty("picocli.ansi", "false");
         final CommandLine commandLine = new CommandLine( new Main() );
-        commandLine.execute(args); //Change to args if you want do default
+        try{
+            commandLine.parseArgs(args);
+        }catch(CommandLine.UnmatchedArgumentException ex){
+            String errLine = "Invalid command or argument: " + ex.getCommandLine().getUnmatchedArguments().get(0);
+            System.err.println(CommandLine.Help.Ansi.ON.string("@|red " + errLine + "|@"));
+            commandLine.usage(System.err, CommandLine.Help.Ansi.ON);
+            System.exit(1);
+        }
 
-        CommandLine.ParseResult parseResult = commandLine.getParseResult(); //Get back the user Object returned
-        CommandLine.ParseResult subcommand = parseResult.subcommand();
-        if(subcommand !=null && subcommand.commandSpec().name() == "Login"){
-            CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
-            User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
-            if(user != null) {
-                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWelcome " + user.getUsername() + ",\n|@"));
-                //Run the Menu
-                BankMenu menu = new BankMenu(user);
-                menu.run();
-            }
-            else {
-                System.out.println("The bank will now self destruct in 3");
-                Thread.sleep(1000);
-                System.out.print("2\n");
-                Thread.sleep(1000);
-                System.out.print("1\n");
-                Thread.sleep(1000);
-                System.out.print("Boom");
-                System.exit(-1);
+        CommandLine.ParseResult parseResult = commandLine.getParseResult(); 
+        if (!parseResult.hasSubcommand()) {
+            new Main().run();
+        }else{
+            CommandLine.ParseResult subcommand = parseResult.subcommand();
+            if(subcommand != null && (subcommand.commandSpec().name().equals("Login") || Arrays.asList(subcommand.commandSpec().aliases()).contains("login"))) {
+                CommandLine.ParseResult pr = (parseResult.subcommands()).get(0);
+                User user = pr.commandSpec().commandLine().getExecutionResult(); // Return user object from login
+                if(user != null) {
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nWelcome " + user.getUsername() + ",\n|@"));
+                    //Run the Menu
+                    BankMenu menu = new BankMenu(scanner, user);
+                    menu.run();
+                }
+                else {
+                    System.out.println("The bank will now self destruct in 3");
+                    Thread.sleep(1000);
+                    System.out.print("2\n");
+                    Thread.sleep(1000);
+                    System.out.print("1\n");
+                    Thread.sleep(1000);
+                    System.out.print("Boom");
+                    System.exit(-1);
+                }
             }
         }
+
     }
 
-    @CommandLine.Command
+    @CommandLine.Command(name = "Login", aliases = {"login", "init"})
     public User Login() { // Login option
         String[] banner = new CommandLine(new Main()).getCommandSpec().usageMessage().header();
 
@@ -78,7 +94,6 @@ public class Main implements Runnable{
             //AnsiConsole.systemUninstall();
         }
 
-        Scanner scanner = new Scanner(System.in);
         ServerUser serverUser = new ServerUser();
         //Console console = System.console();
         //do while loop to check login, condition user is null
@@ -108,12 +123,11 @@ public class Main implements Runnable{
             //return user
             counter--;
         } while(counter >= 0);
-        
-        scanner.close();
+
         return user;
     }
 
-    @CommandLine.Command
+    @CommandLine.Command(name = "Registration", aliases = {"register", "new", "signup"})
     public void Registration() throws ParseException { // User Registration option
         ServerUser.registerUser();
         System.out.println("Success creation of user. Please Login below!\n");
