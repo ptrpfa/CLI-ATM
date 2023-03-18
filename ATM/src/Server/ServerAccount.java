@@ -86,6 +86,43 @@ public interface ServerAccount extends SQLConnect{
                 if(rs.next()){
                     int accID = rs.getInt(1);
                     acc =  new Account(accID, userid, accIDString, accName, description, 0, initialDeposit, initialDeposit, 0, 0, timestamp, true);
+                    
+                    /* Create account setup transaction */
+                    // Get transaction number
+                    String getTransactNoSQL = "SELECT MAX(SUBSTR(TransactionNo,1, 8)) FROM `OOP_ATM`.`Transaction`";
+                    PreparedStatement updateStmt = db.prepareStatement(getTransactNoSQL);
+                    rs = updateStmt.executeQuery();
+                    int transactionNo = 0;
+                    if(rs.next()){
+                        if(rs.getString(1) != null){
+                            transactionNo = Integer.parseInt(rs.getString(1)) + 1;
+                        }
+                    }
+
+                    //Get Current TimeStamp
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date currentDate = new Date();
+                    String transactDate = dateFormat.format(currentDate);
+                    // Get Transaction Month in MM 
+                    SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+                    String month = monthFormat.format(currentDate);
+                    // Get Transaction Year in YYYY '2023'
+                    SimpleDateFormat yearFormat = new SimpleDateFormat("YYYY");
+                    String year = yearFormat.format(currentDate);
+                    //Format TransactionNo
+                    String transacString = String.format("%08d-%s-%s", transactionNo, month, year);
+
+                    // Insert into Transaction Table
+                    String sql = String.format("INSERT INTO Transaction VALUES(NULL,?,?,?,?,?,0,?,1,\"Initial ATM Account Setup\")");
+                    updateStmt = db.prepareStatement(sql);
+                    updateStmt.setInt(1, accID);                                 // AccountID
+                    updateStmt.setString(2, transacString);                      // TransactionNo
+                    updateStmt.setTimestamp(3, Timestamp.valueOf(transactDate)); // Datetime
+                    updateStmt.setTimestamp(4, Timestamp.valueOf(transactDate)); // ValueDatetime
+                    updateStmt.setDouble(5, initialDeposit);                     // Debit
+                    updateStmt.setDouble(6, initialDeposit);                     // Balance
+                    row = updateStmt.executeUpdate(); 
+                    
                     return acc;
                 }
             }
@@ -358,6 +395,41 @@ public interface ServerAccount extends SQLConnect{
         return true;
     }
     
+    public static double getRemainingTransferLimit(int accID, double dbLimit) {
+
+        // Initialise remaining limit
+        double limit = 0;
+
+        // SQL to get the sum of all outgoing transfers (to add checks in remarks too)
+        String sql = "SELECT Temp.CurrentDay, Temp.Sum FROM (SELECT DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\") AS 'CurrentDay', SUM(Credit) AS 'Sum' FROM `Transaction` WHERE AccountID = ? AND Remarks LIKE \"%ATM-Transfer (To:%\" GROUP BY DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\")) AS Temp WHERE Temp.CurrentDay = DATE_FORMAT(CURDATE() , \"%d/%m/%Y\");";
+
+        // Establish a connection with the database
+        Connection db = SQLConnect.getDBConnection();
+        try {
+            PreparedStatement statement = db.prepareStatement(sql);
+            statement.setString(1, String.valueOf(accID));
+            ResultSet rs= statement.executeQuery();  
+            // Update current limit
+            if (!rs.isBeforeFirst() ) {    
+                limit = dbLimit;
+            } 
+            else {
+                // Get sum of all outgoing transfers within the day
+                rs.next();
+                limit = dbLimit - rs.getDouble("Sum");
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.disconnectDB(db);
+        }
+        
+        // Return limit
+        return limit;
+        
+    }
+
     public static double getRemainingWithdrawLimit(int accID, double dbLimit) {
 
         // Initialise remaining limit
