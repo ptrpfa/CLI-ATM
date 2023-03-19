@@ -172,11 +172,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         }
                 }
             } catch (WrongNumberException e) {
-                System.out.println(e.getMessage()); 
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@")); 
             } catch (InputMismatchException i){
-                System.out.println("Invalid input. Please enter an integer.\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nInvalid input. Please enter an integer.|@\n"));
             } catch (NoSuchElementException e) {
-                System.out.println("No input available.\n");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nNo input available.|@\n"));
             }finally {
                 option = 1;
                 scanner.nextLine();
@@ -225,10 +225,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         break;
                 }
             } catch (EmptyTableException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 break;
             } catch (InputMismatchException | WrongNumberException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 userOption = 1;
             } catch(GoBackException e){
                 break;
@@ -255,7 +255,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     validateAmount(amount);
                     isValidInput = true;
                 } catch (WrongNumberException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 }
             }
         } catch (GoBackException e) {
@@ -314,9 +314,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 isValidInput = true;
             } catch (WrongNumberException | TransactionError e) {
                 // Throw by validateAmount()
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
             } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 break;
             } catch (GoBackException e) {
                 return;
@@ -344,9 +344,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     
                     isValidInput = true;
                 } catch (WrongNumberException | TransactionError e) {
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 } catch (InterruptedException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                     break;
                 } catch (GoBackException e) {
                     return;
@@ -403,12 +403,12 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         case 2://Transfer to others accuount
                             break;
                         default:
-                            System.out.println("Wrong Input. Try Again.");
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong Input. Try Again.|@"));
                             break;
                     }
                     isValidInput = true;
                 }catch(WrongNumberException | TransactionError e){
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 }catch(GoBackException e){
                     return;
                 }
@@ -484,7 +484,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     }
                 } catch (WrongNumberException e) {
                     // Thrown by checkOption
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 } catch (EmptyTableException e) {
                     e.printStackTrace();
                     break;
@@ -563,7 +563,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                     }
                 } catch (WrongNumberException e) {
                     // Thrown by checkOption
-                    System.out.println(e.getMessage());
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 } catch (EmptyTableException e) {
                     e.printStackTrace();
                     break;
@@ -629,7 +629,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
                 }
             } catch (WrongNumberException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
             } catch (GoBackException e) {
                 return;
             }
@@ -689,7 +689,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
                 }
             } catch (WrongNumberException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
             } catch (GoBackException e) {
                 return;
             }
@@ -708,7 +708,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                 accountOption = promptForInput("@|51 Please choose Account...|@", Integer.class);
                 checkOption(accountOption, accounts.size());
             } catch (WrongNumberException e) {
-                System.out.println(e.getMessage());
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|208 " + e.getMessage() + "|@"));
                 accountOption = -1;
             } catch (GoBackException e) {
                 return -1;
@@ -752,7 +752,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         input = type.cast(Integer.parseInt(userInput));
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("Wrong Input. Try again..");
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Wrong Input. Try again..|@"));
                 }
             }
         } while (input == null);
