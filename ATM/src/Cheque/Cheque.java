@@ -111,11 +111,25 @@ public class Cheque {
     }
 
     public String[] PrintValues(){ 
+        String statusString = "";
+
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy"); 
         String date = formatter.format(this.dateTime);  
+
+        // Transaction status formatting
+        if(status < 0) {
+            statusString = "@|196 Failed |@";
+        }
+        else if(status == 1) {
+            statusString = "@|118 Success |@";
+        }
+        else{
+            statusString = "@|220 Pending |@";
+        }
+
         String[] values = { Integer.toString(chequeID), Integer.toString(issuerAccount), Integer.toString(recipientAccount), 
                             Integer.toString(issuingTransaction), Integer.toString(receivingTransaction), chequeNumber, 
-                            Double.toString(value), date, Integer.toString(status)};
+                            Double.toString(value), date, statusString};
         return values;
     }
 
