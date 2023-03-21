@@ -63,7 +63,7 @@ public class AES256 {
     }
 
     public static void main(String[] args) {
-        String originalString = "howtodoinjava.com";
+        String originalString = "password";
         String salt = generateSalt();
         System.out.println("the salt is " + salt);
 

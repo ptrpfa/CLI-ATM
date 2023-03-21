@@ -75,7 +75,8 @@ public class Account {
         return accID;
     }
 
-    public String getAccNo() {return accNo;}
+    public String getAccNo() {
+        return accNo;}
 
     public int getUserID() {
         return userID;
@@ -147,4 +148,5 @@ public class Account {
     public void transferFunds(Account RecivingAccount, double amount){
         this.transaction.transferFunds(this, RecivingAccount, amount);
     }
+    
 }

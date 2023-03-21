@@ -1,5 +1,6 @@
 package Server;
 
+import java.math.BigDecimal;
 //Imports
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,46 @@ public interface ServerAccount extends SQLConnect{
             SQLConnect.disconnectDB(db);
         }
         return accounts;
+    }
+
+    public static Account findAccountbyNumber(String AccNo){
+        String sql = String.format("SELECT * FROM Account WHERE AccountNo = ?",AccNo);
+        Connection db = SQLConnect.getDBConnection();
+        Account acc = null;
+        try {
+            PreparedStatement statement = db.prepareStatement(sql);
+            statement.setString(1, AccNo);
+            ResultSet rs= statement.executeQuery();  
+            
+            while (rs.next()) {
+                boolean active = rs.getBoolean("Active");
+                if(active){ 
+                    Timestamp timestamp = rs.getTimestamp("OpeningDate");
+                    java.util.Date datetime = new java.util.Date(timestamp.getTime());
+                    //Create the Acc object
+                    acc = new Account(rs.getInt("AccountID"),
+                                            rs.getInt("UserID"),
+                                            rs.getString("AccountNo"),
+                                            rs.getString("Name"),
+                                            rs.getString("Description"),
+                                            rs.getDouble("HoldingBalance"),
+                                            rs.getDouble("AvailableBalance"),
+                                            rs.getDouble("TotalBalance"),
+                                            rs.getDouble("TransferLimit"),
+                                            rs.getDouble("WithdrawalLimit"),
+                                            datetime,
+                                            active);
+
+                    return acc;
+                }
+            } 
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            SQLConnect.disconnectDB(db);
+        }
+        return acc;
     }
 
     public static Account NewAccount(int userid, String accName, String description, double initialDeposit){
@@ -358,6 +399,9 @@ public interface ServerAccount extends SQLConnect{
             String issuingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Issuing
             String recievingSQL = "UPDATE Account SET AvailableBalance=?,TotalBalance=? WHERE UserID=? AND AccountID=?"; //Recieving
             
+            // switch case: differentiate (ref line 379)
+            // UPDATE Account SET AvailableBalance = ?, TotalBalance = ? WHERE UserID = (SELECT UserID FROM User WHERE username = ?) AND AccountID = ?; // Transfer to another account
+
             //Prepare the issuingAccount Details
             updateStmt = db.prepareStatement(issuingSQL);
             double availableBalance = IssuingAccount.getAvailableBalance();
@@ -394,11 +438,11 @@ public interface ServerAccount extends SQLConnect{
         // Return true once all processing have successfully been executed
         return true;
     }
-    
-    public static double getRemainingTransferLimit(int accID, double dbLimit) {
+
+    public static BigDecimal getRemainingTransferLimit(int accID, double dbLimit) {
 
         // Initialise remaining limit
-        double limit = 0;
+        BigDecimal limit = new BigDecimal(0);
 
         // SQL to get the sum of all outgoing transfers (to add checks in remarks too)
         String sql = "SELECT Temp.CurrentDay, Temp.Sum FROM (SELECT DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\") AS 'CurrentDay', SUM(Credit) AS 'Sum' FROM `Transaction` WHERE AccountID = ? AND Remarks LIKE \"%ATM-Transfer (To:%\" GROUP BY DATE_FORMAT(ValueDatetime, \"%d/%m/%Y\")) AS Temp WHERE Temp.CurrentDay = DATE_FORMAT(CURDATE() , \"%d/%m/%Y\");";
@@ -411,12 +455,13 @@ public interface ServerAccount extends SQLConnect{
             ResultSet rs= statement.executeQuery();  
             // Update current limit
             if (!rs.isBeforeFirst() ) {    
-                limit = dbLimit;
+                limit = new BigDecimal(dbLimit);
             } 
             else {
                 // Get sum of all outgoing transfers within the day
                 rs.next();
-                limit = dbLimit - rs.getDouble("Sum");
+                limit = new BigDecimal(dbLimit - rs.getDouble("Sum"));
+                
             }
             
         } catch (SQLException e) {
