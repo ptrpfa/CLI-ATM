@@ -98,7 +98,6 @@ public interface ServerCheque extends SQLConnect {
                                                 rs.getInt("Status"));
 
                     row--;       
-                    System.out.println(row);
                     cheques.add(cheque);         
                 }
             }
