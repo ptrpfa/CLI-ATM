@@ -881,9 +881,13 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             }
         }
 
+        System.out.print("\n");
         // Print the table header
-        line = String.format("\n| %-3s", "No");
-        System.out.print(line);
+        if(!headers[0].equals("No")) {
+            line = String.format("| %-3s", "No");
+            System.out.print(line);
+        }
+
         for (int i = 0; i < headers.length; i++) {
             line = String.format("| %-" + colWidths[i] + "s ", headers[i]);
             System.out.print(CommandLine.Help.Ansi.ON.string(line));
@@ -891,7 +895,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         System.out.print("|\n");
 
         // Print the horizontal line below the header
-        System.out.print("+----");
+        if(!headers[0].equals("No")) {
+            System.out.print("+----");
+        }
         for (int i = 0; i < headers.length; i++) {
             line = String.format("+-%-" + colWidths[i] + "s-", "-").replace(' ', '-');
             System.out.print(CommandLine.Help.Ansi.ON.string(line));
@@ -900,8 +906,11 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
         // Print the table values
         for (int i = 0; i < values.length; i++) {
-            line = String.format("| %-2d ", i + 1);
-            System.out.print(line);
+            if(!headers[0].equals("No")) {
+                line = String.format("| %-2d ", i + 1);
+                System.out.print(line);
+            }
+
             for (int j = 0; j < headers.length; j++) {
                 line = String.format("| %-" + tempColWidths[j] + "s ", values[i][j]);
                 System.out.print(CommandLine.Help.Ansi.ON.string(line));

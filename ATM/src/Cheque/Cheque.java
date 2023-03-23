@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Cheque {
+    private int rowNum; 
     private int chequeID; 
     private int issuerAccount; 
     private int recipientAccount; 
@@ -14,8 +15,9 @@ public class Cheque {
     private Date dateTime; 
     private int status;
 
-    public Cheque (int chequeID, int issuerAccount, int recipientAccount, int issuingTransaction, int receivingTransaction,
+    public Cheque (int rowNum, int chequeID, int issuerAccount, int recipientAccount, int issuingTransaction, int receivingTransaction,
     String chequeNumber, double value, Date dateTime, int status) {
+        this.rowNum = rowNum;
         this.chequeID = chequeID;
         this.issuerAccount = issuerAccount;
         this.recipientAccount = recipientAccount;
@@ -127,14 +129,14 @@ public class Cheque {
             statusString = "@|220 Pending |@";
         }
 
-        String[] values = { Integer.toString(chequeID), Integer.toString(issuerAccount), Integer.toString(recipientAccount), 
-                            Integer.toString(issuingTransaction), Integer.toString(receivingTransaction), chequeNumber, 
-                            Double.toString(value), date, statusString};
+        String[] values = { Integer.toString(rowNum), Integer.toString(chequeID), Integer.toString(issuerAccount),
+                            Integer.toString(recipientAccount), Integer.toString(issuingTransaction), Integer.toString(receivingTransaction), 
+                            chequeNumber, Double.toString(value), date, statusString};
         return values;
     }
 
     public static String[] PrintHeaders(){
-        String[] headers = {"Cheque ID", "Issuer Account", "Receiver Account", "Issuer Transaction", "Receiver Transaction", "Cheque Number", "Value", "Date", "Status"};
+        String[] headers = {"No", "Cheque ID", "Issuer Account", "Receiver Account", "Issuer Transaction", "Receiver Transaction", "Cheque Number", "Value", "Date", "Status"};
         return headers;
     }
 }
