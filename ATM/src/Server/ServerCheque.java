@@ -76,17 +76,26 @@ public interface ServerCheque extends SQLConnect {
         List<ChequeAccount> chequeIDs = ServerCheque.getChequeIDs(account.getAccID());
 
         List<Cheque> cheques = new ArrayList<>();
-        int row = chequeIDs.size();
         try {
+            String sql2 =   """
+                            SELECT (SELECT COUNT(*) FROM ChequeAccount WHERE AccountID = %s) - ROW_NUMBER()
+                            OVER (ORDER BY ChequeAccount.ChequeID) + 1 as ReverseRowNum, ChequeAccount.*
+                            FROM ChequeAccount
+                            WHERE AccountID = %s
+                            ORDER BY ChequeAccount.ChequeID
+                            """.formatted(account.getAccID(), account.getAccID()); 
+            PreparedStatement statement2 = db.prepareStatement(sql2);
+            ResultSet rs2 = statement2.executeQuery();
+
             for (int i = 0; i < chequeIDs.size(); i++) {
                 String sql = String.format("SELECT * FROM Cheque WHERE ChequeID = %s", chequeIDs.get(i).getChequeID());
 
                 PreparedStatement statement = db.prepareStatement(sql);
                 ResultSet rs = statement.executeQuery();
 
-                while (rs.next()) {
+                while (rs.next() && rs2.next()) {
                     // Create the Cheque object
-                    Cheque cheque = new Cheque( row,
+                    Cheque cheque = new Cheque( rs2.getInt("ReverseRowNum"),
                                                 rs.getInt("ChequeID"),   
                                                 rs.getInt("IssuerAccount"),
                                                 rs.getInt("RecipientAccount"),
@@ -97,7 +106,6 @@ public interface ServerCheque extends SQLConnect {
                                                 rs.getDate("Date"),
                                                 rs.getInt("Status"));
 
-                    row--;       
                     cheques.add(cheque);         
                 }
             }
