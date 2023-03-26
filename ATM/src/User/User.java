@@ -103,11 +103,12 @@ public class User {
         return date;
     }
   
-    // Returns user type
+    // Returns user activation status. 1 - active, 0 - inactive
     public int getUserType() {
         return this.userType;
     }
 
+    // Returns user type
     public int getActive() {
         if(this.active == true) {
             return 1;
@@ -150,6 +151,7 @@ public class User {
         this.registrationDate = registrationDate;
     }
 
+    // Hold user activation status. 1 - active, 0 - inactive
     public void setActive(int active){
         if(active == 1) {
             this.active = true;
@@ -159,10 +161,12 @@ public class User {
         }
     }
 
+    // Hold user's half censored password for display
     public void setCensorPass(String passwordSalt, String passwordHash){
         this.censoredPass = censoredPass(passwordSalt, passwordHash);
     }
 
+    // Method to hide half of password with * for display
     private String censoredPass(String passwordSalt, String passwordHash) {        
         String decryptedPass = AES256.decrypt(passwordHash, passwordSalt);
         int half = decryptedPass.length() / 2;
@@ -172,6 +176,7 @@ public class User {
         return censoredText;
     }
 
+    // Method to hide half of password with * for display
     private String censor(String text, int n) {
         if (text == null || text.isEmpty()) {
             return text;
