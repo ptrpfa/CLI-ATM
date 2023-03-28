@@ -32,6 +32,31 @@ A MySQL database hosted on the cloud through the [Google Cloud Platform](https:
 The main ATM application is packaged into a single Java ARchive (JAR) file, which compiles all project dependencies and components, for ease of execution. Various libraries are used in the application, such as [picocli](https://picocli.info/) for the main command line interface, and [Twilio](https://www.twilio.com/docs/libraries/java), which enables 2-Factor Authentication through SMS messages.
 ## Features
 ---
+### Fundamental Features
+Various fundamental features have been implemented in this application to support its base operations. These include Create, Read, Update, Delete (CRUD) operations on the bank user, and their associated accounts. For deletion related operations, deletion will not effect in the actual deletion of data from the system. Like real-world banking applications, the data that is selected for deletion will be kept for record-keeping purposes. Deletion in this application would essentially only update the respective associated status (ie account status set to disabled).
+
+<u>User Operations</u><br>
+- User login
+- User authentication
+- New user registration
+- User deactivation
+- Reset of password
+- Updating of user details
+
+<u>Account Operations</u><br>
+- Account creation
+- Account deactivation
+- Account information inquiry (account details, current balance)
+- Cash withdrawal
+- Cash deposit
+- Fund transfer
+    - Inter-account Transfer
+    - Third-party Transfer
+- Setting account transfer limit
+- Setting account withdrawal limit
+- View transactions
+- View cheques received
+### Advanced Features
 <u>Database</u><br>
 A MySQL database was designed to store the user, financial transaction and other ATM information. An in-depth explanation of the database design is provided in [this section](#database-design).
 
@@ -315,7 +340,6 @@ The following set of data cleaning was performed on each **column** of the `bank
     - Renamed to `Remarks`
     - Convert values into general values (ie 6.13e+11)
 - . (`Removed`)
-<br>
 Apart from these data processing on the dataset's columns, duplicate row entries were removed. Anomaly data were also dealt with separately, together with the following flagged transactions which were eventually deemed to be fraudulent transactions (status set to `-1`, rejected):
 ![Flagged Transactions](docs/flagged_transactions.png)
     - Record `63342` (TransactionNo: `00063319-05-2017`)
