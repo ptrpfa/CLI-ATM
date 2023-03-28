@@ -267,10 +267,10 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
         try {
             accName = promptForInput("@|51 Enter the Account Name|@", String.class);
-            accDescString = promptForInput("Account Description", String.class);
+            accDescString = promptForInput("\n@|51 Account Description|@", String.class);
             while (!isValidInput) {
                 try {
-                    amount = promptForInput("Initial Deposit", Double.class);
+                    amount = promptForInput("\n@|51 Initial Deposit|@", Double.class);
                     // Check amount
                     validateAmount(amount);
                     isValidInput = true;
@@ -283,7 +283,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         }
 
         // Send to server
-        System.out.println("Creating Account " + accName + "...\n");
+        System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Creating Account " + accName + "...|@\n"));
         Account acc = ServerAccount.NewAccount(userid, accName, accDescString, amount);
         try {
             Thread.sleep(1000);
@@ -291,8 +291,8 @@ public class BankMenu implements ServerAccount, ServerTransactions {
             System.out.println(e.getMessage());
             return;
         }
-        if (acc != null) {
-            System.out.println("Account is Created\n");
+        if (acc != null) {  
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Account has been created!\n|@"));
             this.accounts.add(acc);
             try {
                 printTable(Account.PrintHeaders(), accounts);
@@ -325,7 +325,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
         while (!isValidInput) {
             try {
-                amount = promptForInput("@|51 Enter Deposit Amount|@", Double.class);
+                amount = promptForInput("\n@|51 Enter Deposit Amount|@", Double.class);
                 validateAmount(amount);
                 System.out.println(CommandLine.Help.Ansi.ON.string("@|46 Depositing...\n|@"));
                 acc.deposit(amount);
@@ -351,7 +351,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         boolean isValidInput = false;
         double currentLimit = ServerAccount.getRemainingWithdrawLimit(acc.getAccID(), acc.getWithdrawLimit());
         System.out.println(CommandLine.Help.Ansi.ON
-                .string("@|208 Current remaining withdrawal limit is: $" + currentLimit + "|@"));
+                .string("\n@|208 Current remaining withdrawal limit is: $" + currentLimit + "|@"));
         if (currentLimit > 0) {
             while (!isValidInput) {
                 try {
@@ -506,7 +506,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
                     // Display menu and check for valid input of 1 - 3
                     System.out.println(CommandLine.Help.Ansi.ON
-                            .string("@|51 \t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
+                            .string("@|51 \t\t\t\t\t\tPage: " + pageCount + " / " + pages2 + "|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|39 1- Back|@"));
                     System.out.println(CommandLine.Help.Ansi.ON.string("@|39 2- Next\n|@"));
                     System.out.println(

@@ -31,7 +31,7 @@ public class NormalUser extends User {
 
     // Constructor taking in object type
     public NormalUser(User user,
-                    String NRIC, String firstName, String middleName, String lastName, String gender, Date birthday) {
+                      String NRIC, String firstName, String middleName, String lastName, String gender, Date birthday) {
         super(user);
         this.NRIC = NRIC;
         this.firstName = firstName;
