@@ -202,7 +202,7 @@ public class ServerUser {
         }
 
         //Clean up
-        input.close();
+        // input.close();
 
     }
 
