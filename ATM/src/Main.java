@@ -130,7 +130,6 @@ public class Main implements Runnable{
     @CommandLine.Command(name = "Registration", aliases = {"register", "new", "signup"}, description = "@|yellow Register new User to the system. |@")
     public void Registration() throws ParseException { // User Registration option
         ServerUser.registerUser();
-        System.out.println("Success creation of user. Please Login below!\n");
-        Login();
+        System.out.println("Success creation of user! You can now login by running the program with the login option!\n");
     }
 }
