@@ -28,6 +28,9 @@ public interface ServerTransactions extends SQLConnect {
             PreparedStatement statement2 = db.prepareStatement(sql2);
             ResultSet rs = statement.executeQuery();
             ResultSet rs2 = statement2.executeQuery();
+
+            // rs.next();
+            // rs2.next();
             
             while (rs.next() && rs2.next()) {
                 // Create the Transaction object
@@ -96,18 +99,5 @@ public interface ServerTransactions extends SQLConnect {
             SQLConnect.disconnectDB(db);
         }
     }
-
-//     public static void main(String[] args) {
-//         /* Pretend this is work class where user does a transaction */
-//         // Create new transaction, store in transaction object
-//         // Send transaction object to method that adds to DB
-//         TransactionDetails transaction;
-//         Scanner input = new Scanner(System.in);
-
-//         System.out.println("Enter amount to deposit (debit): ");
-//         double amount = input.nextDouble();
-
-//         createNewTransaction(transaction);
-//     }
 }
     

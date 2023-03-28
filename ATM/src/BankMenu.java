@@ -144,7 +144,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                         } else {
                             if (Option.getStringValue(option) == "TRANSFER_FUNDS")
                             {
-                                System.out.println("Select the Issuing Account...");
+                                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nSelect the Issuing Account...|@"));
                                 int accountOption = chooseAccount();
                                 TransferFunds(accounts.get(accountOption - 1));
                                 break;
@@ -215,7 +215,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         do {
             try {
                 // Display user particulars
-                System.out.println("Request to edit user details..");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Request to edit user details..|@"));
                 List<User> userList = new ArrayList<>();
                 userList.add(user);
                 printTable(User.PrintHeaders(), userList);
@@ -314,7 +314,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         } else {
             // Update Accountlist
             accounts.remove(acc);
-            System.out.println("Account Deactivated Successfully.\n");
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nAccount Deactivated Successfully.\n|@"));
         }
     }
 
@@ -385,35 +385,35 @@ public class BankMenu implements ServerAccount, ServerTransactions {
     // Option 6
     private void TransferFunds(Account IssuingAccount) { // Recieve the IssuingAccount from Run
         String[] transferCommand = {
-                "1- Transfer funds between own Accounts",
-                "2- Transfer funds to another Account"
+                "@|39 1- Transfer funds between own Accounts|@",
+                "@|39 2- Transfer funds to another Account|@"
         };
         boolean isValidInput = false;
         BigDecimal currentLimit = ServerAccount.getRemainingTransferLimit(IssuingAccount.getAccID(),
                 IssuingAccount.getTransferLimit());
         System.out.println(
-                CommandLine.Help.Ansi.ON.string("@|208 Current remaining transfer limit is: $" + currentLimit + "|@"));
+                CommandLine.Help.Ansi.ON.string("@|208 \nCurrent remaining transfer limit is: $" + currentLimit + "|@"));
         if (currentLimit.compareTo(BigDecimal.ZERO) > 0) {
             while (!isValidInput) {
                 printMenu(transferCommand);
                 System.out.println();
                 try {
-                    int transactionOption = promptForInput("Which Transaction Operation?", Integer.class);
+                    int transactionOption = promptForInput("@|51 Which Transaction Operation?|@", Integer.class);
                     // Check if transOption is within the size of the transferCommand
                     checkOption(transactionOption, transferCommand.length);
                     switch (transactionOption) {
                         
                         case 1:// Transfer to Own Account
                         try {
-                            System.out.println("Select the Receiving Account...");
+                            System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nSelect the Receiving Account...|@"));
                             int accountOption = chooseAccount();
                             Account RecivingAccount = accounts.get(accountOption - 1);
                             double transferAmount = 0;
                             while (transferAmount == 0) { // Loop till transfer amount correct
                                 // Get Transfer Amount
-                                transferAmount = promptForInput("Transfer Amount:", Double.class);
+                                transferAmount = promptForInput("@|51 \nTransfer Amount:|@", Double.class);
                                 if (transferAmount == 0) {
-                                    System.out.println("Unable to proceed with amount keyed. Try again");
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Unable to proceed with amount keyed. Try again|@"));
                                 } else {
                                     validateAmount(transferAmount);
                                     // Send to AccountTransaction Method
@@ -437,9 +437,9 @@ public class BankMenu implements ServerAccount, ServerTransactions {
                             double amount = 0;
                             while (amount == 0) { // Loop till transfer amount correct
                                 // Get Transfer Amount
-                                amount = promptForInput("Transfer Amount:", Double.class);
+                                amount = promptForInput("@|51 \nTransfer Amount:|@", Double.class);
                                 if (amount == 0) {
-                                    System.out.println("Unable to proceed with amount keyed. Try again");
+                                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Unable to proceed with amount keyed. Try again|@"));
                                 } else {
                                     validateAmount(amount);
                                     // Send to AccountTransaction Method
@@ -636,7 +636,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
         while (!isValidInput) {
             try {
                 double newLimit = promptForInput(String
-                        .format("@|51 Enter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()),
+                        .format("@|51 \nEnter a new withdrawal limit (current limit is $%s): |@", acc.getWithdrawLimit()),
                         Double.class);
                 if (newLimit == acc.getWithdrawLimit()) {
                     System.out.println(

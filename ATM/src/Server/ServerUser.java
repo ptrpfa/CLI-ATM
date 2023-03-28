@@ -36,21 +36,22 @@ public class ServerUser {
         
         // Set option for user to register as NormalUser or BusinessUser which will set different prompts later
         do{
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 Request to register new user\n\n|@"));
             System.out.print(CommandLine.Help.Ansi.ON.string("@|51 What user type are you?\n|@"));
             System.out.print(CommandLine.Help.Ansi.ON.string("@|39 1- Normal user\n|@"));
             System.out.print(CommandLine.Help.Ansi.ON.string("@|39 2- Business user\n|@"));
-            System.out.println("Enter user type: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 Enter user type: |@"));
             userType = input.nextInt();
         } while (userType != 1 & userType != 2);
         input.nextLine();
         
         // Get user's desired username used for log in
         
-        System.out.print("\nEnter username: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter username: |@"));
         username = input.nextLine();
 
         // Get user's desired password used for log in
-        char[] passwordChars = console.readPassword("\nEnter password (Hidden for Security): ");
+        char[] passwordChars = console.readPassword(CommandLine.Help.Ansi.ON.string("@|51 \nEnter password (Hidden for Security): |@"));
         String passwordTemp = new String(passwordChars);
     
 
@@ -61,7 +62,7 @@ public class ServerUser {
         passwordHash = AES256.encrypt(passwordTemp, passwordSalt);
 
         // Get user's email 
-        System.out.print("\nEnter email: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter email: |@"));
         email = input.nextLine();
 
         // Loop controller
@@ -70,7 +71,7 @@ public class ServerUser {
         String otp = SMS.generateOTP(6);
         String input_otp = null;
 
-        System.out.print("\nEnter phone (+65): ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter phone (+65): |@"));
         phone = input.nextLine();
         phone = "+65" + phone; // Add country code by default as verified number uses +65
 
@@ -97,19 +98,19 @@ public class ServerUser {
         }
 
         // Get user's first address
-        System.out.print("\nEnter address one: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter address one: |@"));
         addressOne = input.nextLine();
 
         // Get user's second address
-        System.out.print("\nEnter address two: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter address two: |@"));
         addressTwo = input.nextLine();
 
         // Get user's third address
-        System.out.print("\nEnter address three: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter address three: |@"));
         addressThree = input.nextLine();
 
         // Get user's postal code
-        System.out.print("\nEnter postal code: ");
+        System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter postal code: |@"));
         postalCode = input.nextLine();
 
         // Generate current date as registration date
@@ -125,19 +126,19 @@ public class ServerUser {
             Date birthday = null;
 
             // Get user's NRIC
-            System.out.print("\nEnter NRIC: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter NRIC: |@"));
             NRIC = input.nextLine();
             
             // Get user's first name
-            System.out.print("\nEnter first name: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter first name: |@"));
             firstName = input.nextLine();
             
             // Get user's last name
-            System.out.print("\nEnter last name: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter last name: |@"));
             lastName = input.nextLine();
             
             // Get user's middle name
-            System.out.print("\nEnter middle name (If applicable): ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter middle name (If applicable): |@"));
             middleName = input.nextLine();
             
             // Get user's gender using integer options for standardisation
@@ -162,7 +163,7 @@ public class ServerUser {
             while(birthday == null){
                 try {
                     // Get user's birthday and convert to proper necessary format 
-                    System.out.print("\nEnter DOB (dd-MM-yyyy): ");
+                    System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter DOB (dd-MM-yyyy): |@"));
                     String birthdayTemp = input.nextLine();
                     DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                     birthday = dateFormat.parse(birthdayTemp);
@@ -187,11 +188,11 @@ public class ServerUser {
             String businessName;
 
             // Get company's UEN
-            System.out.print("\nEnter UEN: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter UEN: |@"));
             UEN = input.nextLine();
 
             // Get company's name
-            System.out.print("\nEnter business name: ");
+            System.out.print(CommandLine.Help.Ansi.ON.string("@|51 \nEnter business name: |@"));
             businessName = input.nextLine();
 
             // Create BusinessUser object which holds user data and sends for user creation process
@@ -962,8 +963,8 @@ public class ServerUser {
                 myRs1.next();
 
                 // Get old password input for security feature
-                System.out.println("Request to reset password\n");
-                char[] passwordChars = console.readPassword("Enter old password (Hidden for Security): ");
+                System.out.println(CommandLine.Help.Ansi.ON.string("@|51 Request to reset password\n|@"));
+                char[] passwordChars = console.readPassword(CommandLine.Help.Ansi.ON.string("@|51 Enter old password (Hidden for Security): |@"));
                 String oldPassword = new String(passwordChars);
 
                 // Get old password from DB
@@ -973,7 +974,7 @@ public class ServerUser {
                 checkPassword(oldPassword, DBPassword, passwordTries);
 
                 // Get new password input
-                passwordChars = console.readPassword("Enter new password (Hidden for Security): ");
+                passwordChars = console.readPassword(CommandLine.Help.Ansi.ON.string("@|51 Enter new password (Hidden for Security): |@"));
                 String newPassword = new String(passwordChars);
 
                 // Secondary loop counter where user have 3 tries to confirm new password
@@ -983,11 +984,11 @@ public class ServerUser {
                     PreparedStatement statement = db.prepareStatement(sql2);
 
                     // Get confirmed new password input
-                    passwordChars = console.readPassword("Confirm new password (Hidden for Security): ");
+                    passwordChars = console.readPassword(CommandLine.Help.Ansi.ON.string("@|51 Confirm new password (Hidden for Security): |@"));
                     String confirmPassword = new String(passwordChars);
 
                     // Check new password matches twice. If match continue, else reduce tries by 1
-                    if(newPassword.equals(confirmPassword)){
+                    if(newPassword.equals(confirmPassword)) {
                         // Encrpyts new password and set it for updating to DB
                         newPassword = AES256.encrypt(confirmPassword, myRs1.getString("PasswordSalt"));
                         statement.setString(1, newPassword);
@@ -1150,7 +1151,7 @@ public class ServerUser {
     // Checks if user input more than options allowed and count number of tries
     private static void checkPassword(String oldPass, String newPass, int tries) throws WrongException {
         if(!oldPass.equals(newPass)) {
-            throw new WrongException("\nIncorrect password! " + tries + " tries left.\n");
+            throw new WrongException(CommandLine.Help.Ansi.ON.string("@|208 \nIncorrect password! " + tries + " tries left.\n|@"));
         }
     }
 

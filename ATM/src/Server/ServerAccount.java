@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import Account.Account;
 
-public interface ServerAccount extends SQLConnect{
+public interface ServerAccount extends SQLConnect {
 
     public static List<Account> findUserAccounts(int userID){
         String sql = String.format("SELECT * FROM Account WHERE UserID = %s",userID);

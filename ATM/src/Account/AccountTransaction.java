@@ -77,7 +77,7 @@ public class AccountTransaction implements ServerAccount{
             totalBalance = ReceivingAccount.getTotalBalance();
             ReceivingAccount.setAvailableBalance(accBalance+amount);
             ReceivingAccount.setTotalBalance(accBalance+amount);
-            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 Successful internal fund transfer!|@"));
+            System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nSuccessful internal fund transfer!|@"));
         }else{ //Transfer Failed    
             throw new TransactionError("Transaction at Server failed");
         } 
