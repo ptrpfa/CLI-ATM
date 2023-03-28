@@ -77,6 +77,8 @@ To improve the cybersecurity aspects of this application, the SHA256 hashing alg
 ```
 README.md (this file)
 
+credentials.md (file containing a list of user credentials)
+
 CSC1109-ATM.jar (executable application)
 
 ATM/ (contains application's source code)
@@ -131,7 +133,7 @@ Follow the instructions below to setup a local database for the application:
     Register as a new user: register, new, signup, Registration
 
     ```
-2. Start banking with us!
+2. Start banking with us! You can use any user account provided in the `credentials.md` file to test the ATM application.
 
 
 ## Database Design
