@@ -28,9 +28,6 @@ public interface ServerTransactions extends SQLConnect {
             PreparedStatement statement2 = db.prepareStatement(sql2);
             ResultSet rs = statement.executeQuery();
             ResultSet rs2 = statement2.executeQuery();
-
-            rs.next();
-            rs2.next();
             
             while (rs.next() && rs2.next()) {
                 // Create the Transaction object

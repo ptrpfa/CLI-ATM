@@ -806,7 +806,7 @@ public class BankMenu implements ServerAccount, ServerTransactions {
 
         do {
             System.out.print("> ");
-            String userInput = scanner.next();
+            String userInput = scanner.nextLine();
             if (userInput.equals("0")) {
                 System.out.print("\n");
                 throw new GoBackException("Return Control");
