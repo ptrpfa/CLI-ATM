@@ -71,30 +71,42 @@ public interface ServerCheque extends SQLConnect {
     // Get list of cheques for an account
     public static List<Cheque> findUserCheques(Account account) {
         // Get ChequeID list based on accountID
+        Connection db = SQLConnect.getDBConnection();
+
         List<ChequeAccount> chequeIDs = ServerCheque.getChequeIDs(account.getAccID());
 
         List<Cheque> cheques = new ArrayList<>();
-
-        Connection db = SQLConnect.getDBConnection();
         try {
+            String sql2 =   """
+                            SELECT (SELECT COUNT(*) FROM ChequeAccount WHERE AccountID = %s) - ROW_NUMBER()
+                            OVER (ORDER BY ChequeAccount.ChequeID) + 1 as ReverseRowNum, ChequeAccount.*
+                            FROM ChequeAccount
+                            WHERE AccountID = %s
+                            ORDER BY ChequeAccount.ChequeID
+                            """.formatted(account.getAccID(), account.getAccID()); 
+            PreparedStatement statement2 = db.prepareStatement(sql2);
+            ResultSet rs2 = statement2.executeQuery();
+
             for (int i = 0; i < chequeIDs.size(); i++) {
                 String sql = String.format("SELECT * FROM Cheque WHERE ChequeID = %s", chequeIDs.get(i).getChequeID());
+
                 PreparedStatement statement = db.prepareStatement(sql);
                 ResultSet rs = statement.executeQuery();
 
-                if(rs.next()) {
+                while (rs.next() && rs2.next()) {
                     // Create the Cheque object
-                    Cheque cheque = new Cheque(rs.getInt("ChequeID"),   
-                                            rs.getInt("IssuerAccount"),
-                                            rs.getInt("RecipientAccount"),
-                                            rs.getInt("IssuingTransaction"),
-                                            rs.getInt("ReceivingTransaction"),
-                                            rs.getString("ChequeNo"),
-                                            rs.getDouble("Value"),
-                                            rs.getDate("Date"),
-                                            rs.getInt("Status"));
+                    Cheque cheque = new Cheque( rs2.getInt("ReverseRowNum"),
+                                                rs.getInt("ChequeID"),   
+                                                rs.getInt("IssuerAccount"),
+                                                rs.getInt("RecipientAccount"),
+                                                rs.getInt("IssuingTransaction"),
+                                                rs.getInt("ReceivingTransaction"),
+                                                rs.getString("ChequeNo"),
+                                                rs.getDouble("Value"),
+                                                rs.getDate("Date"),
+                                                rs.getInt("Status"));
 
-                    cheques.add(cheque);
+                    cheques.add(cheque);         
                 }
             }
         } catch (SQLException e) {

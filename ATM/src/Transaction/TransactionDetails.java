@@ -2,6 +2,7 @@ package Transaction;
 import java.sql.Date;
 
 public class TransactionDetails {
+    private int rowNum;
     private int transID;
     private int accID;
     private String transno;
@@ -13,7 +14,8 @@ public class TransactionDetails {
     private int status;
     private String Remarks;
 
-    public TransactionDetails(int transID, int accID, String transno, Date datetime, Date valueDatetime, double debit, double credit, double balance, int status, String remarks) {
+    public TransactionDetails(int rowNum, int transID, int accID, String transno, Date datetime, Date valueDatetime, double debit, double credit, double balance, int status, String remarks) {
+        this.rowNum = rowNum;
         this.transID = transID;
         this.accID = accID;
         this.transno = transno;
@@ -156,13 +158,13 @@ public class TransactionDetails {
             statusString = "@|220 Pending |@";
         }
 
-        String[] values = {transno, datetime, debitString, creditString, balanceString, statusString, Remarks};
+        String[] values = {Integer.toString(rowNum), transno, datetime, debitString, creditString, balanceString, statusString, Remarks};
         //System.out.printf("| %-15s | %20s | %02f %n", accNo, accName,  totalBalance);
         return values;
     }
 
     public static String[] PrintHeaders(){
-        String[] headers = {"Transaction Number", "Date", "Debit", "Credit", "Balance", "Status", "Remarks"};
+        String[] headers = {"No", "Transaction Number", "Date", "Debit", "Credit", "Balance", "Status", "Remarks"};
         return headers;
     }
 }

@@ -11,26 +11,40 @@ import java.sql.*;
 public interface ServerTransactions extends SQLConnect {
     // Get transactions for specific account
     public static List<TransactionDetails> findUserTransactions(Account account) {
-        String sql = String.format("SELECT * FROM Transaction WHERE AccountID = %s", account.getAccID());
         Connection db = SQLConnect.getDBConnection();
+        
+        String sql = String.format("SELECT * FROM Transaction WHERE AccountID = %s", account.getAccID());
+        String sql2 =   """
+                        SELECT (SELECT COUNT(*) FROM Transaction WHERE AccountID = %s) - ROW_NUMBER()
+                        OVER (ORDER BY Transaction.TransactionNo) + 1 as ReverseRowNumber, Transaction.*
+                        FROM Transaction
+                        WHERE AccountID = %s
+                        ORDER BY Transaction.TransactionNo
+                        """.formatted(account.getAccID(), account.getAccID()); 
+
         List<TransactionDetails> Transactions = new ArrayList<>();
         try {
             PreparedStatement statement = db.prepareStatement(sql);
+            PreparedStatement statement2 = db.prepareStatement(sql2);
             ResultSet rs = statement.executeQuery();
+            ResultSet rs2 = statement2.executeQuery();
 
-            while (rs.next()) {
-
+            rs.next();
+            rs2.next();
+            
+            while (rs.next() && rs2.next()) {
                 // Create the Transaction object
-                TransactionDetails Transaction = new TransactionDetails(rs.getInt("TransactionID"),
-                        rs.getInt("AccountID"),
-                        rs.getString("TransactionNo"),
-                        rs.getDate("Datetime"),
-                        rs.getDate("ValueDatetime"),
-                        rs.getDouble("Debit"),
-                        rs.getDouble("Credit"),
-                        rs.getDouble("Balance"),
-                        rs.getInt("Status"),
-                        rs.getString("Remarks"));
+                TransactionDetails Transaction = new TransactionDetails(rs2.getInt("ReverseRowNumber"),
+                                                                        rs.getInt("TransactionID"),
+                                                                        rs.getInt("AccountID"),
+                                                                        rs.getString("TransactionNo"),
+                                                                        rs.getDate("Datetime"),
+                                                                        rs.getDate("ValueDatetime"),
+                                                                        rs.getDouble("Debit"),
+                                                                        rs.getDouble("Credit"),
+                                                                        rs.getDouble("Balance"),
+                                                                        rs.getInt("Status"),
+                                                                        rs.getString("Remarks"));
 
                 Transactions.add(Transaction);
             }

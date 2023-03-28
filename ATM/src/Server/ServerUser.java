@@ -202,7 +202,7 @@ public class ServerUser {
         }
 
         //Clean up
-        input.close();
+        // input.close();
 
     }
 
@@ -353,7 +353,7 @@ public class ServerUser {
             if(myRs1.next()){
                 // Check whether user is deactivated, disallow login if disabled
                 if(myRs1.getInt("Active") == 0) {
-                    System.out.println(CommandLine.Help.Ansi.ON.string("@|51 \nYour account is inactive. Please contact the bank administrator.|@"));
+                    System.out.println(CommandLine.Help.Ansi.ON.string("@|208 \nYour account is inactive. Please contact the bank administrator.|@"));
                     System.exit(1);
                 }
                 String tempPassword = AES256.encrypt(password, myRs1.getString("PasswordSalt"));
@@ -1147,18 +1147,21 @@ public class ServerUser {
         }
     }
 
+    // Checks if user input more than options allowed and count number of tries
     private static void checkPassword(String oldPass, String newPass, int tries) throws WrongException {
         if(!oldPass.equals(newPass)) {
             throw new WrongException("\nIncorrect password! " + tries + " tries left.\n");
         }
     }
 
+    // Checks if user input more than options allowed
     private static void checkOption(int number, int max) throws WrongException {
         if(number > max || number < 0) {
             throw new WrongException("\nInvalid input. Enter 0 to " + max + ".\n");
         }
     }
-
+    
+    // Checks if string input is empty or similar and prints incorrect option
     private static void checkString(String oldString, String newString, String variable) throws WrongException {
         if(newString.isEmpty() || newString.trim().isEmpty()) {
             throw new WrongException("\nField cannot be empty!\n");
