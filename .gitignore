@@ -5,3 +5,4 @@ brief/
 **/local_settings.config
 .vscode/
 .idea/
+**/.venv
