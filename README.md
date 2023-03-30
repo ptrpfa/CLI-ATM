@@ -100,7 +100,7 @@ There are three main components/folders for this project:
 ## Getting Started
 ---
 1. Download all required [files and folders](#project-components) for this project.
-2. Ensure that you have `java` installed on your machine. Click [here](https://www.java.com/en/download/help/download_options.html) for installation instructions if they are not already installed.
+2. Ensure that you have `java` (minimally Java 17) installed on your machine. Click [here](https://www.java.com/en/download/help/download_options.html) for installation instructions if they are not already installed.
 
 ## Program Usage
 ---
@@ -123,7 +123,7 @@ Follow the instructions below to setup a local database for the application:
     ```
 ### Program Execution
 1. Run the ATM application using the following command on a terminal:
-    <br>**Ensure that you are in the same working directory as the program files*
+    <br>**Ensure that you are in the same working directory as the program files (same directory as `ATM/`)*
     ```
     java -jar --enable-preview CSC1109-ATM.jar <option>
     
@@ -133,12 +133,12 @@ Follow the instructions below to setup a local database for the application:
     Register as a new user: register, new, signup, Registration
 
     ```
-2. Start banking with us! You can use any user account provided in the `credentials.md` file to test the ATM application.
+2. Start banking with us! You can use any user account provided in the [`credentials.md`](/credentials.MD) file to test the ATM application.
 
 
 ## Database Design
 ---
-Due to the connected nature of financial data, a normalised relational database was designed to facilitate the storage and use of such data. The database is designed to be scalable, and to maintain minimal data replication. Each data table has an extra column which is used as its primary key within the database. The rationale for using an extra column for identifying each row of data is due to the use of custom formats for data such as `Account Number`, `Cheque Number` and `Transaction Number`.<br>
+Due to the connected nature of financial data in the provided `bank.xlsx` dataset, a normalised relational database was designed to facilitate the storage and use of such data. The database is designed to be scalable, and to maintain minimal data replication. Each data table has an extra column which is used as its primary key within the database. The rationale for using an extra column for identifying each row of data is due to the use of custom formats for data such as `Account Number`, `Cheque Number` and `Transaction Number`.<br>
 
 ![Database Diagram](docs/database.png)<br>
 
@@ -148,7 +148,7 @@ Additionally, the database also supports real-world usecases, such as pending tr
 
 Similarly, tables associated with cheques have varying statuses to indicate whether a cheque has been cleared, and to indicate the type of account and transaction involved (ie issuing account or receiving account, and issuing transaction or receiving transaction). <br>
 
-However, for this application, these extra columns and data are not used directly, as there are ambiguities in terms of their usage, especially since this project is just in the form of just a Proof-of-Concept. There are no easy way of verifying whether a cheque has been cleared, whether a transaction is fraudulent or not and whether a transaction has been released and deemed successful. In the real-world, there are separate systems built for these purposes alone, and varying factors are involved (ie company only charge pending transactions on a certain date). Hence, whilst the database have been specifically designed to support real-life applications, these design choices may not be directly used and implemented in this application.<br>
+However, for this application, these extra columns and data are not used directly, as there are ambiguities in terms of their usage, especially since this project is just in the form of a Proof-of-Concept. There are no easy way of verifying whether a cheque has been cleared, whether a transaction is fraudulent or not and whether a transaction has been released and deemed successful. In the real-world, there are separate systems built for these purposes alone, and varying factors are involved (ie company only charge pending transactions on a certain date). Hence, whilst the database have been specifically designed to support real-life applications, these design choices may not be directly used and implemented in this application.<br>
 
 The database consists of <b>nine</b> tables, each consisting of the following data columns:
 - User
