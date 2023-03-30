@@ -1,5 +1,5 @@
 # 🏧 CSC1109 (Group 15) Automated Teller Machine Application
-Command Line-based ATM application designed to facilitate digital financial transactions, without the need for any direct interactions with banking staff.
+Command Line-based ATM application designed to facilitate digital financial transactions, without the need for any direct interactions with banking staff. A demo of our application is available [here](https://www.youtube.com/watch?v=ipexPsaOVC4).
 ![Header](docs/cli.png)
 ## Team Members
 - Peter Febrianto Afandy (2200959)
