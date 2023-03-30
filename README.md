@@ -111,9 +111,9 @@ Follow the instructions below to setup a local database for the application:
 1. Ensure that you have installed MySQL on your machine. For installation instructions, click [here](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/).
 2. On a terminal, run the following command to import the pre-configured database:
     ```
-    mysql -u<username> -p < database/sql/DatabaseFull_Setup2March2023.sql
+    mysql -u<username> -p < database/sql/DatabaseFullMockData_Setup30March2023.sql
     ```
-3. Modify the `settings.config`configuration file in `ATM/src` to connect to the local database instead of the cloud database. The following changes are required:
+3. Modify the `settings.config` configuration file in `ATM/src` to connect to the local database instead of the cloud database. The following changes are required:
     ```
     DB_HOST=localhost
     DB_PORT=3306

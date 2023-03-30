@@ -12,7 +12,7 @@ import java.security.spec.KeySpec;
 import java.util.Base64;
 
 public class AES256 {
-    private static final String SECRET_KEY = "kaiping_best";
+    private static final String SECRET_KEY = "OOP_SECRET";
     private static final int SALT_LENGTH = 16;
 
     public static String encrypt(String strToEncrypt, String salt) {
