@@ -1,7 +1,6 @@
 **/.DS_Store
 **/~.*
 brief/
-*.pdf
 **/local_settings.config
 .vscode/
 .idea/

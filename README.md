@@ -87,6 +87,8 @@ database/ (contains database and dataset programs)
 
 docs/ (contains documentation images)
 
+presentation/ (contains presentation slides)
+
 ```
 
 There are three main components/folders for this project:
