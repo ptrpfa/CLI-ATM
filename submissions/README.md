@@ -10,6 +10,7 @@ Command Line-based ATM application designed to facilitate digital financial tran
 
 ## List of Contents
 - [System Design](#system-design)
+= [UML Design](#uml-design)
 - [Features](#features)
 - [Project Components](#project-components)
 - [Getting Started](#getting-started)
@@ -70,6 +71,12 @@ To improve the user experience and make the application visually appealing for u
 <u>Password Hashing and Encryption</u><br>
 To improve the cybersecurity aspects of this application, the SHA256 hashing algorithm was used to hash user passwords, together with a randomised given salt value. Additionally, AES256 encryption was utilised on top of the hashed password to further improve its confidentiality.
 
+## UML Design
+---
+This application utilises the following UML architecture:
+![UML Design](/docs/uml.png)
+Upon completion of development, the overall UML architecture is:
+![UML Full](/docs/uml_full.png)
 
 ## Project Components
 ---
@@ -115,7 +122,7 @@ Follow the instructions below to setup a local database for the application:
     ```
     mysql -u<username> -p < database/sql/DatabaseFullMockData_Setup30March2023.sql
     ```
-3. Modify the `settings.config` configuration file in `ATM/src` to connect to the local database instead of the cloud database. The following changes are required:
+3. Modify the `settings.config` configuration file in `ATM/` to connect to the local database instead of the cloud database. The following changes are required:
     ```
     DB_HOST=localhost
     DB_PORT=3306
