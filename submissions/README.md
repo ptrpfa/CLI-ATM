@@ -10,8 +10,8 @@ Command Line-based ATM application designed to facilitate digital financial tran
 
 ## List of Contents
 - [System Design](#system-design)
-- [UML Design](#uml-design)
 - [Features](#features)
+- [UML Design](#uml-design)
 - [Project Components](#project-components)
 - [Getting Started](#getting-started)
 - [Program Usage](#program-usage)
