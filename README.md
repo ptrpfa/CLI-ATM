@@ -1,12 +1,12 @@
-# 🏧 CSC1109 (Group 15) Automated Teller Machine Application
+# 🏧 CLI-Based Automated Teller Machine Application
 Command Line-based ATM application designed to facilitate digital financial transactions, without the need for any direct interactions with banking staff. A demo of our application is available [here](https://www.youtube.com/watch?v=ipexPsaOVC4).
 ![Header](docs/cli.png)
 ## Team Members
-- Peter Febrianto Afandy (2200959)
-- Pang Zi Jian Adrian (2200692)
-- Muhammad Nur Dinie Bin Aziz (2200936)
-- Tng Jian Rong (2201014)
-- Ryan Lai Wei Shao (2201159)
+- Peter Febrianto Afandy 
+- Pang Zi Jian Adrian 
+- Muhammad Nur Dinie Bin Aziz 
+- Tng Jian Rong 
+- Ryan Lai Wei Shao 
 
 ## List of Contents
 - [System Design](#system-design)
